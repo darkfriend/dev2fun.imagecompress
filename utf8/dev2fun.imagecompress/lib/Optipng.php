@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.2.3
+ * @version 0.2.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -66,7 +66,17 @@ class Optipng
 		);
 		foreach (GetModuleEvents($this->MODULE_ID, "OnBeforeResizeImageOptipng", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$strFilePath, &$quality));
-		exec($this->pngOptimPath."/optipng -strip all -o{$quality} $strFilePath 2>&1", $res);
+		exec($this->pngOptimPath."/optipng -v", $out);
+		$execString = "-strip all -o{$quality} $strFilePath 2>&1";
+		if(!empty($out[0])) {
+			if(preg_match('#optipng.(.*?)\:#i',$out[0],$vMatch)) {
+				$vMatch = preg_replace('#(\.)#','',$vMatch[1]);
+				if($vMatch && $vMatch<70) {
+					$execString = "-o{$quality} $strFilePath 2>&1";
+				}
+			}
+		}
+		exec($this->pngOptimPath."/optipng $execString", $res);
 		chmod($strFilePath,0777);
 		foreach (GetModuleEvents($this->MODULE_ID, "OnAfterResizeImage", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$strFilePath));

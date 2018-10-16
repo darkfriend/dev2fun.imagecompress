@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.1.8
+ * @version 0.2.4
  */
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -105,8 +105,8 @@ $list->SetFilter(array(
         )
     ),
     'module_id' => array('TITLE' => GetMessage('DEV2FUN_IMAGECOMPRESS_FILTER_MODULE_ID')),
-    'original_name' => array('TITLE' => GetMessage('DEV2FUN_IMAGECOMPRESS_FILTER_ORIGINAL_NAME'), 'OPER' => '?'),
-    'file_name' => array('TITLE' => GetMessage('DEV2FUN_IMAGECOMPRESS_FILTER_FILE_NAME'), 'OPER' => '?'),
+    'original_name' => array('TITLE' => GetMessage('DEV2FUN_IMAGECOMPRESS_FILTER_ORIGINAL_NAME'), 'OPER' => ''),
+    'file_name' => array('TITLE' => GetMessage('DEV2FUN_IMAGECOMPRESS_FILTER_FILE_NAME'), 'OPER' => ''),
     'content_type' => array(
         'TITLE' => GetMessage('DEV2FUN_IMAGECOMPRESS_FILTER_FILE_TYPE'),
         'TYPE' => 'select',
@@ -139,9 +139,11 @@ $list->SetList(
             $strFilePath = \CFile::GetPath($arRec["ID"]);
             if(file_exists($_SERVER['DOCUMENT_ROOT'].$strFilePath)) {
                 if (intval($arRec['FILE_ID']) <= 0) {
-                    return "<button value='" . $arRec["ID"] . "' name='compress' data-image-id='" . $arRec["ID"] . "' href='#'>" . GetMessage("DEV2FUN_IMAGECOMPRESS_COMPRESS") . "</button>";
+                    return "<button value='" . $arRec["ID"] . "' name='compress' data-image-id='" . $arRec["ID"] . "'>" . GetMessage("DEV2FUN_IMAGECOMPRESS_COMPRESS") . "</button>";
                 } else {
-                    return GetMessage('DEV2FUN_IMAGECOMPRESS_COMRESSED');
+                    return GetMessage('DEV2FUN_IMAGECOMPRESS_COMRESSED')
+											.'<br>'
+											."<button value='" . $arRec["ID"] . "' name='compress' data-image-id='" . $arRec["ID"] . "'>" . GetMessage("DEV2FUN_IMAGECOMPRESS_COMPRESS_REPEAT") . "</button>";
                 }
             } else {
                 return "<span class='text-error'>".GetMessage('DEV2FUN_IMAGECOMPRESS_FILE_NOT_FOUND')."</span>";
