@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.2.4
+ * @version 0.2.5
  */
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -68,6 +68,8 @@ if ($_REQUEST["compress"]) {
         }
     }
 
+} elseif(!empty($_REQUEST['compress_file_delete'])) {
+	CFile::Delete(intval($_REQUEST["compress_file_delete"]));
 }
 
 $list = new AdminList($curModuleName);
@@ -146,7 +148,8 @@ $list->SetList(
 											."<button value='" . $arRec["ID"] . "' name='compress' data-image-id='" . $arRec["ID"] . "'>" . GetMessage("DEV2FUN_IMAGECOMPRESS_COMPRESS_REPEAT") . "</button>";
                 }
             } else {
-                return "<span class='text-error'>".GetMessage('DEV2FUN_IMAGECOMPRESS_FILE_NOT_FOUND')."</span>";
+								$labelBtnDelete = GetMessage("DEV2FUN_IMAGECOMPRESS_FILE_DELETE");
+                return "<span class='text-error'>".GetMessage('DEV2FUN_IMAGECOMPRESS_FILE_NOT_FOUND')."</span><br><button value='{$arRec["ID"]}' name='compress_file_delete' data-image-id='{$arRec["ID"]}'>$labelBtnDelete</button>";
             }
         },
         'SIZE_BEFORE' => function($val, $arRec){

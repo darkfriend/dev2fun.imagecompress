@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.2.3
+ * @version 0.2.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -65,8 +65,16 @@ class Jpegoptim
 				'['=>'\[',
 			)
 		);
-		foreach (GetModuleEvents($this->MODULE_ID, "OnBeforeResizeImageJpegoptim", true) as $arEvent)
-			ExecuteModuleEventEx($arEvent, array(&$strFilePath, &$quality, &$params));
+//		foreach (GetModuleEvents($this->MODULE_ID, "OnBeforeResizeImageJpegoptim", true) as $arEvent)
+//			ExecuteModuleEventEx($arEvent, array(&$strFilePath, &$quality, &$params));
+
+		$event = new \Bitrix\Main\Event(
+			$this->MODULE_ID,
+			"OnBeforeResizeImageJpegoptim",
+			array(&$strFilePath, &$quality, &$params)
+		);
+		$event->send();
+
 		$strCommand = '';
 		if(!empty($params['progressiveJpeg'])) {
 			$strCommand .= '--all-progressive';
@@ -76,9 +84,16 @@ class Jpegoptim
 			$strCommand .= " -m{$quality}";
 		}
 		exec($this->jpegOptimPath."/jpegoptim $strCommand $strFilePath 2>&1", $res);
-		chmod($strFilePath,0777);
-		foreach (GetModuleEvents($this->MODULE_ID, "OnAfterResize", true) as $arEvent)
-			ExecuteModuleEventEx($arEvent, array(&$strFilePath));
+		if(!empty($params['changeChmod']))
+			chmod($strFilePath,$params['changeChmod']);
+//		foreach (GetModuleEvents($this->MODULE_ID, "OnAfterResize", true) as $arEvent)
+//			ExecuteModuleEventEx($arEvent, array(&$strFilePath));
+		$event = new \Bitrix\Main\Event(
+			$this->MODULE_ID,
+			"OnAfterResize",
+			array(&$strFilePath)
+		);
+		$event->send();
 		return true;
 	}
 }

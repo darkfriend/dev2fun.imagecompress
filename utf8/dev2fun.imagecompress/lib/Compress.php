@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.2.3
+ * @version 0.2.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -130,6 +130,7 @@ class Compress
 				$this->jpegOptimCompress,
 				[
 					'progressiveJpeg' => $this->jpegProgress,
+					'changeChmod' => Option::get($this->MODULE_ID,'change_chmod', 0777),
 				]
 			);
 //            $strFilePath = strtr(
@@ -166,7 +167,10 @@ class Compress
 			$algInstance = $this->getAlgInstance($this->algorithmPng);
 			$res = $algInstance->compressPNG(
 				$strFilePath,
-				$this->pngOptimCompress
+				$this->pngOptimCompress,
+				[
+					'changeChmod' => Option::get($this->MODULE_ID,'change_chmod', 0777),
+				]
 			);
 //            $strFilePath = strtr(
 //                $strFilePath,
@@ -194,8 +198,19 @@ class Compress
 		$res = false;
 		if(!$intFileID) return null;
 
-		foreach (GetModuleEvents($this->MODULE_ID, "OnBeforeResizeImage", true) as $arEvent)
-			ExecuteModuleEventEx($arEvent, array(&$intFileID));
+//		foreach (GetModuleEvents($this->MODULE_ID, "OnBeforeResizeImage", true) as $arEvent)
+//			ExecuteModuleEventEx($arEvent, array(&$intFileID));
+
+		$event = new \Bitrix\Main\Event($this->MODULE_ID, "OnBeforeResizeImage",array($intFileID));
+		$event->send();
+		//		if ($event->getResults()) {
+		//			foreach($event->getResults() as $evenResult){
+		////				var_dump($evenResult);
+		//				if($evenResult->getType() == \Bitrix\Main\EventResult::SUCCESS){
+		//					$intFileID = $evenResult->getParameters();
+		//				}
+		//			}
+		//		}
 
 		$arFile  = \CFile::GetByID($intFileID)->GetNext();
 
