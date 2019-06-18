@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.2.5
+ * @version 0.2.6
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -134,7 +134,11 @@ if ($request->isPost() && check_bitrix_sessid()) {
 			Option::set($curModuleName, 'cnt_step', $cntStep);
 
 			$chmod = $request->getPost('change_chmod');
-			if (!isset($chmod)) $chmod = '0777';
+			if (!isset($chmod)) {
+				$chmod = 777;
+			} else {
+				$chmod = intval($chmod);
+			}
 			Option::set($curModuleName, 'change_chmod', $chmod);
 
 			$enableElement = $request->getPost('enable_element');
@@ -442,7 +446,7 @@ $tabControl->begin();
 		<td width="60%">
 			<input type="text"
 						 name="change_chmod"
-						 value="<?= Option::get($curModuleName,'change_chmod', '0777') ?>"
+						 value="<?= Option::get($curModuleName,'change_chmod', '777') ?>"
 			/>
 		</td>
 	</tr>

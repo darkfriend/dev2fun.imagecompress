@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.2.5
+ * @version 0.2.6
  */
 
 namespace Dev2fun\ImageCompress;
@@ -130,7 +130,7 @@ class Compress
 				$this->jpegOptimCompress,
 				[
 					'progressiveJpeg' => $this->jpegProgress,
-					'changeChmod' => Option::get($this->MODULE_ID,'change_chmod', 0777),
+					'changeChmod' => intval(Option::get($this->MODULE_ID,'change_chmod', 777)),
 				]
 			);
 //            $strFilePath = strtr(
@@ -169,7 +169,7 @@ class Compress
 				$strFilePath,
 				$this->pngOptimCompress,
 				[
-					'changeChmod' => Option::get($this->MODULE_ID,'change_chmod', 0777),
+					'changeChmod' => intval(Option::get($this->MODULE_ID,'change_chmod', 777)),
 				]
 			);
 //            $strFilePath = strtr(
