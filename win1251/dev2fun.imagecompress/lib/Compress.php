@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.2.6
+ * @version 0.2.7
  */
 
 namespace Dev2fun\ImageCompress;
@@ -130,29 +130,9 @@ class Compress
 				$this->jpegOptimCompress,
 				[
 					'progressiveJpeg' => $this->jpegProgress,
-					'changeChmod' => intval(Option::get($this->MODULE_ID,'change_chmod', 777)),
+					'changeChmod' => decoct(intval(Option::get($this->MODULE_ID,'change_chmod', 777))),
 				]
 			);
-//            $strFilePath = strtr(
-//                $strFilePath,
-//                array(
-//                    ' '=>'\ ',
-//                    '('=>'\(',
-//                    ')'=>'\)',
-//                    ']'=>'\]',
-//                    '['=>'\[',
-//                )
-//            );
-//            $strCommand = '';
-//            if($this->jpegProgress) {
-//                $strCommand .= '--all-progressive';
-//            }
-//            $strCommand .= ' --strip-all -t';
-//            if($this->jpegOptimCompress) {
-//                $strCommand .= " -m{$this->jpegOptimCompress}";
-//            }
-//            exec($this->jpegOptimPath."/jpegoptim $strCommand $strFilePath 2>&1", $res);
-//            chmod($strFilePath,0777);
 		}
 		return $res;
 	}
@@ -169,21 +149,9 @@ class Compress
 				$strFilePath,
 				$this->pngOptimCompress,
 				[
-					'changeChmod' => intval(Option::get($this->MODULE_ID,'change_chmod', 777)),
+					'changeChmod' => decoct(intval(Option::get($this->MODULE_ID,'change_chmod', 777))),
 				]
 			);
-//            $strFilePath = strtr(
-//                $strFilePath,
-//                array(
-//                    ' '=>'\ ',
-//                    '('=>'\(',
-//                    ')'=>'\)',
-//                    ']'=>'\]',
-//                    '['=>'\[',
-//                )
-//            );
-//            exec($this->pngOptimPath."/optipng -strip all -o{$this->pngOptimCompress} $strFilePath 2>&1", $res);
-//            chmod($strFilePath,0777);
 		}
 		return $res;
 	}
