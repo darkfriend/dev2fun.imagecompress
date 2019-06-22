@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.2.7
+ * @version 0.2.8
  */
 
 namespace Dev2fun\ImageCompress;
@@ -130,7 +130,7 @@ class Compress
 				$this->jpegOptimCompress,
 				[
 					'progressiveJpeg' => $this->jpegProgress,
-					'changeChmod' => decoct(intval(Option::get($this->MODULE_ID,'change_chmod', 777))),
+					'changeChmod' => $this->getChmod(Option::get($this->MODULE_ID,'change_chmod', 777)),
 				]
 			);
 		}
@@ -149,7 +149,7 @@ class Compress
 				$strFilePath,
 				$this->pngOptimCompress,
 				[
-					'changeChmod' => decoct(intval(Option::get($this->MODULE_ID,'change_chmod', 777))),
+					'changeChmod' => $this->getChmod(Option::get($this->MODULE_ID,'change_chmod', 777)),
 				]
 			);
 		}
@@ -570,4 +570,21 @@ class Compress
 		return round($fileSize, $digits) . " " . $sizes[$total];
 	}
 
+	public function getChmod($num) {
+		if(!$num) return 0777;
+		$num = intval($num);
+		switch ($num) {
+			case 644: $num = 0644; break;
+			case 660: $num = 0660; break;
+			case 664: $num = 0664; break;
+			case 666: $num = 0666; break;
+			case 700: $num = 0700; break;
+			case 744: $num = 0744; break;
+			case 755: $num = 0755; break;
+			case 775: $num = 0775; break;
+			case 777: $num = 0777; break;
+			default: $num = 0777;
+		}
+		return $num;
+	}
 }
