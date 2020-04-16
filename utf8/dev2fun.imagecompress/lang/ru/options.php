@@ -1,4 +1,4 @@
-<?
+<?php
 $MESS["MAIN_TAB_RIGHTS"] = "Доступ";
 $MESS["MAIN_TAB_TITLE_RIGHTS"] = "Уровень доступа к модулю";
 $MESS["MAIN_SAVE"] = "Сохранить";
@@ -7,6 +7,8 @@ $MESS["D2F_COMPRESS_REFERENCES_OPTIONS_SAVED"] = "Настройки успеш�
 
 $MESS["D2F_COMPRESS_REFERENCES_PATH_JPEGOPTI"] = "Путь до jpegoptim";
 $MESS["D2F_COMPRESS_REFERENCES_PATH_PNGOPTI"] = "Путь до optipng";
+$MESS["D2F_COMPRESS_REFERENCES_PATH_TO"] = "Путь до #MODULE#";
+$MESS["D2F_COMPRESS_REFERENCES_ENABLE_OPTIMIZE_TO"] = "Включить оптимизацию #MODULE#";
 $MESS["D2F_COMPRESS_REFERENCES_ENABLE_ELEMENT"] = "Включить сжатие у элементов";
 $MESS["D2F_COMPRESS_REFERENCES_ENABLE_SECTION"] = "Включить сжатие у разделов";
 $MESS["D2F_COMPRESS_REFERENCES_ENABLE_RESIZE"] = "Включить сжатие при ресайзе";
@@ -20,6 +22,7 @@ $MESS["D2F_COMPRESS_REFERENCES_TEST_BTN"] = "Тестировать конфиг
 $MESS["D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND"] = "Не найден #MODULE#. Установите на сервере #MODULE#";
 $MESS["D2F_IMAGECOMPRESS_ERROR_NOT_FOUND_ALGORITHM"] = "Не известная проблема с алгоритмом для #MODULE#";
 $MESS["D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE"] = "Алгоритм для #MODULE# не выбран!";
+$MESS["D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO"] = "Не указан путь до оптимизации #MODULE#";
 
 
 $MESS["D2F_IMAGECOMPRESS_HEADING_TEXT_SETTINGS"] = "Настройки оптимизации для #MODULE#";
@@ -70,4 +73,3 @@ $MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_ENABLE'] = "Включить автор
 $MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_WIDTH'] = "Максимальная ширина";
 $MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_HEIGHT'] = "Максимальная высота";
 $MESS['D2F_IMAGECOMPRESS_OPTIONS_RESIZE_IMAGE_ALGORITHM_SELECT'] = "Алгоритм ресайза";
-?>
