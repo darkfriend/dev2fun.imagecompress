@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.3.0
+ * @version 0.4.0
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -71,20 +71,10 @@ if ($request->isPost() && check_bitrix_sessid()) {
         $error = false;
         $algorithmJpeg = Option::get($curModuleName, 'opti_algorithm_jpeg');
         $algorithmPng = Option::get($curModuleName, 'opti_algorithm_png');
-        //        $enableJpeg = Option::get($curModuleName, 'enable_jpeg', 'N');
-        //        $enablePng = Option::get($curModuleName, 'enable_png', 'N');
-        //        $enablePdf = Option::get($curModuleName, 'enable_pdf', 'N');
-        //        if($enableJpeg==='Y' && !Check::isJPEGOptim($algorithmJpeg)) {
-        if(!Check::isJPEGOptim($algorithmJpeg)) {
-            $text[] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'jpegoptim']);
-        }
-        //        if($enablePng==='Y' && !Check::isPNGOptim($algorithmPng)) {
-        if(!Check::isPNGOptim($algorithmPng)) {
-            $text[] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'optipng']);
-        }
-        //        if($enablePdf==='Y' && !Check::isOptim('ps2pdf')) {
-        if(!Check::isOptim('ps2pdf')) {
-            $text[] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'ps2pdf']);
+        foreach (Check::$optiClasses as $algKey=>$algItem) {
+            if(!Check::isJPEGOptim($algKey)) {
+                $text[] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => $algKey]);
+            }
         }
         if (!$text) {
             $text = Loc::getMessage("D2F_COMPRESS_OPTIONS_TESTED");
@@ -108,8 +98,9 @@ if ($request->isPost() && check_bitrix_sessid()) {
             $updCheckbox = [];
             $updString = [];
 
+            // TODO: do refactor!
+            // save jpeg
             $enableJpeg = $request->getPost('enable_jpeg');
-            //            Option::set($curModuleName, 'enable_jpeg', ($enableJpeg ? 'Y' : 'N'));
             $algorithmJpeg = $request->getPost('opti_algorithm_jpeg');
             $pthJpeg = $request->getPost('path_to_jpegoptim');
             if ($pthJpeg) {
@@ -130,13 +121,9 @@ if ($request->isPost() && check_bitrix_sessid()) {
             $updString['opti_algorithm_jpeg'] = $algorithmJpeg;
             $updString['path_to_jpegoptim'] = $pthJpeg;
 
-//            if ($algorithmJpeg) {
-//                Option::set($curModuleName, 'opti_algorithm_jpeg', $algorithmJpeg);
-//            } else {
-//                throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'jpeg']));
-//            }
+            // TODO: do refactor!
+            // save png
             $enablePng = $request->getPost('enable_png');
-            //            Option::set($curModuleName, 'enable_png', ($enablePng ? 'Y' : 'N'));
             $algorithmPng = $request->getPost('opti_algorithm_png');
             $pthPng = $request->getPost('path_to_optipng');
             if ($pthPng) {
@@ -156,29 +143,15 @@ if ($request->isPost() && check_bitrix_sessid()) {
             $updCheckbox['enable_png'] = $enablePng;
             $updString['opti_algorithm_png'] = $algorithmPng;
             $updString['path_to_optipng'] = $pthPng;
-//            if ($algorithmPng) {
-//                Option::set($curModuleName, 'opti_algorithm_png', $algorithmPng);
-//            } else {
-//                throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'png']));
-//            }
 
-//            if ($pthJpeg = $request->getPost('path_to_jpegoptim')) {
-//                $pthJpeg = rtrim($pthJpeg, '/');
-//                Option::set($curModuleName, 'path_to_jpegoptim', $pthJpeg);
-//            }
 
-//            if ($pthPng = $request->getPost('path_to_optipng')) {
-//                $pthPng = rtrim($pthPng, '/');
-//                Option::set($curModuleName, 'path_to_optipng', $pthPng);
-//            }
-
+            // TODO: do refactor!
+            // save pdf
             $enablePdf = $request->getPost('enable_pdf');
             $ps2pdf = $request->getPost('path_to_ps2pdf');
             if ($ps2pdf) {
                 $ps2pdf = rtrim($ps2pdf, '/');
-//                Option::set($curModuleName, 'path_to_ps2pdf', $ps2pdf);
             }
-//            Option::set($curModuleName, 'enable_pdf', ($enablePdf ? 'Y' : 'N'));
             if($enablePdf==='Y') {
                 if(!$ps2pdf) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'pdf']));
@@ -191,6 +164,47 @@ if ($request->isPost() && check_bitrix_sessid()) {
 //            $updString['opti_algorithm_png'] = $algorithmPng;
             $updString['path_to_ps2pdf'] = $ps2pdf;
 
+
+            $saveTypes = [
+//                'webp',
+                'gif',
+                'svg',
+            ];
+            foreach ($saveTypes as $saveType) {
+                // save type
+                $enable = $request->getPost('enable_'.$saveType, 'N');
+                $algorithm = $request->getPost('opti_algorithm_'.$saveType);
+                $pth = $request->getPost('path_to_'.$saveType, '/usr/bin');
+                if ($pth) {
+                    $pth = rtrim($pth, '/');
+                }
+                if($enable==='Y') {
+                    if(!$pth) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => $saveType]));
+                    }
+                    if(!$algorithm) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => $saveType]));
+                    }
+                    if (!Check::isOptim($algorithm)) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => $saveType]));
+                    }
+                }
+                $updCheckbox['enable_'.$saveType] = $enable;
+                $updString['opti_algorithm_'.$saveType] = $algorithm;
+                $updString['path_to_'.$saveType] = $pth;
+
+                // advanced settings
+                $advanceSettings = Compress::getAlgInstance($saveType)
+                    ->getOptionsSettings($request->getPost($saveType, []));
+                if($advanceSettings && !empty($advanceSettings['checkbox'])) {
+                    $updCheckbox = array_merge($updCheckbox,$advanceSettings['checkbox']);
+                }
+                if($advanceSettings && !empty($advanceSettings['string'])) {
+                    $updString = array_merge($updString,$advanceSettings['string']);
+                }
+            }
+
+
             if($updCheckbox) {
                 foreach ($updCheckbox as $kOption => $vOption) {
                     Option::set($curModuleName, $kOption, ($vOption ? 'Y' : 'N'));
@@ -201,6 +215,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
                     Option::set($curModuleName, $kOption, $vOption);
                 }
             }
+
 
             $cntStep = $request->getPost('cnt_step');
             if (!$cntStep) $cntStep = 30;
@@ -286,12 +301,33 @@ $tabControl->begin();
     $optiAlgorithmPng = [
         'optipng' => 'Optipng',
     ];
+    $optiAlgorithmList = [
+        'jpg' => [
+            'jpegoptim',
+        ],
+        'png' => [
+            'optipng',
+        ],
+        'pdf' => [
+            'ps2pdf',
+        ],
+        'webp' => [
+            'cwebp',
+        ],
+        'gif' => [
+            'gifsicle',
+        ],
+        'svg' => [
+            'svgo',
+        ],
+    ];
     $resizeAlgorithm = [
-        BX_RESIZE_IMAGE_PROPORTIONAL => Loc::getMessage('LABEL_SETTING_OG_BX_RESIZE_IMAGE_PROPORTIONAL'),
-        BX_RESIZE_IMAGE_EXACT => Loc::getMessage('LABEL_SETTING_OG_BX_RESIZE_IMAGE_EXACT'),
-        BX_RESIZE_IMAGE_PROPORTIONAL_ALT => Loc::getMessage('LABEL_SETTING_OG_BX_RESIZE_IMAGE_PROPORTIONAL_ALT'),
+        \BX_RESIZE_IMAGE_PROPORTIONAL => Loc::getMessage('LABEL_SETTING_OG_BX_RESIZE_IMAGE_PROPORTIONAL'),
+        \BX_RESIZE_IMAGE_EXACT => Loc::getMessage('LABEL_SETTING_OG_BX_RESIZE_IMAGE_EXACT'),
+        \BX_RESIZE_IMAGE_PROPORTIONAL_ALT => Loc::getMessage('LABEL_SETTING_OG_BX_RESIZE_IMAGE_PROPORTIONAL_ALT'),
     ];
     ?>
+    <!-- JPEG-->
     <tr class="heading">
         <td colspan="2">
             <b><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_SETTINGS', ['#MODULE#' => 'JPEG']) ?></b>
@@ -357,13 +393,9 @@ $tabControl->begin();
                     <option value="<?= $i ?>" <?= ($i == $jpgCompress ? 'selected' : '') ?>><?= $i ?></option>
                 <?php } ?>
             </select>
-            <!--            <input type="text"-->
-            <!--                   name="jpegoptim_compress"-->
-            <!--                   value="--><? //=Option::get($curModuleName, "jpegoptim_compress", '80');?><!--"-->
-            <!--            />-->
         </td>
     </tr>
-
+<!--    JPEG SETTINGS-->
     <tr>
         <td width="40%">
             <label for="enable_element">
@@ -384,6 +416,7 @@ $tabControl->begin();
     </tr>
 
 
+<!--    PNG-->
     <tr class="heading">
         <td colspan="2">
             <b><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_SETTINGS', ['#MODULE#' => 'PNG']) ?></b>
@@ -492,6 +525,14 @@ $tabControl->begin();
         </td>
     </tr>
     <!-- /PDF -->
+
+    <?php
+    foreach (Check::$optiClasses as $optType=>$optClass) {
+        echo "<!-- $optType -->";
+        include __DIR__."/include/options/{$optType}.php";
+        echo "<!-- /$optType -->";
+    }
+    ?>
 
 
     <tr class="heading">

@@ -12,10 +12,11 @@ use Bitrix\Main\Config\Option;
 
 IncludeModuleLangFile(__FILE__);
 
-class Ps2Pdf
+class Svg
 {
     private static $instance;
     public $lastError;
+    public $binaryName = 'svgo';
 
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $path = '';
@@ -23,8 +24,8 @@ class Ps2Pdf
 
     private function __construct()
     {
-        $this->path = Option::get($this->MODULE_ID, 'path_to_ps2pdf');
-        $this->enable = Option::get($this->MODULE_ID, 'enable_pdf', false);
+        $this->path = Option::get($this->MODULE_ID, 'path_to_svg', '/usr/bin');
+        $this->enable = Option::get($this->MODULE_ID, 'enable_svg', false);
     }
 
     /**
@@ -44,19 +45,10 @@ class Ps2Pdf
      * Проверка возможности оптимизации pdf
      * @return bool
      */
-    public function isPdfOptim()
-    {
-        exec($this->path . '/gs -v', $s);
-        return ($s ? true : false);
-    }
-
-    /**
-     * Проверка возможности оптимизации pdf
-     * @return bool
-     */
     public function isOptim()
     {
-        return $this->isPdfOptim();
+        exec($this->path . "/{$this->binaryName} -v", $s);
+        return ($s ? true : false);
     }
 
     /**
@@ -82,20 +74,22 @@ class Ps2Pdf
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
-            "OnBeforeResizeImagePs2Pdf",
+            "OnBeforeResizeImageSvg",
             [&$strFilePath, &$params]
         );
         $event->send();
 
-        $strFilePathNew = $strFilePath.'.pdf';
         $strCommand = '';
 
-        exec($this->path . "/ps2pdf $strCommand $strFilePath $strFilePathNew 2>&1", $res);
+        exec(
+            "{$this->path}/{$this->binaryName} $strCommand --input=$strFilePath --output=$strFilePath 2>&1",
+            $res
+        );
 
-        if(file_exists($strFilePathNew)) {
-            unlink($strFilePath);
-            rename($strFilePathNew, $strFilePath);
-        }
+//        if(file_exists($strFilePathNew)) {
+//            unlink($strFilePath);
+//            rename($strFilePathNew, $strFilePath);
+//        }
 
         if (!empty($params['changeChmod'])) {
             chmod($strFilePath, $params['changeChmod']);
@@ -107,5 +101,10 @@ class Ps2Pdf
         );
         $event->send();
         return true;
+    }
+
+    public function getOptionsSettings($advanceSettings=[])
+    {
+        return [];
     }
 }

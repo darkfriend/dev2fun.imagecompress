@@ -12,7 +12,7 @@ use Bitrix\Main\Config\Option;
 
 IncludeModuleLangFile(__FILE__);
 
-class Ps2Pdf
+class Webp
 {
     private static $instance;
     public $lastError;
@@ -23,8 +23,8 @@ class Ps2Pdf
 
     private function __construct()
     {
-        $this->path = Option::get($this->MODULE_ID, 'path_to_ps2pdf');
-        $this->enable = Option::get($this->MODULE_ID, 'enable_pdf', false);
+        $this->path = Option::get($this->MODULE_ID, 'path_to_webp', '/usr/bin');
+        $this->enable = Option::get($this->MODULE_ID, 'enable_webp', false);
     }
 
     /**
@@ -44,19 +44,10 @@ class Ps2Pdf
      * Проверка возможности оптимизации pdf
      * @return bool
      */
-    public function isPdfOptim()
-    {
-        exec($this->path . '/gs -v', $s);
-        return ($s ? true : false);
-    }
-
-    /**
-     * Проверка возможности оптимизации pdf
-     * @return bool
-     */
     public function isOptim()
     {
-        return $this->isPdfOptim();
+        exec($this->path . '/cwebp -version', $s);
+        return ($s ? true : false);
     }
 
     /**
@@ -82,20 +73,29 @@ class Ps2Pdf
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
-            "OnBeforeResizeImagePs2Pdf",
+            "OnBeforeResizeImageWebp",
             [&$strFilePath, &$params]
         );
         $event->send();
 
-        $strFilePathNew = $strFilePath.'.pdf';
-        $strCommand = '';
-
-        exec($this->path . "/ps2pdf $strCommand $strFilePath $strFilePathNew 2>&1", $res);
-
-        if(file_exists($strFilePathNew)) {
-            unlink($strFilePath);
-            rename($strFilePathNew, $strFilePath);
+//        $strFilePathNew = $strFilePath.'.webp';
+        $strCommand = '-lossless ';
+        if(!empty($params['compression'])) {
+            $strCommand .= "-m {$params['compression']} ";
         }
+        if(!empty($params['multithreading'])) {
+            $strCommand .= "-mt ";
+        }
+        if(!empty($params['quality'])) {
+            $strCommand .= "-q {$params['quality']} ";
+        }
+
+        exec($this->path . "/cwebp $strCommand $strFilePath 2>&1", $res);
+
+//        if(file_exists($strFilePathNew)) {
+//            unlink($strFilePath);
+//            rename($strFilePathNew, $strFilePath);
+//        }
 
         if (!empty($params['changeChmod'])) {
             chmod($strFilePath, $params['changeChmod']);
@@ -107,5 +107,30 @@ class Ps2Pdf
         );
         $event->send();
         return true;
+    }
+
+    public function getOptionsSettings($advanceSettings=[])
+    {
+        $settings = [
+            'webp_multithreading' => 'checkbox',
+            'webp_compress' => 'string',
+            'webp_quality' => 'string',
+        ];
+        $post = [
+            'checkbox' => [],
+            'string' => [],
+        ];
+        foreach ($settings as $option=>$setting) {
+            if(empty($advanceSettings[$setting][$option])) {
+                if($setting==='checkbox') {
+                    $post[$setting][$option] = 'N';
+                } else {
+                    $post[$setting][$option] = '';
+                }
+            } else {
+                $post[$setting][$option] = $advanceSettings[$setting][$option];
+            }
+        }
+        return $post;
     }
 }

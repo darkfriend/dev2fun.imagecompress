@@ -33,6 +33,14 @@ $MESS["D2F_IMAGECOMPRESS_HEADING_TEXT_BASE_SETTINGS"] = "Общие настройки";
 $MESS["D2F_IMAGECOMPRESS_JPEGOPTIM_NOTE_TEXT"] = "Путь до jpegoptim обязательно нужно указывать, если выбран алгоритм jpegoptim для jpeg-картинок.<br>В ином случае оставьте поле пустым.";
 $MESS["D2F_IMAGECOMPRESS_OPTIPNG_NOTE_TEXT"] = "Путь до optipng обязательно нужно указывать, если выбран алгоритм optipng для png-картинок.<br>В ином случае оставьте поле пустым.";
 
+// webp settings
+$MESS["D2F_COMPRESS_REFERENCES_WEBP_QUALITY"] = "Качество картинки (%)";
+$MESS["D2F_COMPRESS_REFERENCES_WEBP_COMPRESS"] = "Степень сжатия (рекомендуется 4)";
+$MESS["D2F_COMPRESS_REFERENCES_WEBP_MULTITHREADING"] = "Многотопочность";
+
+// gif settings
+$MESS["D2F_COMPRESS_REFERENCES_GIF_COMPRESS"] = "Оптимизация gif";
+
 
 $MESS["D2F_COMPRESS_OPTIONS_TESTED"] = "Конфигурация сервера успешно протестировна";
 $MESS["D2F_COMPRESS_OPTIONS_NO_TESTED"] = "Конфигурация сервера не соответствует!";

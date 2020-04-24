@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.3.0
+ * @version 0.4.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -44,13 +44,25 @@ class Compress
 
     private $algorithmClass;
 
+    public static $supportContentType = [
+        'image/jpeg',
+        'image/png',
+        'application/pdf',
+        'image/svg',
+        'image/gif',
+    ];
+
     private static $optiClasses = [
         'jpegoptim' => '\Dev2fun\ImageCompress\Jpegoptim',
         'optipng' => '\Dev2fun\ImageCompress\Optipng',
         'ps2pdf' => '\Dev2fun\ImageCompress\Ps2Pdf',
+        'svg' => '\Dev2fun\ImageCompress\Svg',
+        'gif' => '\Dev2fun\ImageCompress\Gif',
     ];
 
     private static $instance;
+    /** @var bool state */
+    protected static $enable = true;
 
     private function __construct()
     {
@@ -86,23 +98,37 @@ class Compress
     }
 
     /**
+     * Get algorithm class
      * @param string $algorithm
-     * @return Jpegoptim|Optipng|Ps2Pdf
+     * @return null|Jpegoptim|Optipng|Ps2Pdf|Webp|Gif|Svg
      */
-    public function getAlgInstance($algorithm)
+    public static function getAlgInstance($algorithm)
     {
+        $obj = null;
         switch ($algorithm) {
             case 'jpegoptim':
-                $class = \Dev2fun\ImageCompress\Jpegoptim::getInstance();
+                $obj = \Dev2fun\ImageCompress\Jpegoptim::getInstance();
                 break;
             case 'optipng':
-                $class = \Dev2fun\ImageCompress\Optipng::getInstance();
+                $obj = \Dev2fun\ImageCompress\Optipng::getInstance();
                 break;
             case 'ps2pdf':
-                $class = \Dev2fun\ImageCompress\Ps2Pdf::getInstance();
+                $obj = \Dev2fun\ImageCompress\Ps2Pdf::getInstance();
+                break;
+            case 'webp':
+            case 'cwebp':
+                $obj = \Dev2fun\ImageCompress\Webp::getInstance();
+                break;
+            case 'gif':
+            case 'gifsicle':
+                $obj = \Dev2fun\ImageCompress\Gif::getInstance();
+                break;
+            case 'svg':
+            case 'svgo':
+                $obj = \Dev2fun\ImageCompress\Svg::getInstance();
                 break;
         }
-        return $class;
+        return $obj;
         //		return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
     }
 
@@ -130,6 +156,7 @@ class Compress
 
     public function compressJPG($strFilePath)
     {
+        if(!static::$enable) return null;
         $res = false;
         if (!$this->isJPEGOptim()) {
             if (empty($this->LAST_ERROR)) {
@@ -138,7 +165,7 @@ class Compress
             return $res;
         }
         if (file_exists($strFilePath)) {
-            $algInstance = $this->getAlgInstance($this->algorithmJpeg);
+            $algInstance = static::getAlgInstance($this->algorithmJpeg);
             $res = $algInstance->compressJPG(
                 $strFilePath,
                 $this->jpegOptimCompress,
@@ -153,13 +180,14 @@ class Compress
 
     public function compressPNG($strFilePath)
     {
+        if(!static::$enable) return null;
         $res = false;
         if (!$this->isPNGOptim()) {
             $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NO_MODULE', ['#MODULE#' => 'optipng']);
             return $res;
         }
         if (file_exists($strFilePath)) {
-            $algInstance = $this->getAlgInstance($this->algorithmPng);
+            $algInstance = static::getAlgInstance($this->algorithmPng);
             $res = $algInstance->compressPNG(
                 $strFilePath,
                 $this->pngOptimCompress,
@@ -173,8 +201,9 @@ class Compress
 
     public function compressPdf($strFilePath)
     {
+        if(!static::$enable) return null;
         $res = false;
-        $algInstance = $this->getAlgInstance('ps2pdf');
+        $algInstance = static::getAlgInstance('ps2pdf');
         if (!$algInstance->isPdfOptim()) {
             $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NO_MODULE', ['#MODULE#' => 'ps2pdf']);
             return $res;
@@ -191,6 +220,41 @@ class Compress
     }
 
     /**
+     * Запускает процесс
+     * @param string $strFilePath
+     * @param string $alg
+     * @param array $options
+     * @return bool|null
+     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     */
+    public function process($strFilePath, $alg=null, $options=[])
+    {
+        if(!static::$enable) return null;
+        $res = false;
+        if(!$alg) {
+            return $res;
+        }
+        $algInstance = static::getAlgInstance($alg);
+        if (!$algInstance->isOptim()) {
+            $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NO_MODULE', ['#MODULE#' => $alg]);
+            return $res;
+        }
+        if (\file_exists($strFilePath)) {
+            $res = $algInstance->compress(
+                $strFilePath,
+                \array_merge(
+                    [
+                        'changeChmod' => $this->getChmod(Option::get($this->MODULE_ID, 'change_chmod', 777)),
+                    ],
+                    $options
+                )
+            );
+        }
+        return $res;
+    }
+
+    /**
      * Compress image by fileID
      * @param integer $intFileID
      * @return bool|null
@@ -199,18 +263,14 @@ class Compress
     {
         global $DB;
         $res = false;
+        if(!static::$enable) return null;
         if (!$intFileID) return null;
 
         $event = new \Bitrix\Main\Event($this->MODULE_ID, "OnBeforeResizeImage", [$intFileID]);
         $event->send();
 
         $arFile = \CFile::GetByID($intFileID)->GetNext();
-        $contentTypeList = [
-            'image/jpeg',
-            'image/png',
-            'application/pdf',
-        ];
-        if (!in_array($arFile["CONTENT_TYPE"], $contentTypeList)) {
+        if (!in_array($arFile["CONTENT_TYPE"], static::$supportContentType)) {
             return null;
         }
 
@@ -230,6 +290,18 @@ class Compress
                     break;
                 case 'application/pdf' :
                     $isCompress = $this->compressPdf($strFilePath);
+                    break;
+                case 'image/svg' :
+                    $isCompress = $this->process(
+                        $strFilePath,
+                        Option::get($this->MODULE_ID, 'opti_algorithm_svg', '')
+                    );
+                    break;
+                case 'image/gif' :
+                    $isCompress = $this->process(
+                        $strFilePath,
+                        Option::get($this->MODULE_ID, 'opti_algorithm_gif', '')
+                    );
                     break;
                 default :
                     $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONTENT_TYPE', [
@@ -276,6 +348,7 @@ class Compress
      */
     public function resize($fileId, $strFilePath)
     {
+        if(!static::$enable) return false;
         if (!$strFilePath) return false;
         if (!$this->enableImageResize) return false;
 
@@ -343,6 +416,7 @@ class Compress
      */
     public static function CompressImageOnSectionEvent(&$arFields)
     {
+        if(!static::$enable) return;
         $instance = self::getInstance();
         if ($instance->enableSection && $arFields['PICTURE']) {
             $rsSection = \CIBlockSection::GetByID($arFields["ID"]);
@@ -357,6 +431,7 @@ class Compress
      */
     public static function CompressImageOnElementEvent(&$arFields)
     {
+        if(!static::$enable) return;
         $instance = self::getInstance();
         if (!$instance->enableElement) return;
         if (intval($arFields["PREVIEW_PICTURE_ID"]) > 0) {
@@ -374,12 +449,12 @@ class Compress
                 foreach ($values as $k => $v) {
                     if (is_array($v)) {
 
-                        $contentTypeList = [
-                            'image/jpeg',
-                            'image/png',
-                            'application/pdf',
-                        ];
-                        if (!in_array($v['VALUE']['type'], $contentTypeList)) {
+//                        $contentTypeList = [
+//                            'image/jpeg',
+//                            'image/png',
+//                            'application/pdf',
+//                        ];
+                        if (!in_array($v['VALUE']['type'], static::$supportContentType)) {
                             continue;
                         }
 
@@ -414,17 +489,18 @@ class Compress
      */
     public static function CompressImageOnFileEvent(&$arFile, $strFileName, $strSavePath, $bForceMD5, $bSkipExt)
     {
+        if(!static::$enable) return;
         $instance = self::getInstance();
         if (!$instance->enableSave) return;
         //		var_dump($arFile, $strFileName, $strSavePath, $bForceMD5, $bSkipExt); die();
         //		if ((!isset($arFile["MODULE_ID"]) || $arFile["MODULE_ID"] != "iblock")){
 
-        $contentTypeList = [
-            'image/jpeg',
-            'image/png',
-            'application/pdf',
-        ];
-        if (!in_array($arFile["type"], $contentTypeList)) {
+//        $contentTypeList = [
+//            'image/jpeg',
+//            'image/png',
+//            'application/pdf',
+//        ];
+        if (!in_array($arFile["type"], static::$supportContentType)) {
             return;
         }
 
@@ -439,12 +515,23 @@ class Compress
             case 'application/pdf' :
                 $isCompress = $instance->compressPdf($arFile["tmp_name"]);
                 break;
+            case 'image/svg' :
+                $isCompress = $instance->process(
+                    $arFile["tmp_name"],
+                    Option::get($instance->MODULE_ID, 'opti_algorithm_svg', '')
+                );
+                break;
+            case 'image/gif' :
+                $isCompress = $instance->process(
+                    $arFile["tmp_name"],
+                    Option::get($instance->MODULE_ID, 'opti_algorithm_gif', '')
+                );
+                break;
         }
         if ($isCompress) {
             $arFile["size"] = filesize($arFile["tmp_name"]);
         }
-        //			}
-        //		}
+
     }
 
     /**
@@ -464,15 +551,16 @@ class Compress
         &$arImageSize
     )
     {
+        if(!static::$enable) return;
         $instance = self::getInstance();
         if (!$instance->enableResize) return;
 
-        $contentTypeList = [
-            'image/jpeg',
-            'image/png',
-            'application/pdf',
-        ];
-        if (!in_array($arFile["CONTENT_TYPE"], $contentTypeList)) {
+//        $contentTypeList = [
+//            'image/jpeg',
+//            'image/png',
+//            'application/pdf',
+//        ];
+        if (!in_array($arFile["CONTENT_TYPE"], static::$supportContentType)) {
             return null;
         }
         //		if ($arFile["CONTENT_TYPE"] == "image/jpeg" || $arFile["CONTENT_TYPE"] == "image/png") {
@@ -486,8 +574,19 @@ class Compress
             case 'application/pdf' :
                 $instance->compressPdf($cacheImageFileTmp);
                 break;
+            case 'image/svg' :
+                $instance->process(
+                    $cacheImageFileTmp,
+                    Option::get($instance->MODULE_ID, 'opti_algorithm_svg', '')
+                );
+                break;
+            case 'image/gif' :
+                $instance->process(
+                    $cacheImageFileTmp,
+                    Option::get($instance->MODULE_ID, 'opti_algorithm_gif', '')
+                );
+                break;
         }
-        //		}
     }
 
     public function queryBuilder($arOrder = [], $arFilter = [])
@@ -661,5 +760,23 @@ class Compress
                 $num = 0777;
         }
         return $num;
+    }
+
+    /**
+     * Set state module
+     * @param bool $enable
+     */
+    public static function setEnable($enable)
+    {
+        static::$enable = $enable;
+    }
+
+    /**
+     * Get current state module
+     * @return bool
+     */
+    public static function getEnable()
+    {
+        return static::$enable;
     }
 }

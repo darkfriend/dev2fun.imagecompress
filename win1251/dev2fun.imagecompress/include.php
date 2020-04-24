@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.3.0
+ * @version 0.4.0
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -22,17 +22,18 @@ Loader::registerAutoLoadClasses(
         'Dev2fun\ImageCompress\AdminList' => 'lib/AdminList.php',
         'Dev2fun\ImageCompress\Check' => 'lib/Check.php',
         'Dev2fun\ImageCompress\Compress' => 'lib/Compress.php',
+        'Dev2fun\ImageCompress\Process' => 'lib/Process.php',
         "Dev2funImageCompress" => __FILE__,
 
         "Dev2fun\ImageCompress\Jpegoptim" => 'lib/Jpegoptim.php',
         "Dev2fun\ImageCompress\Optipng" => 'lib/Optipng.php',
         "Dev2fun\ImageCompress\Ps2Pdf" => 'lib/Ps2Pdf.php',
+        "Dev2fun\ImageCompress\Webp" => 'lib/Webp.php',
     ]
 );
 
 class Dev2funImageCompress
 {
-
     const MODULE_ID = 'dev2fun.imagecompress';
 
     public function DoBuildGlobalMenu(&$aGlobalMenu, &$aModuleMenu)

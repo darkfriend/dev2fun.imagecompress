@@ -12,7 +12,7 @@ use Bitrix\Main\Config\Option;
 
 IncludeModuleLangFile(__FILE__);
 
-class Ps2Pdf
+class Gif
 {
     private static $instance;
     public $lastError;
@@ -23,8 +23,8 @@ class Ps2Pdf
 
     private function __construct()
     {
-        $this->path = Option::get($this->MODULE_ID, 'path_to_ps2pdf');
-        $this->enable = Option::get($this->MODULE_ID, 'enable_pdf', false);
+        $this->path = Option::get($this->MODULE_ID, 'path_to_gif', '/usr/bin');
+        $this->enable = Option::get($this->MODULE_ID, 'enable_gif', false);
     }
 
     /**
@@ -44,19 +44,10 @@ class Ps2Pdf
      * Проверка возможности оптимизации pdf
      * @return bool
      */
-    public function isPdfOptim()
-    {
-        exec($this->path . '/gs -v', $s);
-        return ($s ? true : false);
-    }
-
-    /**
-     * Проверка возможности оптимизации pdf
-     * @return bool
-     */
     public function isOptim()
     {
-        return $this->isPdfOptim();
+        exec($this->path . '/gifsicle --version', $s);
+        return ($s ? true : false);
     }
 
     /**
@@ -80,22 +71,23 @@ class Ps2Pdf
             ]
         );
 
+        if(empty($params['compression'])) {
+            $params['compression'] = Option::get($this->MODULE_ID, 'gif_compress', 2);
+        }
+
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
-            "OnBeforeResizeImagePs2Pdf",
+            "OnBeforeResizeImageGif",
             [&$strFilePath, &$params]
         );
         $event->send();
 
-        $strFilePathNew = $strFilePath.'.pdf';
         $strCommand = '';
-
-        exec($this->path . "/ps2pdf $strCommand $strFilePath $strFilePathNew 2>&1", $res);
-
-        if(file_exists($strFilePathNew)) {
-            unlink($strFilePath);
-            rename($strFilePathNew, $strFilePath);
+        if(!empty($params['compression'])) {
+            $strCommand .= "-O{$params['compression']} ";
         }
+
+        exec($this->path . "/gifsicle $strCommand $strFilePath -o $strFilePath 2>&1", $res);
 
         if (!empty($params['changeChmod'])) {
             chmod($strFilePath, $params['changeChmod']);
@@ -107,5 +99,28 @@ class Ps2Pdf
         );
         $event->send();
         return true;
+    }
+
+    public function getOptionsSettings($advanceSettings=[])
+    {
+        $settings = [
+            'gif_compress' => 'string',
+        ];
+        $post = [
+            'checkbox' => [],
+            'string' => [],
+        ];
+        foreach ($settings as $option=>$setting) {
+            if(empty($advanceSettings[$setting][$option])) {
+                if($setting==='checkbox') {
+                    $post[$setting][$option] = 'N';
+                } else {
+                    $post[$setting][$option] = '';
+                }
+            } else {
+                $post[$setting][$option] = $advanceSettings[$setting][$option];
+            }
+        }
+        return $post;
     }
 }

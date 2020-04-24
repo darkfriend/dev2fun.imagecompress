@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.3.0
+ * @version 0.4.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -15,10 +15,15 @@ IncludeModuleLangFile(__FILE__);
 
 class Check
 {
-    private static $optiClasses = [
+    public static $optiClasses = [
         'jpegoptim' => '\Dev2fun\ImageCompress\Jpegoptim',
         'optipng' => '\Dev2fun\ImageCompress\Optipng',
         'ps2pdf' => '\Dev2fun\ImageCompress\Ps2Pdf',
+        'webp' => '\Dev2fun\ImageCompress\Webp',
+        'gif' => '\Dev2fun\ImageCompress\Gif',
+        'gifsicle' => '\Dev2fun\ImageCompress\Gif',
+        'svg' => '\Dev2fun\ImageCompress\Svg',
+        'svgo' => '\Dev2fun\ImageCompress\Svg',
     ];
 
     public static $lastError;
@@ -26,6 +31,8 @@ class Check
     /**
      * @param string $algorithm
      * @return bool
+     * @deprecated
+     * @uses Check::isOptim()
      */
     public static function isPNGOptim($algorithm)
     {
@@ -47,6 +54,8 @@ class Check
     /**
      * @param string $algorithm
      * @return bool
+     * @deprecated
+     * @uses Check::isOptim()
      */
     public static function isJPEGOptim($algorithm)
     {
@@ -84,6 +93,18 @@ class Check
             case 'ps2pdf':
                 $obj = \Dev2fun\ImageCompress\Ps2Pdf::getInstance();
                 break;
+            case 'webp':
+            case 'cwebp':
+                $obj = \Dev2fun\ImageCompress\Webp::getInstance();
+                break;
+            case 'gif':
+            case 'gifsicle':
+                $obj = \Dev2fun\ImageCompress\Gif::getInstance();
+                break;
+            case 'svg':
+            case 'svgo':
+                $obj = \Dev2fun\ImageCompress\Svg::getInstance();
+                break;
         }
         //$obj = self::$optiClasses[$algorithm]::getInstance(); // PHP7+
         $check = $obj->isOptim();
@@ -104,6 +125,7 @@ class Check
     /**
      * Делает проверку системы на корректность
      * @return bool
+     * @deprecated
      */
     public static function system()
     {
@@ -122,10 +144,12 @@ class Check
                 throw new \Exception(self::$lastError);
             }
 
-            if (!$algorithmPng)
+            if (!$algorithmPng) {
                 throw new \Exception(Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NOT_CHOICE', ['#ALGORITHM#' => 'PNG']));
-            if ($algorithmPng == 'optipng' && !Option::get(\Dev2funImageCompress::MODULE_ID, 'path_to_optipng'))
+            }
+            if ($algorithmPng == 'optipng' && !Option::get(\Dev2funImageCompress::MODULE_ID, 'path_to_optipng')) {
                 throw new \Exception('Не указан путь до optipng');
+            }
             if (!self::isPNGOptim($algorithmPng)) {
                 if (!self::$lastError)
                     self::$lastError = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_ERROR_IN_ALGORITHM', ['#ALGORITHM#' => 'PNG']);
@@ -138,20 +162,35 @@ class Check
         return $success;
     }
 
+    /**
+     * Get algorithm class
+     * @param string $algorithm
+     * @return null|Jpegoptim|Optipng|Ps2Pdf|Webp|Gif|Svg
+     */
     public static function getAlgInstance($algorithm)
     {
-        switch ($algorithm) {
-            case 'jpegoptim':
-                $obj = \Dev2fun\ImageCompress\Jpegoptim::getInstance();
-                break;
-            case 'optipng':
-                $obj = \Dev2fun\ImageCompress\Optipng::getInstance();
-                break;
-            case 'ps2pdf':
-                $obj = \Dev2fun\ImageCompress\Ps2Pdf::getInstance();
-                break;
-        }
-        return $obj;
+        return Compress::getAlgInstance($algorithm);
+//        switch ($algorithm) {
+//            case 'jpegoptim':
+//                $obj = \Dev2fun\ImageCompress\Jpegoptim::getInstance();
+//                break;
+//            case 'optipng':
+//                $obj = \Dev2fun\ImageCompress\Optipng::getInstance();
+//                break;
+//            case 'ps2pdf':
+//                $obj = \Dev2fun\ImageCompress\Ps2Pdf::getInstance();
+//                break;
+//            case 'webp':
+//                $obj = \Dev2fun\ImageCompress\Webp::getInstance();
+//                break;
+//            case 'gif':
+//                $obj = \Dev2fun\ImageCompress\Gif::getInstance();
+//                break;
+//            case 'svg':
+//                $obj = \Dev2fun\ImageCompress\Svg::getInstance();
+//                break;
+//        }
+//        return $obj;
         //return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
     }
 }
