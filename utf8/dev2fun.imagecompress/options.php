@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.4.0
+ * @version 0.4.1
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -72,7 +72,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
         $algorithmJpeg = Option::get($curModuleName, 'opti_algorithm_jpeg');
         $algorithmPng = Option::get($curModuleName, 'opti_algorithm_png');
         foreach (Check::$optiClasses as $algKey=>$algItem) {
-            if(!Check::isJPEGOptim($algKey)) {
+            if(!Check::isOptim($algKey)) {
                 $text[] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => $algKey]);
             }
         }
