@@ -81,3 +81,15 @@ $MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_ENABLE'] = "Включить авторесайз";
 $MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_WIDTH'] = "Максимальная ширина";
 $MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_HEIGHT'] = "Максимальная высота";
 $MESS['D2F_IMAGECOMPRESS_OPTIONS_RESIZE_IMAGE_ALGORITHM_SELECT'] = "Алгоритм ресайза";
+
+
+$MESS['MAIN_TAB_SET_OPTI'] = "Оптимизация";
+$MESS['MAIN_TAB_CONVERT'] = "Конвертация";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_BASE_CONVERT'] = "Настройки конвертации";
+$MESS['D2F_COMPRESS_REFERENCES_ENABLE_CONVERT'] = "Активность конвертации в webp";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_CONVERT'] = "Алгоритм конвертации в webp";
+$MESS['D2F_COMPRESS_REFERENCES_WEBP_QUALITY'] = "Качество картинки в webp";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_CWEBP'] = "Настройки для алгоритма cwebp";
+$MESS['D2F_COMPRESS_REFERENCES_PATH_CWEBP'] = "Путь до cwebp";
+$MESS['D2F_COMPRESS_REFERENCES_CWEBP_COMPRESS'] = "Степень оптимизации cwebp (рекомендуется 4)";
+$MESS['D2F_COMPRESS_REFERENCES_CWEBP_MULTITHREADING'] = "Активность мультипоточности при конвертации (рекомендуется)";

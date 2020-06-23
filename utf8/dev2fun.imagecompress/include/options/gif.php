@@ -1,9 +1,8 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: darkfriend <hi@darkfriend.ru>
- * Date: 24.04.2020
- * Time: 2:37
+ * @author darkfriend <hi@darkfriend.ru>
+ * @copyright dev2fun
+ * @version 0.5.0
  */
 ?>
 <?php
@@ -61,7 +60,7 @@ use \Bitrix\Main\Config\Option;
                size="50"
                name="path_to_<?=$optType?>"
                value="<?= Option::get($curModuleName, "path_to_{$optType}", '/usr/bin'); ?>"
-        /> /<?=$optType?>
+        /> /gifsicle
     </td>
 </tr>
 

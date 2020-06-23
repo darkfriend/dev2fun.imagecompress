@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.4.0
+ * @version 0.5.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -19,10 +19,11 @@ class Check
         'jpegoptim' => '\Dev2fun\ImageCompress\Jpegoptim',
         'optipng' => '\Dev2fun\ImageCompress\Optipng',
         'ps2pdf' => '\Dev2fun\ImageCompress\Ps2Pdf',
-        'webp' => '\Dev2fun\ImageCompress\Webp',
-        'gif' => '\Dev2fun\ImageCompress\Gif',
+//        'webp' => '\Dev2fun\ImageCompress\Webp',
+        'cwebp' => '\Dev2fun\ImageCompress\Webp',
+//        'gif' => '\Dev2fun\ImageCompress\Gif',
         'gifsicle' => '\Dev2fun\ImageCompress\Gif',
-        'svg' => '\Dev2fun\ImageCompress\Svg',
+//        'svg' => '\Dev2fun\ImageCompress\Svg',
         'svgo' => '\Dev2fun\ImageCompress\Svg',
     ];
 

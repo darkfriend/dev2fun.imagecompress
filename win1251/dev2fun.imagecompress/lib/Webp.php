@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.4.0
+ * @version 0.5.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -18,18 +18,33 @@ class Webp
     public $lastError;
 
     private $MODULE_ID = 'dev2fun.imagecompress';
-    private $path = '';
+    private $path = '/usr/bin';
     private $enable = false;
+    private $quality = 80;
+    private $compression = 4;
+    private $multithreading = true;
 
     private function __construct()
     {
         $this->path = Option::get($this->MODULE_ID, 'path_to_webp', '/usr/bin');
-        $this->enable = Option::get($this->MODULE_ID, 'enable_webp', false);
+        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
+
+        $this->quality = Option::get($this->MODULE_ID, 'webp_quality', 80);
+        if(!$this->quality) {
+            $this->quality = 80;
+        }
+
+        $this->compression = Option::get($this->MODULE_ID, 'cwebp_compress', 4);
+        if(!$this->compression && $this->compression!==0) {
+            $this->compression = 4;
+        }
+
+        $this->multithreading = Option::get($this->MODULE_ID, 'cwebp_multithreading', 'Y') === 'Y';
     }
 
     /**
      * @static
-     * @return Ps2Pdf
+     * @return Webp
      */
     public static function getInstance()
     {
@@ -52,35 +67,62 @@ class Webp
 
     /**
      * Процесс оптимизации JPEG
-     * @param string $strFilePath - абсолютный путь до картинки
+     * @param array $arFile
      * @param array $params - дополнительные параметры
      * @return bool
      * @throws \Exception
      */
-    public function compress($strFilePath, $params = [])
+    public function convert($arFile, $params = [])
     {
         if(!$this->enable) return false;
-        $strFilePath = strtr(
-            $strFilePath,
-            [
-                ' ' => '\ ',
-                '(' => '\(',
-                ')' => '\)',
-                ']' => '\]',
-                '[' => '\[',
-            ]
-        );
+
+//        $strFilePath = strtr(
+//            $strFilePath,
+//            [
+//                ' ' => '\ ',
+//                '(' => '\(',
+//                ')' => '\)',
+//                ']' => '\]',
+//                '[' => '\[',
+//            ]
+//        );
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
-            "OnBeforeResizeImageWebp",
-            [&$strFilePath, &$params]
+            "OnBeforeConvertImageWebp",
+            [&$arFile, &$params]
         );
         $event->send();
 
-//        $strFilePathNew = $strFilePath.'.webp';
+        $uploadDir = Option::get('main', 'upload_dir', 'upload');
+        $src = "{$_SERVER["DOCUMENT_ROOT"]}/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        $fileInfo = \pathinfo($src);
+        $srcWebp = "/{$uploadDir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.webp";
+        $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
+
+        if(\is_file($absSrcWebp)) {
+            return $srcWebp;
+        }
+        $dirname = \dirname($absSrcWebp);
+        if(!\is_dir($dirname)) {
+            @\mkdir($dirname,0777, true);
+        }
+
+        if(!isset($params['compression'])) {
+            $params['compression'] = $this->compression;
+        }
+        if(!isset($params['multithreading'])) {
+            $params['multithreading'] = $this->multithreading;
+        }
+        if(!isset($params['quality'])) {
+            $params['quality'] = $this->quality;
+        }
+        if(!isset($params['changeChmod'])) {
+            $params['changeChmod'] = 0777;
+        }
+
         $strCommand = '-lossless ';
-        if(!empty($params['compression'])) {
+        if(!empty($params['compression']) || $params['compression']===0) {
             $strCommand .= "-m {$params['compression']} ";
         }
         if(!empty($params['multithreading'])) {
@@ -90,23 +132,19 @@ class Webp
             $strCommand .= "-q {$params['quality']} ";
         }
 
-        exec($this->path . "/cwebp $strCommand $strFilePath 2>&1", $res);
-
-//        if(file_exists($strFilePathNew)) {
-//            unlink($strFilePath);
-//            rename($strFilePathNew, $strFilePath);
-//        }
-
+        \exec("{$this->path}/cwebp $strCommand $src -o $absSrcWebp 2>&1", $res);
         if (!empty($params['changeChmod'])) {
-            chmod($strFilePath, $params['changeChmod']);
+            @\chmod($absSrcWebp, $params['changeChmod']);
         }
+
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
             "OnAfterResize",
-            [&$strFilePath]
+            [&$srcWebp]
         );
         $event->send();
-        return true;
+
+        return $srcWebp;
     }
 
     public function getOptionsSettings($advanceSettings=[])

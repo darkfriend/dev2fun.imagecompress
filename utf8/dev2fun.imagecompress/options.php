@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.4.1
+ * @version 0.5.0
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -27,9 +27,15 @@ Loc::loadMessages(__FILE__);
 $aTabs = [
     [
         "DIV" => "edit1",
-        "TAB" => Loc::getMessage("MAIN_TAB_SET"),
+        "TAB" => Loc::getMessage("MAIN_TAB_SET_OPTI"),
         "ICON" => "main_settings",
         "TITLE" => Loc::getMessage("MAIN_TAB_TITLE_SET"),
+    ],
+    [
+        "DIV" => "edit2",
+        "TAB" => Loc::getMessage("MAIN_TAB_CONVERT"),
+        "ICON" => "main_settings",
+        "TITLE" => Loc::getMessage("MAIN_TAB_TITLE_CONVERT"),
     ],
     [
         "DIV" => "donate",
@@ -194,7 +200,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 $updString['path_to_'.$saveType] = $pth;
 
                 // advanced settings
-                $advanceSettings = Compress::getAlgInstance($saveType)
+                $advanceSettings = \Dev2fun\ImageCompress\Compress::getAlgInstance($saveType)
                     ->getOptionsSettings($request->getPost($saveType, []));
                 if($advanceSettings && !empty($advanceSettings['checkbox'])) {
                     $updCheckbox = array_merge($updCheckbox,$advanceSettings['checkbox']);
@@ -203,6 +209,27 @@ if ($request->isPost() && check_bitrix_sessid()) {
                     $updString = array_merge($updString,$advanceSettings['string']);
                 }
             }
+
+
+            // set convert options
+            $updCheckbox['convert_enable'] = $request->getPost('convert_enable', 'N') === 'Y';
+            $updCheckbox['cwebp_multithreading'] = $request->getPost('cwebp_multithreading', 'N') === 'Y';
+
+            $updString['convert_algorithm'] = $request->getPost('convert_algorithm', 'phpWebp');
+            $updString['webp_quality'] = $request->getPost('webp_quality', '80');
+            $updString['path_to_cwebp'] = $request->getPost('path_to_cwebp', '/usr/bin');
+            if ($updString['path_to_cwebp']) {
+                $updString['path_to_cwebp'] = rtrim($updString['path_to_cwebp'], '/');
+            }
+            if($updString['convert_algorithm']==='cwebp') {
+                if(!$updString['path_to_cwebp']) {
+                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'cwebp']));
+                }
+                if (!Check::isOptim('cwebp')) {
+                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'cwebp']));
+                }
+            }
+            $updString['cwebp_compress'] = $request->getPost('cwebp_compress', '4');
 
 
             if($updCheckbox) {
@@ -527,7 +554,10 @@ $tabControl->begin();
     <!-- /PDF -->
 
     <?php
-    foreach (Check::$optiClasses as $optType=>$optClass) {
+    foreach (Dev2funImageCompress::$supportFormats as $optType) {
+        if(!file_exists(__DIR__."/include/options/{$optType}.php")) {
+            continue;
+        }
         echo "<!-- $optType -->";
         include __DIR__."/include/options/{$optType}.php";
         echo "<!-- /$optType -->";
@@ -712,6 +742,7 @@ $tabControl->begin();
         </td>
     </tr>
 
+    <?php include __DIR__.'/tabs/convert.php'?>
     <?php include __DIR__.'/tabs/donate.php'?>
 
     <?php
