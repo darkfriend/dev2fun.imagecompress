@@ -106,7 +106,8 @@ class WebpConvertPhp
             \mkdir($dirname,0777, true);
         }
 //        var_dump($absSrcWebp); die();
-        switch($arFile['CONTENT_TYPE']) {
+//        switch($arFile['CONTENT_TYPE']) {
+        switch(\mime_content_type($src)) {
             case 'image/png':
                 $img = \imageCreateFromPng($src);
                 break;
