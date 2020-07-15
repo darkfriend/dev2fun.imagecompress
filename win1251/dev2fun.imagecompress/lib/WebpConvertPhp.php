@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.0
+ * @version 0.5.2
  */
 
 namespace Dev2fun\ImageCompress;
@@ -67,7 +67,7 @@ class WebpConvertPhp
      */
     public function convert($arFile, $params = [])
     {
-        if(!$this->enable) return null;
+        if(!$this->enable) return false;
 
 //        $strFilePath = strtr(
 //            $strFilePath,
@@ -116,7 +116,7 @@ class WebpConvertPhp
                 break;
         }
         if(empty($img)) {
-            return null;
+            return false;
         }
         \imageWebp(
             $img,

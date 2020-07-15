@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.0
+ * @version 0.5.2
  */
 
 namespace Dev2fun\ImageCompress;
@@ -80,21 +80,21 @@ class Convert
      */
     public function process($arFile, $options=[])
     {
-        if(!static::$enable) return null;
-        $res = null;
+        if(!static::$enable) return false;
+        $res = false;
 
         $event = new \Bitrix\Main\Event($this->MODULE_ID, "OnBeforeConvertImage", [&$arFile]);
         $event->send();
         if($arFile === false) {
-            return null;
+            return false;
         }
 
         if(!static::checkWebpSupport()) {
-            return null;
+            return false;
         }
 
         if (!\in_array($arFile["CONTENT_TYPE"], static::$supportContentType)) {
-            return null;
+            return false;
         }
 
         $alg = Option::get($this->MODULE_ID, 'convert_algorithm', 'phpWebp');
@@ -109,7 +109,7 @@ class Convert
 
         $strFilePath = $_SERVER["DOCUMENT_ROOT"] . $res;
         if (!\is_file($strFilePath)) {
-            return null;
+            return false;
         }
 
 //        $upload_dir = Option::get('main', 'upload_dir', 'upload');
