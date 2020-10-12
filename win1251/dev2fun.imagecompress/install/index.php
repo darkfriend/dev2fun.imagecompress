@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.0
+ * @version 0.5.3
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 \Bitrix\Main\Localization\Loc::loadMessages(__FILE__);
@@ -184,6 +184,7 @@ class dev2fun_imagecompress extends CModule
         $eventManager->registerEventHandler("main", "OnBuildGlobalMenu", $this->MODULE_ID, "Dev2funImageCompress", "DoBuildGlobalMenu");
 
         $eventManager->registerEventHandler("main", "OnGetFileSRC", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "CompressImageOnConvertEvent");
+        $eventManager->registerEventHandler("main", "OnAfterResizeImage", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "CompressImageCacheOnConvertEvent", 10);
 
         return true;
     }
@@ -229,6 +230,7 @@ class dev2fun_imagecompress extends CModule
         $eventManager->unRegisterEventHandler('main', 'OnBuildGlobalMenu', $this->MODULE_ID);
 
         $eventManager->unRegisterEventHandler('main', 'OnGetFileSRC', $this->MODULE_ID);
+        $eventManager->unRegisterEventHandler('main', 'OnAfterResizeImage', $this->MODULE_ID);
 
         return true;
     }

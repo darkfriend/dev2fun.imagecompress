@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.2
+ * @version 0.5.3
  */
 
 namespace Dev2fun\ImageCompress;
@@ -98,6 +98,9 @@ class WebpConvertPhp
 //        $srcWebp = "/{$upload_dir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}.webp";
 
         if(\is_file($absSrcWebp)) {
+            if(\filesize($absSrcWebp==0)) {
+                return false;
+            }
             return $srcWebp;
         }
         $dirname = \dirname($absSrcWebp);
@@ -105,11 +108,11 @@ class WebpConvertPhp
         if(!\is_dir($dirname)) {
             \mkdir($dirname,0777, true);
         }
-//        var_dump($absSrcWebp); die();
-//        switch($arFile['CONTENT_TYPE']) {
+
         switch(\mime_content_type($src)) {
             case 'image/png':
                 $img = \imageCreateFromPng($src);
+                \imagepalettetotruecolor($img);
                 break;
             case 'image/jpeg':
                 $img = \imageCreateFromJpeg($src);

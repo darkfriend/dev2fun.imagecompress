@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.2
+ * @version 0.5.3
  */
 
 namespace Dev2fun\ImageCompress;
@@ -125,6 +125,77 @@ class Convert
                 $options
             )
         );
+    }
+
+    /**
+     * Событие на ресайзе
+     * @param array $arFile
+     * @param array $arInfo
+     * @param array $callbackData
+     * @param string $cacheImageFile
+     * @param string $cacheImageFileTmp
+     * @param array $arImageSize
+     * @return bool
+     * @throws \ErrorException
+     */
+    public static function CompressImageCacheOnConvertEvent(
+        $arFile,
+        $arInfo,
+        &$callbackData,
+        &$cacheImageFile,
+        &$cacheImageFileTmp,
+        &$arImageSize
+    )
+    {
+        if(!static::$enable) return false;
+        if(!static::checkWebpSupport()) return false;
+
+        $urlFile = \parse_url($cacheImageFile);
+        $uploadDir = Option::get('main', 'upload_dir', 'upload');
+
+        $urlFile['path'] = \str_replace("/$uploadDir/",'',$urlFile['path']);
+        $urlFile['path'] = \str_replace("/{$arFile['FILE_NAME']}",'',$urlFile['path']);
+
+        $arFileConvert = [
+            'CONTENT_TYPE' => $arFile['CONTENT_TYPE'],
+            'SUBDIR' => $urlFile['path'],
+            'FILE_NAME' => $arFile['FILE_NAME'],
+        ];
+
+        $event = new \Bitrix\Main\Event(self::getInstance()->MODULE_ID, "OnBeforeConvertImageResize", [&$arFileConvert]);
+        $event->send();
+        if($arFile === false) {
+            return false;
+        }
+
+        if (!\in_array($arFileConvert["CONTENT_TYPE"], static::$supportContentType)) {
+            return false;
+        }
+
+        $alg = Option::get(self::getInstance()->MODULE_ID, 'convert_algorithm', 'phpWebp');
+        $algInstance = static::getAlgInstance($alg);
+        if (!$algInstance->isOptim()) {
+            return false;
+        }
+
+        $res = "/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+
+        $strFilePath = $_SERVER["DOCUMENT_ROOT"] . $res;
+        if (!\is_file($strFilePath)) {
+            return false;
+        }
+
+        $webpPath = $algInstance->convert(
+            $arFileConvert,
+            [
+                'changeChmod' => self::getInstance()->getChmod(Option::get(self::getInstance()->MODULE_ID, 'change_chmod', 777)),
+            ]
+        );
+
+        if($webpPath) {
+            $cacheImageFile = $webpPath;
+            return true;
+        }
     }
 
     /**
