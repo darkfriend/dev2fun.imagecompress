@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.3
+ * @version 0.5.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -329,8 +329,8 @@ class Convert
         if (\preg_match('#\/bitrix\/#', $APPLICATION->GetCurPage())) {
             return false;
         }
-        if (\strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) !== false) {
-            return true;
+        if (\strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) === false) {
+            return false;
         }
         return \in_array(
             self::getBrowserAgentName($_SERVER["HTTP_USER_AGENT"]),
