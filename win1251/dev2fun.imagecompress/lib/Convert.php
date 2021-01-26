@@ -336,17 +336,17 @@ class Convert
     {
         $userAgent = \mb_strtolower($userAgent);
         switch ($userAgent) {
-            case \strpos($userAgent, 'opera') || \strpos($userAgent, 'opr/'):
+            case \strpos($userAgent, 'opera') !== false || \strpos($userAgent, 'opr/') !== false:
                 return 'opera';
-            case \strpos($userAgent, 'edge'):
+            case \strpos($userAgent, 'edge') !== false:
                 return 'edge';
-            case \strpos($userAgent, 'chrome'):
+            case \strpos($userAgent, 'chrome') !== false:
                 return 'chrome';
-            case \strpos($userAgent, 'safari'):
+            case \strpos($userAgent, 'safari') !== false:
                 return 'safari';
-            case \strpos($userAgent, 'firefox'):
+            case \strpos($userAgent, 'firefox') !== false:
                 return 'firefox';
-            case strpos($userAgent, 'msie') || strpos($userAgent, 'trident/7'):
+            case strpos($userAgent, 'msie') !== false || strpos($userAgent, 'trident/7') !== false:
                 return 'msie';
         }
 
