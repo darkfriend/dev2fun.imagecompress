@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.3
+ * @version 0.5.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -44,7 +44,7 @@ class WebpConvertPhp
     }
 
     /**
-     * Проверка возможности конвертирования
+     * Check
      * @return bool
      */
     public function isOptim()
@@ -59,7 +59,7 @@ class WebpConvertPhp
     }
 
     /**
-     * Процесс оптимизации JPEG
+     * Process convert
      * @param array $arFile
      * @param array $params - дополнительные параметры
      * @return bool|null
@@ -97,8 +97,8 @@ class WebpConvertPhp
 //        $src = "{$_SERVER["DOCUMENT_ROOT"]}/$upload_dir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
 //        $srcWebp = "/{$upload_dir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}.webp";
 
-        if(\is_file($absSrcWebp)) {
-            if(\filesize($absSrcWebp==0)) {
+        if(@\is_file($absSrcWebp)) {
+            if(\filesize($absSrcWebp)===0) {
                 return false;
             }
             return $srcWebp;

@@ -97,6 +97,8 @@
 | OnBeforeResizeImageJpegoptim | &$strFilePath - путь до файла,<br> &$quality - качество картинки,<br> &$params - дополнительные параметры  | Событие запускается перед началом оптимизации jpeg-картинок |
 | OnBeforeResizeImageOptipng | &$strFilePath - путь до файла,<br> &$quality - степень сжатия картинки,<br> &$params - дополнительные параметры  | Событие запускается перед началом оптимизации png-картинок |
 | OnAfterResizeImage | &$strFilePath - путь до файла | Событие запускается после оптимизации |
+| OnBeforeCheckWebpBrowserSupport | &$supportBrowsers - массив поддерживаемых браузеров | Событие запускается перед проверкой браузера |
+| OnAfterCheckWebpSupport | $result - результат проверки на поддержку webp,<br> обязательно сделайте `return $result;` | Событие запускается после всех проверок на поддержку webp |
 
 ## Donate
 

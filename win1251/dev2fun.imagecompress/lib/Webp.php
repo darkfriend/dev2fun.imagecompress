@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.2
+ * @version 0.5.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -56,7 +56,7 @@ class Webp
     }
 
     /**
-     * Проверка возможности оптимизации pdf
+     * Check
      * @return bool
      */
     public function isOptim()
@@ -66,7 +66,7 @@ class Webp
     }
 
     /**
-     * Процесс оптимизации JPEG
+     * Process convert
      * @param array $arFile
      * @param array $params - дополнительные параметры
      * @return bool
@@ -100,7 +100,10 @@ class Webp
         $srcWebp = "/{$uploadDir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.webp";
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
 
-        if(\is_file($absSrcWebp)) {
+        if(@\is_file($absSrcWebp)) {
+            if(\filesize($absSrcWebp)===0) {
+                return false;
+            }
             return $srcWebp;
         }
         $dirname = \dirname($absSrcWebp);

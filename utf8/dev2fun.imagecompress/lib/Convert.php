@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.4
+ * @version 0.5.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -73,10 +73,10 @@ class Convert
     }
 
     /**
-     * Запускает процесс
+     * Start process convert
      * @param array $arFile
      * @param array $options
-     * @return bool|null
+     * @return bool|null|string
      */
     public function process($arFile, $options=[])
     {
@@ -128,7 +128,7 @@ class Convert
     }
 
     /**
-     * Событие на ресайзе
+     * Событие на ресайзе (OnAfterResizeImage)
      * @param array $arFile
      * @param array $arInfo
      * @param array $callbackData
@@ -252,25 +252,41 @@ class Convert
         return $res;
     }
 
+    /**
+     * Handler for OnGetFileSRC
+     * @param array $arFile
+     * @return bool|null
+     */
     public static function CompressImageOnConvertEvent($arFile)
     {
         return self::getInstance()->process($arFile);
     }
 
+    /**
+     * Get normalize file size
+     * @param int $fileSize
+     * @param int $digits
+     * @return string
+     */
     public function getNiceFileSize($fileSize, $digits = 2)
     {
         $sizes = ["TB", "GB", "MB", "KB", "B"];
-        $total = count($sizes);
+        $total = \count($sizes);
         while ($total-- && $fileSize > 1024) {
             $fileSize /= 1024;
         }
-        return round($fileSize, $digits) . " " . $sizes[$total];
+        return \round($fileSize, $digits) . " " . $sizes[$total];
     }
 
+    /**
+     * Get normalize chmod value
+     * @param string|int $num
+     * @return int
+     */
     public function getChmod($num)
     {
         if (!$num) return 0777;
-        $num = intval($num);
+        $num = \intval($num);
         switch ($num) {
             case 644:
                 $num = 0644;
@@ -323,45 +339,78 @@ class Convert
         return static::$enable;
     }
 
+    /**
+     * Get result check webp support
+     * @return bool
+     */
     public static function checkWebpSupport()
     {
         global $APPLICATION;
-        if (\preg_match('#\/bitrix\/#', $APPLICATION->GetCurPage())) {
+        if (\preg_match('#\/bitrix\/admin\/#', $APPLICATION->GetCurPage())) {
             return false;
         }
-        if (\strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) === false) {
-            return false;
-        }
-        return \in_array(
-            self::getBrowserAgentName($_SERVER["HTTP_USER_AGENT"]),
-            [
-                'chrome',
-                'opera',
-            ]
+//        if (\strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) === false) {
+//            return false;
+//        }
+
+        $supportBrowsers = [
+            'chrome',
+            'opera',
+        ];
+        $event = new \Bitrix\Main\Event(
+            self::getInstance()->MODULE_ID,
+            'OnBeforeCheckWebpBrowserSupport',
+            [&$supportBrowsers]
         );
+        $event->send();
+
+        $result = \in_array(
+            self::getBrowserAgentName($_SERVER["HTTP_USER_AGENT"]),
+            $supportBrowsers
+        );
+
+        $event = new \Bitrix\Main\Event(self::getInstance()->MODULE_ID, "OnAfterCheckWebpSupport", [$result]);
+        $event->send();
+        if ($event->getResults()) {
+            foreach ($event->getResults() as $evenResult) {
+                if ($evenResult->getResultType() == \Bitrix\Main\EventResult::SUCCESS) {
+                    $result = (bool) $evenResult->getParameters();
+                }
+            }
+        }
+
+        return (bool) $result;
     }
 
+    /**
+     * Get browser name
+     * @param string $userAgent
+     * @return string
+     */
     public static function getBrowserAgentName($userAgent)
     {
         $result = 'Other';
+        if(!$userAgent) {
+            return $result;
+        }
         $userAgent = \mb_strtolower($userAgent);
         switch ($userAgent) {
-            case \strpos($userAgent, 'opera') || \strpos($userAgent, 'opr/'):
+            case \strpos($userAgent, 'opera')!==false || \strpos($userAgent, 'opr/')!==false:
                 $result = 'opera';
                 break;
-            case \strpos($userAgent, 'edge'):
+            case \strpos($userAgent, 'edge')!==false:
                 $result = 'edge';
                 break;
-            case \strpos($userAgent, 'chrome'):
+            case \strpos($userAgent, 'chrome')!==false:
                 $result = 'chrome';
                 break;
-            case \strpos($userAgent, 'safari'):
+            case \strpos($userAgent, 'safari')!==false:
                 $result = 'safari';
                 break;
-            case \strpos($userAgent, 'firefox'):
+            case \strpos($userAgent, 'firefox')!==false:
                 $result = 'firefox';
                 break;
-            case strpos($userAgent, 'msie') || strpos($userAgent, 'trident/7'):
+            case \strpos($userAgent, 'msie')!==false || \strpos($userAgent, 'trident/7')!==false:
                 $result = 'msie';
                 break;
         }
