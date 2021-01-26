@@ -20,9 +20,9 @@ class Convert
     public static $supportContentType = [
         'image/jpeg',
         'image/png',
-//        'application/pdf',
+        //        'application/pdf',
         'image/svg',
-//        'image/gif',
+        //        'image/gif',
     ];
 
     public static $convertClasses = [
@@ -59,17 +59,15 @@ class Convert
      */
     public static function getAlgInstance($algorithm)
     {
-        $obj = null;
         switch ($algorithm) {
             case 'cwebp':
-                $obj = \Dev2fun\ImageCompress\Webp::getInstance();
-                break;
+                return \Dev2fun\ImageCompress\Webp::getInstance();
             case 'phpWebp':
-                $obj = \Dev2fun\ImageCompress\WebpConvertPhp::getInstance();
-                break;
+                return \Dev2fun\ImageCompress\WebpConvertPhp::getInstance();
         }
-        return $obj;
-//        return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
+
+        return null;
+        //        return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
     }
 
     /**
@@ -112,9 +110,9 @@ class Convert
             return false;
         }
 
-//        $upload_dir = Option::get('main', 'upload_dir', 'upload');
-//        $src = "{$_SERVER["DOCUMENT_ROOT"]}/$upload_dir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
-//        $srcWebp = "/{$upload_dir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}.webp";
+        //        $upload_dir = Option::get('main', 'upload_dir', 'upload');
+        //        $src = "{$_SERVER["DOCUMENT_ROOT"]}/$upload_dir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        //        $srcWebp = "/{$upload_dir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}.webp";
 
         return $algInstance->convert(
             $arFile,
@@ -210,9 +208,9 @@ class Convert
 
         $arFile = \CFile::GetByID($intFileID)->GetNext();
 
-//        if ($this->enableImageResize) {
-//            $this->resize($intFileID, $strFilePath);
-//        }
+        //        if ($this->enableImageResize) {
+        //            $this->resize($intFileID, $strFilePath);
+        //        }
 
         return $this->process($arFile);
     }
@@ -269,40 +267,31 @@ class Convert
 
     public function getChmod($num)
     {
-        if (!$num) return 0777;
+        if (!$num) {
+            return 0777;
+        }
+
         $num = intval($num);
         switch ($num) {
             case 644:
-                $num = 0644;
-                break;
+                return 0644;
             case 660:
-                $num = 0660;
-                break;
+                return 0660;
             case 664:
-                $num = 0664;
-                break;
+                return 0664;
             case 666:
-                $num = 0666;
-                break;
+                return 0666;
             case 700:
-                $num = 0700;
-                break;
+                return 0700;
             case 744:
-                $num = 0744;
-                break;
+                return 0744;
             case 755:
-                $num = 0755;
-                break;
+                return 0755;
             case 775:
-                $num = 0775;
-                break;
-            case 777:
-                $num = 0777;
-                break;
+                return 0775;
             default:
-                $num = 0777;
+                return 0777;
         }
-        return $num;
     }
 
     /**
@@ -343,29 +332,22 @@ class Convert
 
     public static function getBrowserAgentName($userAgent)
     {
-        $result = 'Other';
         $userAgent = \mb_strtolower($userAgent);
         switch ($userAgent) {
             case \strpos($userAgent, 'opera') || \strpos($userAgent, 'opr/'):
-                $result = 'opera';
-                break;
+                return 'opera';
             case \strpos($userAgent, 'edge'):
-                $result = 'edge';
-                break;
+                return 'edge';
             case \strpos($userAgent, 'chrome'):
-                $result = 'chrome';
-                break;
+                return 'chrome';
             case \strpos($userAgent, 'safari'):
-                $result = 'safari';
-                break;
+                return 'safari';
             case \strpos($userAgent, 'firefox'):
-                $result = 'firefox';
-                break;
+                return 'firefox';
             case strpos($userAgent, 'msie') || strpos($userAgent, 'trident/7'):
-                $result = 'msie';
-                break;
+                return 'msie';
         }
 
-        return $result;
+        return 'Other';
     }
 }
