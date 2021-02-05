@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.5
+ * @version 0.6.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -16,13 +16,24 @@ class Convert
 {
     private $MODULE_ID = 'dev2fun.imagecompress';
     public $LAST_ERROR;
+    /** @var string[] support tag attributes */
+    public $supportAttrs = [];
+    /** @var string[]  */
+    public $convertMode = [];
+
+    public $cacheTime = 3600;
 
     public static $supportContentType = [
         'image/jpeg',
         'image/png',
-//        'application/pdf',
+        //        'application/pdf',
         'image/svg',
-//        'image/gif',
+        //        'image/gif',
+    ];
+
+    public static $convertModes = [
+        'hitConvert',
+        'postConvert',
     ];
 
     public static $convertClasses = [
@@ -37,6 +48,22 @@ class Convert
     private function __construct()
     {
         static::$enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
+        $supportAttrs = Option::get($this->MODULE_ID, 'convert_attributes', []);
+        //        var_dump($supportAttrs);// die();
+        if($supportAttrs) {
+            $supportAttrs = \unserialize($supportAttrs);
+        }
+        $this->supportAttrs = $supportAttrs;
+
+        $convertMode = Option::get($this->MODULE_ID, 'convert_mode');
+        if($convertMode) {
+            $convertMode = \unserialize($convertMode);
+        } else {
+            $convertMode = ['postConvert'];
+        }
+        $this->convertMode = $convertMode;
+
+        $this->cacheTime = Option::get($this->MODULE_ID, 'cache_time', 3600);
     }
 
     /**
@@ -69,7 +96,7 @@ class Convert
                 break;
         }
         return $obj;
-//        return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
+        //        return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
     }
 
     /**
@@ -112,9 +139,9 @@ class Convert
             return false;
         }
 
-//        $upload_dir = Option::get('main', 'upload_dir', 'upload');
-//        $src = "{$_SERVER["DOCUMENT_ROOT"]}/$upload_dir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
-//        $srcWebp = "/{$upload_dir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}.webp";
+        //        $upload_dir = Option::get('main', 'upload_dir', 'upload');
+        //        $src = "{$_SERVER["DOCUMENT_ROOT"]}/$upload_dir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        //        $srcWebp = "/{$upload_dir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}.webp";
 
         return $algInstance->convert(
             $arFile,
@@ -125,6 +152,70 @@ class Convert
                 $options
             )
         );
+    }
+
+    /**
+     * @param string[] $arFiles
+     * @param array $options
+     * @return array|false
+     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     * @throws \ErrorException
+     */
+    public function postProcess($arFiles, $options=[])
+    {
+        if(!static::$enable) return false;
+
+        if(!static::checkWebpSupport()) {
+            return false;
+        }
+
+        $alg = Option::get($this->MODULE_ID, 'convert_algorithm', 'phpWebp');
+        $algInstance = static::getAlgInstance($alg);
+        if (!$algInstance->isOptim()) {
+            $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NO_MODULE', ['#MODULE#' => $alg]);
+            return false;
+        }
+
+        $arFilesReplace = [];
+        foreach ($arFiles as $file) {
+            $event = new \Bitrix\Main\Event($this->MODULE_ID, "OnBeforePostConvertImage", [&$file]);
+            $event->send();
+            if(!$file) {
+                continue;
+            }
+
+            $absFile = "{$_SERVER["DOCUMENT_ROOT"]}$file";
+            $fileInfo = \pathinfo($absFile);
+            $arFile = [
+                'CONTENT_TYPE' => \mime_content_type($absFile),
+                'SUBDIR' => \str_replace($_SERVER["DOCUMENT_ROOT"], '', $fileInfo['dirname']),
+                'FILE_NAME' => $fileInfo['basename'],
+                'ABS_PATH' => $absFile,
+            ];
+
+            if (!\in_array($arFile["CONTENT_TYPE"], static::$supportContentType)) {
+                continue;
+            }
+            if (!\is_file($absFile)) {
+                continue;
+            }
+
+            $resFile = $algInstance->convert(
+                $arFile,
+                \array_merge(
+                    [
+                        'changeChmod' => $this->getChmod(Option::get($this->MODULE_ID, 'change_chmod', 777)),
+                    ],
+                    $options
+                )
+            );
+            if($resFile) {
+                $arFilesReplace[$file] = $resFile;
+            }
+        }
+
+        return $arFilesReplace;
     }
 
     /**
@@ -196,6 +287,8 @@ class Convert
             $cacheImageFile = $webpPath;
             return true;
         }
+
+        return false;
     }
 
     /**
@@ -210,9 +303,9 @@ class Convert
 
         $arFile = \CFile::GetByID($intFileID)->GetNext();
 
-//        if ($this->enableImageResize) {
-//            $this->resize($intFileID, $strFilePath);
-//        }
+        //        if ($this->enableImageResize) {
+        //            $this->resize($intFileID, $strFilePath);
+        //        }
 
         return $this->process($arFile);
     }
@@ -260,6 +353,92 @@ class Convert
     public static function CompressImageOnConvertEvent($arFile)
     {
         return self::getInstance()->process($arFile);
+    }
+
+    public function getSupportAttributesString()
+    {
+        return $this->supportAttrs
+            ? \trim(\implode('|', $this->supportAttrs)).'|'
+            : '';
+    }
+
+    /**
+     * Handler for post converter
+     * @param string $content
+     * @return bool|null
+     */
+    public static function PostConverterEvent(&$content)
+    {
+        if(!$content) return $content;
+        if(!\in_array('postConvert', self::getInstance()->convertMode) || !self::$enable) {
+            return $content;
+        }
+
+        if(!static::checkWebpSupport()) {
+            return $content;
+        }
+
+        global $APPLICATION, $USER;
+
+        $curPage = $APPLICATION->GetCurPage();
+        $domain = $_SERVER['HTTP_HOST'];
+        if (!$domain) $domain = \SITE_ID;
+
+        $obCache = new \CPHPCache();
+        $moduleId = self::getInstance()->MODULE_ID;
+        $cachePath = "/{$moduleId}/{$domain}/";
+        $cacheId = \md5($domain . $curPage . \LANGUAGE_ID . $_SERVER['HTTP_USER_AGENT']);
+        $cacheTime = self::getInstance()->cacheTime;
+        if(!$cacheTime) $cacheTime = 3600;
+
+        if ($USER->IsAdmin() && !empty($_REQUEST['clear_cache'])) {
+            $obCache->Clean($cacheId, $cachePath);
+        }
+
+        $arFileReplace = [];
+        if ($obCache->InitCache($cacheTime, $cacheId, $cachePath)) {
+            $arFileReplace = $obCache->GetVars();
+        } elseif ($obCache->StartDataCache()) {
+            $arFiles = [];
+            \preg_match_all('/url\([\'|"](.*?(?:png|jpg|jpeg))[\'|"]\)/mi', $content, $matchInlineImages);
+            if(!empty($matchInlineImages[1])) {
+                $arFiles = $matchInlineImages[1];
+            }
+            \preg_match_all(
+                '/(?:'.self::getInstance()->getSupportAttributesString().'src)=[\'|"](.*?(?:png|jpg|jpeg))[\'|"]/mi',
+                $content,
+                $matchTagImages
+            );
+            if(!empty($matchTagImages[1])) {
+                $arFiles = \array_merge(
+                    $arFiles,
+                    $matchTagImages[1]
+                );
+            }
+            $event = new \Bitrix\Main\Event($moduleId, "OnBeforePostConvertImage", [&$arFiles]);
+            $event->send();
+
+            if($arFiles) {
+                $arFileReplace = self::getInstance()->postProcess($arFiles);
+            }
+
+            $obCache->EndDataCache($arFileReplace);
+        }
+
+        if($arFileReplace) {
+            $event = new \Bitrix\Main\Event(
+                $moduleId,
+                "OnBeforePostConvertReplaceImage",
+                [&$arFileReplace]
+            );
+            $event->send();
+
+            if($arFileReplace) {
+                $content = \strtr($content, $arFileReplace);
+            }
+        }
+
+        return $content;
     }
 
     /**
@@ -340,18 +519,40 @@ class Convert
     }
 
     /**
+     * Check current path on support webp
+     * @return bool
+     */
+    public static function checkSupportWebpCurrentPath()
+    {
+        global $APPLICATION;
+        return !\preg_match('#\/bitrix\/admin\/#', $APPLICATION->GetCurPage());
+    }
+
+    /**
+     * Check header accept on support webp
+     * @return bool
+     */
+    public static function checkSupportWebpAccept()
+    {
+        return \strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false;
+    }
+
+    /**
      * Get result check webp support
      * @return bool
      */
     public static function checkWebpSupport()
     {
-        global $APPLICATION;
-        if (\preg_match('#\/bitrix\/admin\/#', $APPLICATION->GetCurPage())) {
+        //        global $APPLICATION;
+        //        if (\preg_match('#\/bitrix\/admin\/#', $APPLICATION->GetCurPage())) {
+        //            return false;
+        //        }
+        if(!static::checkSupportWebpCurrentPath()) {
             return false;
         }
-//        if (\strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) === false) {
-//            return false;
-//        }
+        //        if (\strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) === false) {
+        //            return false;
+        //        }
 
         $supportBrowsers = [
             'chrome',

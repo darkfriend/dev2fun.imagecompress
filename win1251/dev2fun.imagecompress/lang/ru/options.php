@@ -87,9 +87,14 @@ $MESS['MAIN_TAB_SET_OPTI'] = "Оптимизация";
 $MESS['MAIN_TAB_CONVERT'] = "Конвертация";
 $MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_BASE_CONVERT'] = "Настройки конвертации";
 $MESS['D2F_COMPRESS_REFERENCES_ENABLE_CONVERT'] = "Активность конвертации в webp";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_MODE_CONVERT'] = "Режим конвертации";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_POST_CONVERT_ATTR'] = "Список поддерживаемых атрибутов (для postConvert)";
 $MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_CONVERT'] = "Алгоритм конвертации в webp";
 $MESS['D2F_COMPRESS_REFERENCES_WEBP_QUALITY'] = "Качество картинки в webp";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_POST_CONVERT_CACHE_TIME'] = "Время жизни кэща";
 $MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_CWEBP'] = "Настройки для алгоритма cwebp";
 $MESS['D2F_COMPRESS_REFERENCES_PATH_CWEBP'] = "Путь до cwebp";
 $MESS['D2F_COMPRESS_REFERENCES_CWEBP_COMPRESS'] = "Степень оптимизации cwebp (рекомендуется 4)";
 $MESS['D2F_COMPRESS_REFERENCES_CWEBP_MULTITHREADING'] = "Активность мультипоточности при конвертации (рекомендуется)";
+
+$MESS['LABEL_ADD'] = "Добавить";

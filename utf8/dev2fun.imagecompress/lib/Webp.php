@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.5
+ * @version 0.6.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -26,7 +26,7 @@ class Webp
 
     private function __construct()
     {
-        $this->path = Option::get($this->MODULE_ID, 'path_to_webp', '/usr/bin');
+        $this->path = Option::get($this->MODULE_ID, 'path_to_cwebp', '/usr/bin');
         $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
 
         $this->quality = Option::get($this->MODULE_ID, 'webp_quality', 80);
@@ -76,16 +76,16 @@ class Webp
     {
         if(!$this->enable) return false;
 
-//        $strFilePath = strtr(
-//            $strFilePath,
-//            [
-//                ' ' => '\ ',
-//                '(' => '\(',
-//                ')' => '\)',
-//                ']' => '\]',
-//                '[' => '\[',
-//            ]
-//        );
+        //        $strFilePath = strtr(
+        //            $strFilePath,
+        //            [
+        //                ' ' => '\ ',
+        //                '(' => '\(',
+        //                ')' => '\)',
+        //                ']' => '\]',
+        //                '[' => '\[',
+        //            ]
+        //        );
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
@@ -95,8 +95,15 @@ class Webp
         $event->send();
 
         $uploadDir = Option::get('main', 'upload_dir', 'upload');
-        $src = "{$_SERVER["DOCUMENT_ROOT"]}/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        if(!empty($arFile["ABS_PATH"])) {
+            $src = $arFile["ABS_PATH"];
+        } else {
+            $src = "{$_SERVER["DOCUMENT_ROOT"]}/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        }
+
         $fileInfo = \pathinfo($src);
+        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
+        $arFile["SUBDIR"] = \ltrim($arFile["SUBDIR"], '/');
         $srcWebp = "/{$uploadDir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.webp";
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
 
@@ -108,7 +115,9 @@ class Webp
         }
         $dirname = \dirname($absSrcWebp);
         if(!\is_dir($dirname)) {
-            @\mkdir($dirname,0777, true);
+            if(!@\mkdir($dirname,0777, true)) {
+                return false;
+            }
         }
 
         if(!isset($params['compression'])) {

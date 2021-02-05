@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.0
+ * @version 0.6.0
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -167,12 +167,12 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 }
             }
             $updCheckbox['enable_pdf'] = $enablePdf;
-//            $updString['opti_algorithm_png'] = $algorithmPng;
+            //            $updString['opti_algorithm_png'] = $algorithmPng;
             $updString['path_to_ps2pdf'] = $ps2pdf;
 
 
             $saveTypes = [
-//                'webp',
+                //                'webp',
                 'gif',
                 'svg',
             ];
@@ -215,6 +215,20 @@ if ($request->isPost() && check_bitrix_sessid()) {
             $updCheckbox['convert_enable'] = $request->getPost('convert_enable', 'N') === 'Y';
             $updCheckbox['cwebp_multithreading'] = $request->getPost('cwebp_multithreading', 'N') === 'Y';
 
+            $updString['convert_mode'] = $request->getPost('convert_mode');
+            if(!$updString['convert_mode']) {
+                $updString['convert_mode'] = [];
+            }
+
+            $updString['convert_attributes'] = $request->getPost('convertAttr');
+            if(\is_array($updString['convert_attributes'])) {
+                $updString['convert_attributes'] = \array_filter($updString['convert_attributes'], function($item) {
+                    return !empty($item);
+                });
+            } else {
+                $updString['convert_attributes'] = [];
+            }
+
             $updString['convert_algorithm'] = $request->getPost('convert_algorithm', 'phpWebp');
             $updString['webp_quality'] = $request->getPost('webp_quality', '80');
             $updString['path_to_cwebp'] = $request->getPost('path_to_cwebp', '/usr/bin');
@@ -230,6 +244,8 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 }
             }
             $updString['cwebp_compress'] = $request->getPost('cwebp_compress', '4');
+            $updString['cache_time'] = $request->getPost('cache_time');
+            if(!$updString['cache_time']) $updString['cache_time'] = 3600;
 
 
             if($updCheckbox) {
@@ -239,6 +255,9 @@ if ($request->isPost() && check_bitrix_sessid()) {
             }
             if($updString) {
                 foreach ($updString as $kOption => $vOption) {
+                    if(is_array($vOption)) {
+                        $vOption = \serialize($vOption);
+                    }
                     Option::set($curModuleName, $kOption, $vOption);
                 }
             }
@@ -422,7 +441,7 @@ $tabControl->begin();
             </select>
         </td>
     </tr>
-<!--    JPEG SETTINGS-->
+    <!--    JPEG SETTINGS-->
     <tr>
         <td width="40%">
             <label for="enable_element">
@@ -443,7 +462,7 @@ $tabControl->begin();
     </tr>
 
 
-<!--    PNG-->
+    <!--    PNG-->
     <tr class="heading">
         <td colspan="2">
             <b><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_SETTINGS', ['#MODULE#' => 'PNG']) ?></b>

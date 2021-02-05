@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.5
+ * @version 0.6.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -69,16 +69,16 @@ class WebpConvertPhp
     {
         if(!$this->enable) return false;
 
-//        $strFilePath = strtr(
-//            $strFilePath,
-//            [
-//                ' ' => '\ ',
-//                '(' => '\(',
-//                ')' => '\)',
-//                ']' => '\]',
-//                '[' => '\[',
-//            ]
-//        );
+        //        $strFilePath = strtr(
+        //            $strFilePath,
+        //            [
+        //                ' ' => '\ ',
+        //                '(' => '\(',
+        //                ')' => '\)',
+        //                ']' => '\]',
+        //                '[' => '\[',
+        //            ]
+        //        );
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
@@ -88,14 +88,17 @@ class WebpConvertPhp
         $event->send();
 
         $uploadDir = Option::get('main', 'upload_dir', 'upload');
-        $src = "{$_SERVER["DOCUMENT_ROOT"]}/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        if(!empty($arFile["ABS_PATH"])) {
+            $src = $arFile["ABS_PATH"];
+        } else {
+            $src = "{$_SERVER["DOCUMENT_ROOT"]}/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        }
+
         $fileInfo = \pathinfo($src);
+        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
+        $arFile["SUBDIR"] = \ltrim($arFile["SUBDIR"], '/');
         $srcWebp = "/{$uploadDir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.webp";
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
-
-//        $upload_dir = Option::get('main', 'upload_dir', 'upload');
-//        $src = "{$_SERVER["DOCUMENT_ROOT"]}/$upload_dir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
-//        $srcWebp = "/{$upload_dir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}.webp";
 
         if(@\is_file($absSrcWebp)) {
             if(\filesize($absSrcWebp)===0) {
@@ -106,7 +109,9 @@ class WebpConvertPhp
         $dirname = \dirname($absSrcWebp);
 
         if(!\is_dir($dirname)) {
-            \mkdir($dirname,0777, true);
+            if(!@\mkdir($dirname,0777, true)) {
+                return false;
+            }
         }
 
         switch(\mime_content_type($src)) {
