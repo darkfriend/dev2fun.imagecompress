@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.0
+ * @version 0.6.1
  */
 
 use \Bitrix\Main\Localization\Loc;
@@ -132,6 +132,7 @@ $convertModes = \Dev2fun\ImageCompress\Convert::$convertModes;
     </td>
 </tr>
 
+<?php /* ?>
 <tr>
     <td width="40%">
         <label for="cache_time">
@@ -145,6 +146,7 @@ $convertModes = \Dev2fun\ImageCompress\Convert::$convertModes;
         <input name="cache_time" value="<?= $cacheTime ?>" size="50" type="text"><br>
     </td>
 </tr>
+ <?php */ ?>
 
 
 <!--CWEBP-->

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.0
+ * @version 0.6.1
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 \Bitrix\Main\Localization\Loc::loadMessages(__FILE__);
@@ -41,10 +41,10 @@ class dev2fun_imagecompress extends CModule
 
     function __construct()
     {
-        $path = str_replace("\\", "/", __FILE__);
-        $path = substr($path, 0, strlen($path) - strlen("/index.php"));
+        $path = \str_replace("\\", "/", __FILE__);
+        $path = \substr($path, 0, \strlen($path) - \strlen("/index.php"));
         include($path . "/version.php");
-        if (isset($arModuleVersion) && is_array($arModuleVersion) && array_key_exists("VERSION", $arModuleVersion)) {
+        if (isset($arModuleVersion) && \is_array($arModuleVersion) && \array_key_exists("VERSION", $arModuleVersion)) {
             $this->MODULE_VERSION = $arModuleVersion["VERSION"];
             $this->MODULE_VERSION_DATE = $arModuleVersion["VERSION_DATE"];
         } else {
@@ -163,6 +163,12 @@ class dev2fun_imagecompress extends CModule
         Option::set($this->MODULE_ID, 'jpegoptim_compress', '80');
         Option::set($this->MODULE_ID, 'jpeg_progressive', 'Y');
         Option::set($this->MODULE_ID, 'optipng_compress', '3');
+
+        Option::set(
+            $this->MODULE_ID,
+            'convert_mode',
+            \serialize(['hitConvert', 'postConvert'])
+        );
         return true;
     }
 

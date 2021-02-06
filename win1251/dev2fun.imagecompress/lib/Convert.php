@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.0
+ * @version 0.6.1
  */
 
 namespace Dev2fun\ImageCompress;
@@ -26,9 +26,7 @@ class Convert
     public static $supportContentType = [
         'image/jpeg',
         'image/png',
-        //        'application/pdf',
         'image/svg',
-        //        'image/gif',
     ];
 
     public static $convertModes = [
@@ -49,7 +47,6 @@ class Convert
     {
         static::$enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
         $supportAttrs = Option::get($this->MODULE_ID, 'convert_attributes', []);
-        //        var_dump($supportAttrs);// die();
         if($supportAttrs) {
             $supportAttrs = \unserialize($supportAttrs);
         }
@@ -179,6 +176,12 @@ class Convert
 
         $arFilesReplace = [];
         foreach ($arFiles as $file) {
+            if($file) {
+                $fileScheme = \parse_url($file, \PHP_URL_SCHEME);
+                if($fileScheme==='data') {
+                    continue;
+                }
+            }
             $event = new \Bitrix\Main\Event($this->MODULE_ID, "OnBeforePostConvertImage", [&$file]);
             $event->send();
             if(!$file) {
@@ -186,6 +189,7 @@ class Convert
             }
 
             $absFile = "{$_SERVER["DOCUMENT_ROOT"]}$file";
+            if(!\is_file($absFile)) continue;
             $fileInfo = \pathinfo($absFile);
             $arFile = [
                 'CONTENT_TYPE' => \mime_content_type($absFile),
@@ -298,7 +302,10 @@ class Convert
      */
     public function convertImageByID($intFileID)
     {
-        if(!static::$enable) return null;
+        if(!\in_array('hitConvert', self::getInstance()->convertMode) || !self::$enable) {
+            return false;
+        }
+//        if(!static::$enable) return null;
         if(!$intFileID) return null;
 
         $arFile = \CFile::GetByID($intFileID)->GetNext();
@@ -352,6 +359,9 @@ class Convert
      */
     public static function CompressImageOnConvertEvent($arFile)
     {
+        if(!\in_array('hitConvert', self::getInstance()->convertMode) || !self::$enable) {
+            return false;
+        }
         return self::getInstance()->process($arFile);
     }
 
@@ -378,35 +388,52 @@ class Convert
             return $content;
         }
 
-        global $APPLICATION, $USER;
+//        global $APPLICATION, $USER;
 
-        $curPage = $APPLICATION->GetCurPage();
-        $domain = $_SERVER['HTTP_HOST'];
-        if (!$domain) $domain = \SITE_ID;
-
-        $obCache = new \CPHPCache();
         $moduleId = self::getInstance()->MODULE_ID;
-        $cachePath = "/{$moduleId}/{$domain}/";
-        $cacheId = \md5($domain . $curPage . \LANGUAGE_ID . $_SERVER['HTTP_USER_AGENT']);
-        $cacheTime = self::getInstance()->cacheTime;
-        if(!$cacheTime) $cacheTime = 3600;
+//        $curPage = $APPLICATION->GetCurPage();
+//        $domain = $_SERVER['HTTP_HOST'];
+//        if (!$domain) $domain = \SITE_ID;
 
-        if ($USER->IsAdmin() && !empty($_REQUEST['clear_cache'])) {
-            $obCache->Clean($cacheId, $cachePath);
-        }
+//        $obCache = new \CPHPCache();
+//        $cachePath = "/{$moduleId}/{$domain}/";
+//        $cacheId = \md5(
+//            $domain
+//            . $curPage
+//            . \LANGUAGE_ID
+//            . $_SERVER['HTTP_USER_AGENT']
+//            . $_SERVER['REQUEST_METHOD']
+//            . implode($_REQUEST)
+//            . $USER->GetUserGroupString()
+//        );
+//        $cacheTime = self::getInstance()->cacheTime;
+//        if(!$cacheTime) $cacheTime = 3600;
+
+//        if ($USER->IsAdmin() && !empty($_REQUEST['clear_cache'])) {
+//            $obCache->Clean($cacheId, $cachePath);
+//        }
 
         $arFileReplace = [];
-        if ($obCache->InitCache($cacheTime, $cacheId, $cachePath)) {
-            $arFileReplace = $obCache->GetVars();
-        } elseif ($obCache->StartDataCache()) {
-            $arFiles = [];
-            \preg_match_all('/url\([\'|"](.*?(?:png|jpg|jpeg))[\'|"]\)/mi', $content, $matchInlineImages);
-            if(!empty($matchInlineImages[1])) {
-                $arFiles = $matchInlineImages[1];
-            }
+//        if ($obCache->InitCache($cacheTime, $cacheId, $cachePath)) {
+//            $cacheData = $obCache->GetVars();
+//            if(!empty($cacheData['files'])) {
+//                $arFileReplace = $cacheData['files'];
+//            }
+//        } elseif ($obCache->StartDataCache()) {
+        $arFiles = [];
+        \preg_match_all('/url\([\'|"](.*?(?:png|jpg|jpeg))[\'|"]\)/mi', $content, $matchInlineImages);
+        if(!empty($matchInlineImages[1])) {
+            $arFiles = $matchInlineImages[1];
+        }
+        \preg_match_all(
+            '/(?:'.self::getInstance()->getSupportAttributesString().'src)=[\'|"](.*?(?:png|jpg|jpeg)?)[\'|"]/mi',
+            $content,
+            $matchTags
+        );
+        if(!empty($matchTags[1])) {
             \preg_match_all(
-                '/(?:'.self::getInstance()->getSupportAttributesString().'src)=[\'|"](.*?(?:png|jpg|jpeg))[\'|"]/mi',
-                $content,
+                '/^(.*?\.(?:jpg|png|jpeg))(?:\?.*?|$)$/mi',
+                \implode(\PHP_EOL, $matchTags[1]),
                 $matchTagImages
             );
             if(!empty($matchTagImages[1])) {
@@ -415,15 +442,18 @@ class Convert
                     $matchTagImages[1]
                 );
             }
-            $event = new \Bitrix\Main\Event($moduleId, "OnBeforePostConvertImage", [&$arFiles]);
-            $event->send();
-
-            if($arFiles) {
-                $arFileReplace = self::getInstance()->postProcess($arFiles);
-            }
-
-            $obCache->EndDataCache($arFileReplace);
         }
+        $event = new \Bitrix\Main\Event($moduleId, "OnBeforePostConvertImage", [&$arFiles]);
+        $event->send();
+
+        if($arFiles) {
+            $arFileReplace = self::getInstance()->postProcess($arFiles);
+        }
+
+//            $obCache->EndDataCache([
+//                'files' => $arFileReplace,
+//            ]);
+//        }
 
         if($arFileReplace) {
             $event = new \Bitrix\Main\Event(
