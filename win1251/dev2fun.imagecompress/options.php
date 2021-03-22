@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.0
+ * @version 0.6.2
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -220,14 +220,14 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 $updString['convert_mode'] = [];
             }
 
-            $updString['convert_attributes'] = $request->getPost('convertAttr');
-            if(\is_array($updString['convert_attributes'])) {
-                $updString['convert_attributes'] = \array_filter($updString['convert_attributes'], function($item) {
-                    return !empty($item);
-                });
-            } else {
-                $updString['convert_attributes'] = [];
-            }
+//            $updString['convert_attributes'] = $request->getPost('convertAttr');
+//            if(\is_array($updString['convert_attributes'])) {
+//                $updString['convert_attributes'] = \array_filter($updString['convert_attributes'], function($item) {
+//                    return !empty($item);
+//                });
+//            } else {
+//                $updString['convert_attributes'] = [];
+//            }
 
             $updString['convert_algorithm'] = $request->getPost('convert_algorithm', 'phpWebp');
             $updString['webp_quality'] = $request->getPost('webp_quality', '80');

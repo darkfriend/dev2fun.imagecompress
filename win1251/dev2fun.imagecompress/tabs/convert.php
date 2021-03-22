@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.1
+ * @version 0.6.2
  */
 
 use \Bitrix\Main\Localization\Loc;
@@ -76,41 +76,6 @@ $convertModes = \Dev2fun\ImageCompress\Convert::$convertModes;
                 ><?= $v ?></option>
             <?php } ?>
         </select>
-    </td>
-</tr>
-
-<tr>
-    <td width="40%">
-        <label><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_POST_CONVERT_ATTR') ?>:</label>
-    </td>
-    <td width="60%">
-        <table class="nopadding" cellpadding="0" cellspacing="0" border="0" width="100%" id="d2fConvertAttr">
-            <tbody>
-            <?php
-            $supportAttrs = \Dev2fun\ImageCompress\Convert::getInstance()->supportAttrs;
-            if($supportAttrs) {
-                foreach ($supportAttrs as $field) {
-                    ?>
-                    <tr>
-                        <td class="adm-detail-content-cell-r">
-                            <input name="convertAttr[]" value="<?= $field ?>" size="50" type="text"><br>
-                        </td>
-                    </tr>
-                <?php } ?>
-            <?php } ?>
-            <tr>
-                <td class="adm-detail-content-cell-r">
-                    <input name="convertAttr[]" value="" size="50" type="text"><br>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <input type="button" value="<?= Loc::getMessage("LABEL_ADD"); ?>"
-                           onclick="addNewRow('d2fConvertAttr')">
-                </td>
-            </tr>
-            </tbody>
-        </table>
     </td>
 </tr>
 

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.1
+ * @version 0.6.2
  */
 
 namespace Dev2fun\ImageCompress;
@@ -421,28 +421,29 @@ class Convert
 //            }
 //        } elseif ($obCache->StartDataCache()) {
         $arFiles = [];
-        \preg_match_all('/url\([\'|"](.*?(?:png|jpg|jpeg))[\'|"]\)/mi', $content, $matchInlineImages);
+        \preg_match_all('/([^"\'=\s]+\.(?:jpe?g|png))/mi', $content, $matchInlineImages);
+//        \preg_match_all('/url\([\'|"](.*?(?:png|jpg|jpeg))[\'|"]\)/mi', $content, $matchInlineImages);
         if(!empty($matchInlineImages[1])) {
             $arFiles = $matchInlineImages[1];
         }
-        \preg_match_all(
-            '/(?:'.self::getInstance()->getSupportAttributesString().'src)=[\'|"](.*?(?:png|jpg|jpeg)?)[\'|"]/mi',
-            $content,
-            $matchTags
-        );
-        if(!empty($matchTags[1])) {
-            \preg_match_all(
-                '/^(.*?\.(?:jpg|png|jpeg))(?:\?.*?|$)$/mi',
-                \implode(\PHP_EOL, $matchTags[1]),
-                $matchTagImages
-            );
-            if(!empty($matchTagImages[1])) {
-                $arFiles = \array_merge(
-                    $arFiles,
-                    $matchTagImages[1]
-                );
-            }
-        }
+//        \preg_match_all(
+//            '/(?:'.self::getInstance()->getSupportAttributesString().'src)=[\'|"](.*?(?:png|jpg|jpeg)?)[\'|"]/mi',
+//            $content,
+//            $matchTags
+//        );
+//        if(!empty($matchTags[1])) {
+//            \preg_match_all(
+//                '/^(.*?\.(?:jpg|png|jpeg))(?:\?.*?|$)$/mi',
+//                \implode(\PHP_EOL, $matchTags[1]),
+//                $matchTagImages
+//            );
+//            if(!empty($matchTagImages[1])) {
+//                $arFiles = \array_merge(
+//                    $arFiles,
+//                    $matchTagImages[1]
+//                );
+//            }
+//        }
         $event = new \Bitrix\Main\Event($moduleId, "OnBeforePostConvertImage", [&$arFiles]);
         $event->send();
 
