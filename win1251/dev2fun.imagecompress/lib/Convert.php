@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.2
+ * @version 0.6.3
  */
 
 namespace Dev2fun\ImageCompress;
@@ -425,6 +425,14 @@ class Convert
 //        \preg_match_all('/url\([\'|"](.*?(?:png|jpg|jpeg))[\'|"]\)/mi', $content, $matchInlineImages);
         if(!empty($matchInlineImages[1])) {
             $arFiles = $matchInlineImages[1];
+        }
+
+        \preg_match_all('/url\(([^"\'=\s]+\.(?:jpe?g|png))\)/mi', $content, $matchInlineImages);
+        if(!empty($matchInlineImages[1])) {
+            $arFiles = \array_unique(\array_merge(
+                $arFiles,
+                $matchInlineImages[1]
+            ));
         }
 //        \preg_match_all(
 //            '/(?:'.self::getInstance()->getSupportAttributesString().'src)=[\'|"](.*?(?:png|jpg|jpeg)?)[\'|"]/mi',
