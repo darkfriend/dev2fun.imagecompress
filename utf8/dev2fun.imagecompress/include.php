@@ -49,7 +49,7 @@ class Dev2funImageCompress
         'svg',
     ];
 
-    public function DoBuildGlobalMenu(&$aGlobalMenu, &$aModuleMenu)
+    public static function DoBuildGlobalMenu(&$aGlobalMenu, &$aModuleMenu)
     {
         $aModuleMenu[] = [
             "parent_menu" => "global_menu_settings",
