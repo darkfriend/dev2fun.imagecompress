@@ -454,7 +454,7 @@ class Compress
 //                            'image/png',
 //                            'application/pdf',
 //                        ];
-                        if (!in_array($v['VALUE']['type'], static::$supportContentType)) {
+                        if (isset($v['VALUE']['type']) && !in_array($v['VALUE']['type'], static::$supportContentType)) {
                             continue;
                         }
 
