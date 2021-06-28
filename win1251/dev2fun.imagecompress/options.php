@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.5
+ * @version 0.6.6
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -213,6 +213,9 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 }
             }
 
+            if (!empty($_REQUEST["EXCLUDE_PAGES"])) {
+                \Dev2fun\ImageCompress\Convert::saveSettingsExcludePage($_REQUEST["EXCLUDE_PAGES"]);
+            }
 
             // set convert options
             $updCheckbox['convert_enable'] = $request->getPost('convert_enable', 'N') === 'Y';
@@ -591,8 +594,8 @@ $tabControl->begin();
                     'default' => 'default',
                 ];
                 foreach ($pdfTypeSettings as $key => $val) { ?>
-                    <option value="<?= $key ?>" <?= ($val === $pdfSetting ? 'selected' : '') ?>>
-                        <?= $i ?>
+                    <option value="<?= $key ?>" <?= ($key === $pdfSetting ? 'selected' : '') ?>>
+                        <?= $val ?>
                     </option>
                 <?php } ?>
             </select>

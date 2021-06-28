@@ -97,6 +97,66 @@ $convertModes = \Dev2fun\ImageCompress\Convert::$convertModes;
     </td>
 </tr>
 
+<tr>
+    <td width="40%" class="adm-detail-content-cell-l">
+        <label><?= Loc::getMessage("D2F_COMPRESS_REFERENCES_PAGE_EXCLUDED"); ?>:</label>
+    </td>
+    <td width="60%" class="adm-detail-content-cell-r">
+        <table class="nopadding" cellpadding="0" cellspacing="0" border="0" width="100%"
+               id="d2f_page_excluded_webp">
+            <tbody>
+            <?php
+            $excludedPages = \Dev2fun\ImageCompress\Convert::getSettingsExcludePage();
+            $serverUrl = \Dev2funImageCompress::getUrl('/');
+            foreach ($excludedPages as $key => $page) {
+                $key = \str_replace('n', '', $key);
+                ?>
+                <tr>
+                    <td>
+                        <label><?= $serverUrl ?></label>
+                        <input
+                            name="EXCLUDE_PAGES[n<?= $key ?>]"
+                            value="<?= $page ?>"
+                            size="30"
+                            type="text"
+                        >
+                    </td>
+                </tr>
+            <?php } ?>
+            <tr>
+                <td>
+                    <label><?= $serverUrl ?></label>
+                    <input
+                        name="EXCLUDE_PAGES[n<?= count($excludedPages) ?>]"
+                        value=""
+                        size="30"
+                        type="text"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input
+                        type="button"
+                        value="<?= Loc::getMessage("LABEL_ADD"); ?>"
+                        onclick="addNewRow('d2f_page_excluded_webp')"
+                    >
+                </td>
+            </tr>
+            <script type="text/javascript">
+                BX.addCustomEvent('onAutoSaveRestore', function (ob, data) {
+                    for (var i in data) {
+                        if (i.substring(0, 9) == 'EXCLUDE_PAGES[') {
+                            addNewRow('d2f_page_excluded_webp')
+                        }
+                    }
+                });
+            </script>
+            </tbody>
+        </table>
+    </td>
+</tr>
+
 <?php /* ?>
 <tr>
     <td width="40%">

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.3
+ * @version 0.6.6
  */
 
 namespace Dev2fun\ImageCompress;
@@ -93,7 +93,75 @@ class Convert
                 break;
         }
         return $obj;
-        //        return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
+//        return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
+    }
+
+    /**
+     * Get exclude pages
+     * @return array|mixed
+     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     */
+    public static function getSettingsExcludePage()
+    {
+        $pages = Option::get(\Dev2funImageCompress::MODULE_ID, 'exclude_pages');
+        if ($pages) {
+            $pages = \json_decode($pages, true);
+        } else {
+            $pages = [];
+        }
+        return $pages;
+    }
+
+    /**
+     * Save exclude pages
+     * @param array $sFields
+     * @return bool
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     */
+    public static function saveSettingsExcludePage($sFields = [])
+    {
+        if($sFields) {
+            foreach ($sFields as $key => $field) {
+                if (empty($field)) {
+                    unset($sFields[$key]);
+                }
+            }
+        } elseif(!\is_array($sFields)) {
+            $sFields = [];
+        }
+        Option::set(
+            \Dev2funImageCompress::MODULE_ID,
+            'exclude_pages',
+            \json_encode(\array_values($sFields))
+        );
+        return true;
+    }
+
+    /**
+     * Check page on exclude
+     * @return bool
+     */
+    public static function isExcludePage()
+    {
+        global $APPLICATION;
+        $arExcluded = self::getSettingsExcludePage();
+        if($arExcluded) {
+            $curPage = $APPLICATION->GetCurPage();
+            if ($curPage === '/') {
+                $curPage = 'index.php';
+            }
+            if (\in_array(\ltrim($curPage, '/'), $arExcluded)) {
+                return true;
+            }
+            foreach ($arExcluded as $exc) {
+                if (\preg_match($exc, $curPage)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -243,6 +311,7 @@ class Convert
     )
     {
         if(!static::$enable) return false;
+        if(self::isExcludePage()) return false;
         if(!static::checkWebpSupport()) return false;
 
         $urlFile = \parse_url($cacheImageFile);
@@ -362,6 +431,9 @@ class Convert
         if(!\in_array('hitConvert', self::getInstance()->convertMode) || !self::$enable) {
             return false;
         }
+        if(self::isExcludePage()) {
+            return false;
+        }
         return self::getInstance()->process($arFile);
     }
 
@@ -381,6 +453,10 @@ class Convert
     {
         if(!$content) return $content;
         if(!\in_array('postConvert', self::getInstance()->convertMode) || !self::$enable) {
+            return $content;
+        }
+
+        if(self::isExcludePage()) {
             return $content;
         }
 

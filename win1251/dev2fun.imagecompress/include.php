@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.5
+ * @version 0.6.6
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -48,6 +48,43 @@ class Dev2funImageCompress
         'gif',
         'svg',
     ];
+
+    /**
+     * Get protocol
+     * @return string
+     */
+    public static function getProtocol()
+    {
+        $protocol = 'http';
+        if(\CMain::IsHTTPS()) {
+            $protocol .= 's';
+        }
+        return ($protocol.'://');
+    }
+
+    /**
+     * Get domain
+     * @return mixed
+     */
+    public static function getHost()
+    {
+        $host = \SITE_SERVER_NAME;
+        if(!$host) {
+            $host = $_SERVER['HTTP_HOST'];
+        }
+        return $host;
+    }
+
+    /**
+     * Get url
+     * @param string $path
+     * @return bool|string
+     */
+    public static function getUrl($path='')
+    {
+        if(!$path) return false;
+        return self::getProtocol().self::getHost().$path;
+    }
 
     public static function DoBuildGlobalMenu(&$aGlobalMenu, &$aModuleMenu)
     {

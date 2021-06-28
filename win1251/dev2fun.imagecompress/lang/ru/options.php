@@ -18,6 +18,7 @@ $MESS["D2F_COMPRESS_REFERENCES_CHMOD"] = "Права для файла после оптимизации (в д
 $MESS["D2F_COMPRESS_REFERENCES_JPEG_COMPRESS"] = "Качество jpeg-файлов при сжатии";
 $MESS["D2F_COMPRESS_REFERENCES_PNG_COMPRESS"] = "Степень сжатия у png-файлов";
 $MESS["D2F_COMPRESS_REFERENCES_TEST_BTN"] = "Тестировать конфигурацию сервера";
+$MESS["D2F_COMPRESS_REFERENCES_PAGE_EXCLUDED"] = "Страницы исключения";
 
 $MESS["D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND"] = "Не найден #MODULE#. Установите на сервере #MODULE#";
 $MESS["D2F_IMAGECOMPRESS_ERROR_NOT_FOUND_ALGORITHM"] = "Не известная проблема с алгоритмом для #MODULE#";
