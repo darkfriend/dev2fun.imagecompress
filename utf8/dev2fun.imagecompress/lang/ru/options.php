@@ -41,6 +41,9 @@ $MESS["D2F_COMPRESS_REFERENCES_WEBP_MULTITHREADING"] = "Многотопочно
 // gif settings
 $MESS["D2F_COMPRESS_REFERENCES_GIF_COMPRESS"] = "Оптимизация gif";
 
+// pdf settings
+$MESS["D2F_COMPRESS_REFERENCES_PDF_SETTING_HEADING"] = "Вид оптимизации pdf";
+
 
 $MESS["D2F_COMPRESS_OPTIONS_TESTED"] = "Конфигурация сервера успешно протестировна";
 $MESS["D2F_COMPRESS_OPTIONS_NO_TESTED"] = "Конфигурация сервера не соответствует!";

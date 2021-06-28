@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.4.0
+ * @version 0.6.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -20,11 +20,13 @@ class Ps2Pdf
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $path = '';
     private $enable = false;
+    private $pdfSetting = 'ebook';
 
     private function __construct()
     {
         $this->path = Option::get($this->MODULE_ID, 'path_to_ps2pdf');
         $this->enable = Option::get($this->MODULE_ID, 'enable_pdf', false);
+        $this->pdfSetting = Option::get($this->MODULE_ID, 'pdf_setting', 'ebook');
     }
 
     /**
@@ -46,7 +48,7 @@ class Ps2Pdf
      */
     public function isPdfOptim()
     {
-        exec($this->path . '/gs -v', $s);
+        \exec($this->path . '/gs -v', $s);
         return ($s ? true : false);
     }
 
@@ -69,7 +71,7 @@ class Ps2Pdf
     public function compress($strFilePath, $params = [])
     {
         if(!$this->enable) return false;
-        $strFilePath = strtr(
+        $strFilePath = \strtr(
             $strFilePath,
             [
                 ' ' => '\ ',
@@ -79,6 +81,9 @@ class Ps2Pdf
                 '[' => '\[',
             ]
         );
+        if(!isset($params['pdfSetting'])) {
+            $params['pdfSetting'] = $this->pdfSetting;
+        }
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
@@ -88,17 +93,18 @@ class Ps2Pdf
         $event->send();
 
         $strFilePathNew = $strFilePath.'.pdf';
-        $strCommand = '';
+        $strCommand = "-sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/{$params['pdfSetting']} -dNOPAUSE -dQUIET -dBATCH";
 
-        exec($this->path . "/ps2pdf $strCommand $strFilePath $strFilePathNew 2>&1", $res);
+        \exec($this->path . "/gs {$strCommand} -sOutputFile={$strFilePathNew} {$strFilePath} 2>&1", $res);
+//        exec($this->path . "/ps2pdf $strCommand $strFilePath $strFilePathNew 2>&1", $res);
 
-        if(file_exists($strFilePathNew)) {
-            unlink($strFilePath);
-            rename($strFilePathNew, $strFilePath);
+        if(\file_exists($strFilePathNew)) {
+            \unlink($strFilePath);
+            \rename($strFilePathNew, $strFilePath);
         }
 
         if (!empty($params['changeChmod'])) {
-            chmod($strFilePath, $params['changeChmod']);
+            \chmod($strFilePath, $params['changeChmod']);
         }
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,

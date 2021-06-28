@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.2
+ * @version 0.6.5
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -86,9 +86,9 @@ if ($request->isPost() && check_bitrix_sessid()) {
             $text = Loc::getMessage("D2F_COMPRESS_OPTIONS_TESTED");
         } else {
             $error = true;
-            $text = implode(
+            $text = \implode(
                 PHP_EOL,
-                array_merge(
+                \array_merge(
                     [Loc::getMessage("D2F_COMPRESS_OPTIONS_NO_TESTED")],
                     $text
                 )
@@ -156,7 +156,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
             $enablePdf = $request->getPost('enable_pdf');
             $ps2pdf = $request->getPost('path_to_ps2pdf');
             if ($ps2pdf) {
-                $ps2pdf = rtrim($ps2pdf, '/');
+                $ps2pdf = \rtrim($ps2pdf, '/');
             }
             if($enablePdf==='Y') {
                 if(!$ps2pdf) {
@@ -167,8 +167,11 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 }
             }
             $updCheckbox['enable_pdf'] = $enablePdf;
-            //            $updString['opti_algorithm_png'] = $algorithmPng;
+//            $updString['opti_algorithm_png'] = $algorithmPng;
             $updString['path_to_ps2pdf'] = $ps2pdf;
+
+            $pdfSetting = $request->getPost('pdf_setting');
+            $updString['pdf_setting'] = !empty($pdfSetting) ? $pdfSetting : 'ebook';
 
 
             $saveTypes = [
@@ -182,7 +185,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 $algorithm = $request->getPost('opti_algorithm_'.$saveType);
                 $pth = $request->getPost('path_to_'.$saveType, '/usr/bin');
                 if ($pth) {
-                    $pth = rtrim($pth, '/');
+                    $pth = \rtrim($pth, '/');
                 }
                 if($enable==='Y') {
                     if(!$pth) {
@@ -203,10 +206,10 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 $advanceSettings = \Dev2fun\ImageCompress\Compress::getAlgInstance($saveType)
                     ->getOptionsSettings($request->getPost($saveType, []));
                 if($advanceSettings && !empty($advanceSettings['checkbox'])) {
-                    $updCheckbox = array_merge($updCheckbox,$advanceSettings['checkbox']);
+                    $updCheckbox = \array_merge($updCheckbox, $advanceSettings['checkbox']);
                 }
                 if($advanceSettings && !empty($advanceSettings['string'])) {
-                    $updString = array_merge($updString,$advanceSettings['string']);
+                    $updString = \array_merge($updString, $advanceSettings['string']);
                 }
             }
 
@@ -233,7 +236,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
             $updString['webp_quality'] = $request->getPost('webp_quality', '80');
             $updString['path_to_cwebp'] = $request->getPost('path_to_cwebp', '/usr/bin');
             if ($updString['path_to_cwebp']) {
-                $updString['path_to_cwebp'] = rtrim($updString['path_to_cwebp'], '/');
+                $updString['path_to_cwebp'] = \rtrim($updString['path_to_cwebp'], '/');
             }
             if($updString['convert_algorithm']==='cwebp') {
                 if(!$updString['path_to_cwebp']) {
@@ -255,7 +258,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
             }
             if($updString) {
                 foreach ($updString as $kOption => $vOption) {
-                    if(is_array($vOption)) {
+                    if(\is_array($vOption)) {
                         $vOption = \serialize($vOption);
                     }
                     Option::set($curModuleName, $kOption, $vOption);
@@ -271,7 +274,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
             if (!isset($chmod)) {
                 $chmod = 777;
             } else {
-                $chmod = intval($chmod);
+                $chmod = (int)$chmod;
             }
             Option::set($curModuleName, 'change_chmod', $chmod);
 
@@ -336,7 +339,7 @@ $tabControl->begin();
 
 <form
     method="post"
-    action="<?= sprintf('%s?mid=%s&lang=%s', $request->getRequestedPage(), urlencode($mid), LANGUAGE_ID) ?>"
+    action="<?= \sprintf('%s?mid=%s&lang=%s', $request->getRequestedPage(), \urlencode($mid), LANGUAGE_ID) ?>"
 >
     <?php
     echo bitrix_sessid_post();
@@ -390,7 +393,7 @@ $tabControl->begin();
                    name="enable_jpeg"
                    value="Y"
                 <?php
-                if (Option::get($curModuleName, "enable_jpeg") == 'Y') {
+                if (Option::get($curModuleName, "enable_jpeg") === 'Y') {
                     echo 'checked';
                 }
                 ?>
@@ -406,7 +409,7 @@ $tabControl->begin();
                 <?php
                 $selectAlgorithmJpeg = Option::get($curModuleName, "opti_algorithm_jpeg");
                 foreach ($optiAlgorithmJpeg as $k => $v) { ?>
-                    <option value="<?= $k ?>" <?= ($k == $selectAlgorithmJpeg ? 'selected' : '') ?>><?= $v ?></option>
+                    <option value="<?= $k ?>" <?= ($k === $selectAlgorithmJpeg ? 'selected' : '') ?>><?= $v ?></option>
                 <?php } ?>
             </select>
         </td>
@@ -434,9 +437,9 @@ $tabControl->begin();
         <td width="60%">
             <select name="jpegoptim_compress">
                 <?php
-                $jpgCompress = Option::get($curModuleName, "jpegoptim_compress", '80');
+                $jpgCompress = (int)Option::get($curModuleName, "jpegoptim_compress", '80');
                 for ($i = 0; $i <= 100; $i += 5) { ?>
-                    <option value="<?= $i ?>" <?= ($i == $jpgCompress ? 'selected' : '') ?>><?= $i ?></option>
+                    <option value="<?= $i ?>" <?= ($i === $jpgCompress ? 'selected' : '') ?>><?= $i ?></option>
                 <?php } ?>
             </select>
         </td>
@@ -453,7 +456,7 @@ $tabControl->begin();
                    name="jpeg_progressive"
                    value="Y"
                 <?php
-                if (Option::get($curModuleName, "jpeg_progressive") == 'Y') {
+                if (Option::get($curModuleName, "jpeg_progressive") === 'Y') {
                     echo 'checked';
                 }
                 ?>
@@ -479,7 +482,7 @@ $tabControl->begin();
                    name="enable_png"
                    value="Y"
                 <?php
-                if (Option::get($curModuleName, "enable_png") == 'Y') {
+                if (Option::get($curModuleName, "enable_png") === 'Y') {
                     echo 'checked';
                 }
                 ?>
@@ -495,7 +498,7 @@ $tabControl->begin();
                 <?php
                 $selectAlgorithmPng = Option::get($curModuleName, "opti_algorithm_png");
                 foreach ($optiAlgorithmPng as $k => $v) { ?>
-                    <option value="<?= $k ?>" <?= ($k == $selectAlgorithmPng ? 'selected' : '') ?>><?= $v ?></option>
+                    <option value="<?= $k ?>" <?= ($k === $selectAlgorithmPng ? 'selected' : '') ?>><?= $v ?></option>
                 <?php } ?>
             </select>
         </td>
@@ -523,9 +526,9 @@ $tabControl->begin();
         <td width="60%">
             <select name="optipng_compress">
                 <?php
-                $pngCompress = Option::get($curModuleName, "optipng_compress", '3');
+                $pngCompress = (int)Option::get($curModuleName, "optipng_compress", '3');
                 for ($i = 1; $i <= 7; $i++) { ?>
-                    <option value="<?= $i ?>" <?= ($i == $pngCompress ? 'selected' : '') ?>><?= $i ?></option>
+                    <option value="<?= $i ?>" <?= ($i === $pngCompress ? 'selected' : '') ?>><?= $i ?></option>
                 <?php } ?>
             </select>
         </td>
@@ -549,7 +552,7 @@ $tabControl->begin();
                    name="enable_pdf"
                    value="Y"
                 <?php
-                if (Option::get($curModuleName, "enable_pdf") == 'Y') {
+                if (Option::get($curModuleName, "enable_pdf") === 'Y') {
                     echo 'checked';
                 }
                 ?>
@@ -559,7 +562,7 @@ $tabControl->begin();
     <tr>
         <td width="40%">
             <label for="path_to_ps2pdf">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_PATH_TO", ['#MODULE#' => 'ps2pdf']) ?>:
+                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_PATH_TO", ['#MODULE#' => 'gs']) ?>:
             </label>
         </td>
         <td width="60%">
@@ -567,7 +570,32 @@ $tabControl->begin();
                    size="50"
                    name="path_to_ps2pdf"
                    value="<?= Option::get($curModuleName, "path_to_ps2pdf", '/usr/bin'); ?>"
-            /> /ps2pdf
+            /> /gs
+        </td>
+    </tr>
+    <tr>
+        <td width="40%">
+            <label for="pdf_setting">
+                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_PDF_SETTING_HEADING") ?>:
+            </label>
+        </td>
+        <td width="60%">
+            <select name="pdf_setting">
+                <?php
+                $pdfSetting = Option::get($curModuleName, "pdf_setting", 'ebook');
+                $pdfTypeSettings = [
+                    'screen' => 'screen (72 dpi)',
+                    'ebook' => 'ebook (150 dpi)',
+                    'prepress' => 'prepress (300 dpi)',
+                    'printer' => 'printer (300 dpi)',
+                    'default' => 'default',
+                ];
+                foreach ($pdfTypeSettings as $key => $val) { ?>
+                    <option value="<?= $key ?>" <?= ($val === $pdfSetting ? 'selected' : '') ?>>
+                        <?= $i ?>
+                    </option>
+                <?php } ?>
+            </select>
         </td>
     </tr>
     <!-- /PDF -->
@@ -600,7 +628,7 @@ $tabControl->begin();
                    name="enable_element"
                    value="Y"
                 <?php
-                if (Option::get($curModuleName, "enable_element") == 'Y') {
+                if (Option::get($curModuleName, "enable_element") === 'Y') {
                     echo 'checked';
                 }
                 ?>
@@ -619,7 +647,7 @@ $tabControl->begin();
                    name="enable_section"
                    value="Y"
                 <?php
-                if (Option::get($curModuleName, "enable_section") == 'Y') {
+                if (Option::get($curModuleName, "enable_section") === 'Y') {
                     echo 'checked';
                 }
                 ?>
@@ -638,7 +666,7 @@ $tabControl->begin();
                    name="enable_resize"
                    value="Y"
                 <?php
-                if (Option::get($curModuleName, "enable_resize") == 'Y') {
+                if (Option::get($curModuleName, "enable_resize") === 'Y') {
                     echo 'checked';
                 }
                 ?>
@@ -657,7 +685,7 @@ $tabControl->begin();
                    name="enable_save"
                    value="Y"
                 <?php
-                if (Option::get($curModuleName, "enable_save") == 'Y') {
+                if (Option::get($curModuleName, "enable_save") === 'Y') {
                     echo 'checked';
                 }
                 ?>

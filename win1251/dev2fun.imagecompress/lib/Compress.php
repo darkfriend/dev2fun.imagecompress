@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.4.0
+ * @version 0.6.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -24,10 +24,12 @@ class Compress
     private $optiClassJpeg = '';
     private $optiClassPng = '';
 
-    private $algorithmJpeg = '',
+    private
+        $algorithmJpeg = '',
         $algorithmPng = '';
 
-    private $jpegOptimPath = '',
+    private
+        $jpegOptimPath = '',
         $pngOptimPath = '';
 
     private
@@ -72,16 +74,16 @@ class Compress
         $this->pngOptimPath = Option::get($this->MODULE_ID, 'path_to_optipng');
         $this->jpegOptimPath = Option::get($this->MODULE_ID, 'path_to_jpegoptim');
 
-        $this->enableElement = (Option::get($this->MODULE_ID, 'enable_element') == 'Y');
-        $this->enableSection = (Option::get($this->MODULE_ID, 'enable_section') == 'Y');
-        $this->enableResize = (Option::get($this->MODULE_ID, 'enable_resize') == 'Y');
-        $this->enableSave = (Option::get($this->MODULE_ID, 'enable_save') == 'Y');
+        $this->enableElement = (Option::get($this->MODULE_ID, 'enable_element') === 'Y');
+        $this->enableSection = (Option::get($this->MODULE_ID, 'enable_section') === 'Y');
+        $this->enableResize = (Option::get($this->MODULE_ID, 'enable_resize') === 'Y');
+        $this->enableSave = (Option::get($this->MODULE_ID, 'enable_save') === 'Y');
 
         $this->jpegOptimCompress = Option::get($this->MODULE_ID, 'jpegoptim_compress', 80);
         $this->pngOptimCompress = Option::get($this->MODULE_ID, 'optipng_compress', 3);
 
-        $this->jpegProgress = (Option::get($this->MODULE_ID, 'jpeg_progressive') == 'Y');
-        $this->enableImageResize = (Option::get($this->MODULE_ID, 'resize_image_enable') == 'Y');
+        $this->jpegProgress = (Option::get($this->MODULE_ID, 'jpeg_progressive') === 'Y');
+        $this->enableImageResize = (Option::get($this->MODULE_ID, 'resize_image_enable') === 'Y');
     }
 
     /**
@@ -129,7 +131,7 @@ class Compress
                 break;
         }
         return $obj;
-        //		return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
+//		return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
     }
 
     public function isPNGOptim()
@@ -137,8 +139,8 @@ class Compress
         if (!$this->pngoptim) {
             $this->pngoptim = Check::isPNGOptim($this->algorithmPng);
             if (!$this->pngoptim) $this->LAST_ERROR = Check::$lastError;
-            //            exec($this->pngOptimPath.'/optipng -v',$s);
-            //            if($s) $this->pngoptim = true;
+//            exec($this->pngOptimPath.'/optipng -v',$s);
+//            if($s) $this->pngoptim = true;
         }
         return $this->pngoptim;
     }
@@ -148,8 +150,8 @@ class Compress
         if (!$this->jpegoptim) {
             $this->jpegoptim = Check::isJPEGOptim($this->algorithmJpeg);
             if (!$this->jpegoptim) $this->LAST_ERROR = Check::$lastError;
-            //            exec($this->jpegOptimPath.'/jpegoptim --version',$s);
-            //            if($s) $this->jpegoptim = true;
+//            exec($this->jpegOptimPath.'/jpegoptim --version',$s);
+//            if($s) $this->jpegoptim = true;
         }
         return $this->jpegoptim;
     }
@@ -164,7 +166,7 @@ class Compress
             }
             return $res;
         }
-        if (file_exists($strFilePath)) {
+        if (\file_exists($strFilePath)) {
             $algInstance = static::getAlgInstance($this->algorithmJpeg);
             $res = $algInstance->compressJPG(
                 $strFilePath,
@@ -186,7 +188,7 @@ class Compress
             $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NO_MODULE', ['#MODULE#' => 'optipng']);
             return $res;
         }
-        if (file_exists($strFilePath)) {
+        if (\file_exists($strFilePath)) {
             $algInstance = static::getAlgInstance($this->algorithmPng);
             $res = $algInstance->compressPNG(
                 $strFilePath,
@@ -208,7 +210,7 @@ class Compress
             $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NO_MODULE', ['#MODULE#' => 'ps2pdf']);
             return $res;
         }
-        if (file_exists($strFilePath)) {
+        if (\file_exists($strFilePath)) {
             $res = $algInstance->compress(
                 $strFilePath,
                 [
@@ -270,13 +272,13 @@ class Compress
         $event->send();
 
         $arFile = \CFile::GetByID($intFileID)->GetNext();
-        if (!in_array($arFile["CONTENT_TYPE"], static::$supportContentType)) {
+        if (!\in_array($arFile["CONTENT_TYPE"], static::$supportContentType)) {
             return null;
         }
 
         $strFilePath = $_SERVER["DOCUMENT_ROOT"] . \CFile::GetPath($intFileID);
 
-        if (file_exists($strFilePath)) {
+        if (\file_exists($strFilePath)) {
             $oldSize = $arFile["FILE_SIZE"]; // filesize($strFilePath);
             if ($this->enableImageResize) {
                 $this->resize($intFileID, $strFilePath);
@@ -311,7 +313,7 @@ class Compress
             }
 
             if ($isCompress) {
-                clearstatcache(true, $strFilePath);
+                \clearstatcache(true, $strFilePath);
                 $newSize = filesize($strFilePath);
                 if ($newSize != $oldSize) {
                     //					$DB->Query("UPDATE b_file SET FILE_SIZE='" . $DB->ForSql($newSize, 255) . "' WHERE ID=" . intval($intFileID));
@@ -368,10 +370,10 @@ class Compress
             $algorithm
         );
         if ($res) {
-            chmod($destinationFile, 0777);
-            copy($destinationFile, $strFilePath);
+            \chmod($destinationFile, 0777);
+            \copy($destinationFile, $strFilePath);
             $this->saveWidthHeight($fileId, $strFilePath);
-            unlink($destinationFile);
+            \unlink($destinationFile);
         }
         return $res;
     }
@@ -379,10 +381,9 @@ class Compress
     public function saveWidthHeight($fileId, $filepath)
     {
         global $DB;
-        clearstatcache(true, $filepath);
+        \clearstatcache(true, $filepath);
         $arImageSize = \CFile::GetImageSize($filepath);
-        // var_dump($arImageSize); die();
-        return $DB->Query("UPDATE b_file SET HEIGHT='" . round(floatval($arImageSize[1])) . "', WIDTH='" . round(floatval($arImageSize[0])) . "' WHERE ID=" . intval($fileId));
+        return $DB->Query("UPDATE b_file SET HEIGHT='" . \round((float)$arImageSize[1]) . "', WIDTH='" . \round((float)$arImageSize[0]) . "' WHERE ID=" . (int)$fileId);
     }
 
     /**
@@ -394,7 +395,7 @@ class Compress
     public function saveSizeBitrix($fileId, $newSize)
     {
         global $DB;
-        return $DB->Query("UPDATE b_file SET FILE_SIZE='" . $DB->ForSql($newSize, 255) . "' WHERE ID=" . intval($fileId));
+        return $DB->Query("UPDATE b_file SET FILE_SIZE='" . $DB->ForSql($newSize, 255) . "' WHERE ID=" . (int)$fileId);
     }
 
     public function addCompressTable($intFileID, $arFields)
@@ -434,11 +435,11 @@ class Compress
         if(!static::$enable) return;
         $instance = self::getInstance();
         if (!$instance->enableElement) return;
-        if (intval($arFields["PREVIEW_PICTURE_ID"]) > 0) {
+        if ((int)$arFields["PREVIEW_PICTURE_ID"] > 0) {
             $instance->compressImageByID($arFields["PREVIEW_PICTURE_ID"]);
         }
 
-        if (intval($arFields["DETAIL_PICTURE_ID"]) > 0) {
+        if ((int)$arFields["DETAIL_PICTURE_ID"] > 0) {
             $instance->compressImageByID($arFields["DETAIL_PICTURE_ID"]);
         }
 
@@ -446,15 +447,15 @@ class Compress
 
         if ($arFields["PROPERTY_VALUES"]) {
             foreach ($arFields["PROPERTY_VALUES"] as $key => $values) {
-                foreach ($values as $k => $v) {
-                    if (is_array($v)) {
+                foreach ($values as $v) {
+                    if (\is_array($v)) {
 
 //                        $contentTypeList = [
 //                            'image/jpeg',
 //                            'image/png',
 //                            'application/pdf',
 //                        ];
-                        if (isset($v['VALUE']['type']) && !in_array($v['VALUE']['type'], static::$supportContentType)) {
+                        if (isset($v['VALUE']['type']) && !\in_array($v['VALUE']['type'], static::$supportContentType)) {
                             continue;
                         }
 
@@ -466,9 +467,9 @@ class Compress
                             }
                         }
 
-                        foreach ($arEl["PROPERTIES"] as $strPropCode => $arProp) {
+                        foreach ($arEl["PROPERTIES"] as $arProp) {
                             if ($arProp["ID"] == $key) {
-                                if ($arProp["MULTIPLE"] != 'N') {
+                                if ($arProp["MULTIPLE"] !== 'N') {
                                     foreach ($arProp["VALUE"] as $intFileID) {
                                         $instance->compressImageByID($intFileID);
                                     }
@@ -492,19 +493,16 @@ class Compress
         if(!static::$enable) return;
         $instance = self::getInstance();
         if (!$instance->enableSave) return;
-        //		var_dump($arFile, $strFileName, $strSavePath, $bForceMD5, $bSkipExt); die();
-        //		if ((!isset($arFile["MODULE_ID"]) || $arFile["MODULE_ID"] != "iblock")){
 
 //        $contentTypeList = [
 //            'image/jpeg',
 //            'image/png',
 //            'application/pdf',
 //        ];
-        if (!in_array($arFile["type"], static::$supportContentType)) {
+        if (!\in_array($arFile["type"], static::$supportContentType)) {
             return;
         }
 
-        //			if ($arFile["type"] == "image/jpeg" || $arFile["type"] == "image/png") {
         switch ($arFile["type"]) {
             case 'image/jpeg' :
                 $isCompress = $instance->compressJPG($arFile["tmp_name"]);
@@ -529,7 +527,7 @@ class Compress
                 break;
         }
         if ($isCompress) {
-            $arFile["size"] = filesize($arFile["tmp_name"]);
+            $arFile["size"] = \filesize($arFile["tmp_name"]);
         }
 
     }
@@ -560,10 +558,9 @@ class Compress
 //            'image/png',
 //            'application/pdf',
 //        ];
-        if (!in_array($arFile["CONTENT_TYPE"], static::$supportContentType)) {
+        if (!\in_array($arFile["CONTENT_TYPE"], static::$supportContentType)) {
             return null;
         }
-        //		if ($arFile["CONTENT_TYPE"] == "image/jpeg" || $arFile["CONTENT_TYPE"] == "image/png") {
         switch ($arFile["CONTENT_TYPE"]) {
             case 'image/jpeg' :
                 $instance->compressJPG($cacheImageFileTmp);
@@ -596,41 +593,42 @@ class Compress
         $arSqlOrder = [];
         $strSqlSearch = $strSqlOrder = "";
 
-        if (is_array($arFilter)) {
+        if (\is_array($arFilter)) {
             foreach ($arFilter as $key => $val) {
-                $key = strtoupper($key);
+                $key = \strtoupper($key);
 
                 $strOperation = '';
-                if (substr($key, 0, 1) == "@") {
-                    $key = substr($key, 1);
+                if (\substr($key, 0, 1) === "@") {
+                    $key = \substr($key, 1);
                     $strOperation = "IN";
-                    $arIn = is_array($val) ? $val : explode(',', $val);
+                    $arIn = \is_array($val) ? $val : \explode(',', $val);
                     $val = '';
                     foreach ($arIn as $v) {
-                        $val .= ($val <> '' ? ',' : '') . "'" . $DB->ForSql(trim($v)) . "'";
+                        $val .= ($val <> '' ? ',' : '') . "'" . $DB->ForSql(\trim($v)) . "'";
                     }
-                } elseif (substr($val, 0, 1) == ">") {
-                    $val = substr($val, 1);
+                } elseif (\substr($val, 0, 1) === ">") {
+                    $val = \substr($val, 1);
                     $strOperation = ">";
-                    $arIn = is_array($val) ? $val : explode(',', $val);
+                    $arIn = \is_array($val) ? $val : \explode(',', $val);
                     $val = '';
                     foreach ($arIn as $v) {
-                        $val .= ($val <> '' ? ',' : '') . "'" . $DB->ForSql(trim($v)) . "'";
+                        $val .= ($val <> '' ? ',' : '') . "'" . $DB->ForSql(\trim($v)) . "'";
                     }
-                } elseif (substr($val, 0, 1) == "<") {
-                    $val = substr($val, 1);
+                } elseif (\substr($val, 0, 1) === "<") {
+                    $val = \substr($val, 1);
                     $strOperation = "<";
-                    $arIn = is_array($val) ? $val : explode(',', $val);
+                    $arIn = \is_array($val) ? $val : \explode(',', $val);
                     $val = '';
                     foreach ($arIn as $v) {
-                        $val .= ($val <> '' ? ',' : '') . "'" . $DB->ForSql(trim($v)) . "'";
+                        $val .= ($val <> '' ? ',' : '') . "'" . $DB->ForSql(\trim($v)) . "'";
                     }
                 } else {
                     $val = $DB->ForSql($val);
                 }
 
-                if ($val == '')
+                if ($val === '') {
                     continue;
+                }
 
                 switch ($key) {
                     case "MODULE_ID":
@@ -641,17 +639,17 @@ class Compress
                     case "FILE_SIZE":
                     case "ORIGINAL_NAME":
                     case "CONTENT_TYPE":
-                        if ($strOperation == "IN")
+                        if ($strOperation === "IN")
                             $arSqlSearch[] = "f." . $key . " IN (" . $val . ")";
-                        elseif ($strOperation == ">")
+                        elseif ($strOperation === ">")
                             $arSqlSearch[] = "f." . $key . " > " . $val . "";
-                        elseif ($strOperation == "<")
+                        elseif ($strOperation === "<")
                             $arSqlSearch[] = "f." . $key . " < " . $val . "";
                         else
                             $arSqlSearch[] = "f." . $key . " = '" . $val . "'";
                         break;
                     case "COMRESSED":
-                        if ($val == "Y")
+                        if ($val === "Y")
                             $arSqlSearch[] = "tf.FILE_ID > 0";
                         else
                             $arSqlSearch[] = "tf.FILE_ID is NULL";
@@ -663,10 +661,11 @@ class Compress
             }
         }
 
-        if (!empty($arSqlSearch))
-            $strSqlSearch = " WHERE (" . implode(") AND (", $arSqlSearch) . ")";
+        if (!empty($arSqlSearch)) {
+            $strSqlSearch = " WHERE (" . \implode(") AND (", $arSqlSearch) . ")";
+        }
 
-        if (is_array($arOrder)) {
+        if (\is_array($arOrder)) {
             static $aCols = [
                 "ID" => 1,
                 "TIMESTAMP_X" => 1,
@@ -681,14 +680,14 @@ class Compress
                 "EXTERNAL_ID" => 1,
             ];
             foreach ($arOrder as $by => $ord) {
-                $by = strtoupper($by);
-                if (array_key_exists($by, $aCols))
-                    $arSqlOrder[] = "f." . $by . " " . (strtoupper($ord) == "DESC" ? "DESC" : "ASC");
+                $by = \strtoupper($by);
+                if (\array_key_exists($by, $aCols))
+                    $arSqlOrder[] = "f." . $by . " " . (\strtoupper($ord) === "DESC" ? "DESC" : "ASC");
             }
         }
         if (empty($arSqlOrder))
             $arSqlOrder[] = "f.ID ASC";
-        $strSqlOrder = " ORDER BY " . implode(", ", $arSqlOrder);
+        $strSqlOrder = " ORDER BY " . \implode(", ", $arSqlOrder);
 
         $strSql =
             "SELECT f.*, " . $DB->DateToCharFunction("f.TIMESTAMP_X") . " as TIMESTAMP_X, tf.* " .
@@ -717,18 +716,17 @@ class Compress
     public function getNiceFileSize($fileSize, $digits = 2)
     {
         $sizes = ["TB", "GB", "MB", "KB", "B"];
-        $total = count($sizes);
+        $total = \count($sizes);
         while ($total-- && $fileSize > 1024) {
             $fileSize /= 1024;
         }
-        return round($fileSize, $digits) . " " . $sizes[$total];
+        return \round($fileSize, $digits) . " " . $sizes[$total];
     }
 
     public function getChmod($num)
     {
         if (!$num) return 0777;
-        $num = intval($num);
-        switch ($num) {
+        switch ((int)$num) {
             case 644:
                 $num = 0644;
                 break;
