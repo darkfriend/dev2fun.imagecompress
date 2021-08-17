@@ -2,7 +2,7 @@
 /**
  * Created by PhpStorm.
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.3.0
+ * @version 0.6.8
  */
 use \Bitrix\Main\Localization\Loc;
 
@@ -30,6 +30,14 @@ $tabControl->BeginNextTab();
                                 class="c-heading u-large"><?= Loc::getMessage('LABEL_TITLE_HELP_DONATE_ALL_TEXT'); ?></h2>
                             <table class="c-table">
                                 <tbody class="c-table__body c-table--striped">
+                                <tr class="c-table__row">
+                                    <td class="c-table__cell">Tinkoff Bank and Bank Card</td>
+                                    <td class="c-table__cell">
+                                        <a href="https://www.tinkoff.ru/cf/36wVfnMf7mo" target="_blank">
+                                            https://www.tinkoff.ru/cf/36wVfnMf7mo
+                                        </a>
+                                    </td>
+                                </tr>
                                 <tr class="c-table__row">
                                     <td class="c-table__cell">Yandex.Money</td>
                                     <td class="c-table__cell">410011413398643</td>

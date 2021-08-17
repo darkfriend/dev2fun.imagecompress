@@ -1,4 +1,7 @@
 # These are supported funding model platforms
 
 # github: [darkfriend]
-custom: ['https://yasobe.ru/na/thankyou_bitrix']
+custom: [
+    'https://yasobe.ru/na/thankyou_bitrix',
+    'https://www.tinkoff.ru/cf/36wVfnMf7mo'
+]

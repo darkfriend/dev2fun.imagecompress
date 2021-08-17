@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.5
+ * @version 0.6.7
  */
 
 namespace Dev2fun\ImageCompress;
@@ -455,7 +455,10 @@ class Compress
 //                            'image/png',
 //                            'application/pdf',
 //                        ];
-                        if (isset($v['VALUE']['type']) && !\in_array($v['VALUE']['type'], static::$supportContentType)) {
+                        if (
+                            !isset($v['VALUE']['type'])
+                            || (isset($v['VALUE']['type']) && !\in_array($v['VALUE']['type'], static::$supportContentType))
+                        ) {
                             continue;
                         }
 
