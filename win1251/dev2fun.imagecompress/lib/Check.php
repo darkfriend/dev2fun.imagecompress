@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.0
+ * @version 0.6.8
  */
 
 namespace Dev2fun\ImageCompress;
@@ -113,14 +113,43 @@ class Check
         return $check;
     }
 
+    /**
+     * Return check active mode for mime type
+     * @param string $mimeType
+     * @return bool
+     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     */
+    public static function isActiveByMimeType($mimeType)
+    {
+        switch ($mimeType) {
+            case 'image/jpeg' :
+                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_jpeg', 'N') === 'Y';
+                break;
+            case 'image/png' :
+                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_png', 'N') === 'Y';
+                break;
+            case 'application/pdf' :
+                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_pdf', 'N') === 'Y';
+                break;
+            case 'image/svg' :
+                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_svg', 'N') === 'Y';
+                break;
+            case 'image/gif' :
+                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_gif', 'N') === 'Y';
+        }
+
+        return false;
+    }
+
     public static function isRead($path)
     {
-        return is_readable($path);
+        return \is_readable($path);
     }
 
     public static function isWrite($path)
     {
-        return is_writable($path);
+        return \is_writable($path);
     }
 
     /**

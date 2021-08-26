@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.7
+ * @version 0.6.8
  */
 
 namespace Dev2fun\ImageCompress;
@@ -272,7 +272,10 @@ class Compress
         $event->send();
 
         $arFile = \CFile::GetByID($intFileID)->GetNext();
-        if (!\in_array($arFile["CONTENT_TYPE"], static::$supportContentType)) {
+        if (
+            !\in_array($arFile["CONTENT_TYPE"], static::$supportContentType)
+            || !Check::isActiveByMimeType($arFile["CONTENT_TYPE"])
+        ) {
             return null;
         }
 
@@ -419,7 +422,7 @@ class Compress
     {
         if(!static::$enable) return;
         $instance = self::getInstance();
-        if ($instance->enableSection && $arFields['PICTURE']) {
+        if ($instance->enableSection && !empty($arFields['PICTURE'])) {
             $rsSection = \CIBlockSection::GetByID($arFields["ID"]);
             $arSection = $rsSection->GetNext();
             $instance->compressImageByID($arSection['PICTURE']);
@@ -434,7 +437,10 @@ class Compress
     {
         if(!static::$enable) return;
         $instance = self::getInstance();
-        if (!$instance->enableElement) return;
+        if (!$instance->enableElement) {
+            return;
+        }
+//        var_dump($instance->enableElement); die();
         if ((int)$arFields["PREVIEW_PICTURE_ID"] > 0) {
             $instance->compressImageByID($arFields["PREVIEW_PICTURE_ID"]);
         }
@@ -458,6 +464,7 @@ class Compress
                         if (
                             !isset($v['VALUE']['type'])
                             || (isset($v['VALUE']['type']) && !\in_array($v['VALUE']['type'], static::$supportContentType))
+                            || !Check::isActiveByMimeType($v['VALUE']['type'])
                         ) {
                             continue;
                         }
@@ -504,6 +511,9 @@ class Compress
 //        ];
         if (!\in_array($arFile["type"], static::$supportContentType)) {
             return;
+        }
+        if(!Check::isActiveByMimeType($arFile["type"])) {
+            return null;
         }
 
         switch ($arFile["type"]) {
@@ -561,7 +571,10 @@ class Compress
 //            'image/png',
 //            'application/pdf',
 //        ];
-        if (!\in_array($arFile["CONTENT_TYPE"], static::$supportContentType)) {
+        if (
+            !\in_array($arFile["CONTENT_TYPE"], static::$supportContentType)
+            || !Check::isActiveByMimeType($arFile["CONTENT_TYPE"])
+        ) {
             return null;
         }
         switch ($arFile["CONTENT_TYPE"]) {
