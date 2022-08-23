@@ -12,14 +12,14 @@ use Bitrix\Main\Config\Option;
 
 IncludeModuleLangFile(__FILE__);
 
-class WebpConvertPhp
+class AvifConvertImagick
 {
     private static $instance;
     public $lastError;
 
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $enable = false;
-    private $quality = 70;
+    private $quality = 80;
 
     private function __construct()
     {
@@ -49,11 +49,8 @@ class WebpConvertPhp
      */
     public function isOptim()
     {
-        if(!\function_exists('imagewebp')) {
-            throw new \ErrorException('Not found "imagewebp"');
-        }
-        if(!\extension_loaded('gd')) {
-            throw new \ErrorException('Not found "gd"');
+        if(!\class_exists('Imagick')) {
+            throw new \ErrorException('Not found "Imagick"');
         }
         return true;
     }
@@ -69,20 +66,9 @@ class WebpConvertPhp
     {
         if(!$this->enable) return false;
 
-        //        $strFilePath = strtr(
-        //            $strFilePath,
-        //            [
-        //                ' ' => '\ ',
-        //                '(' => '\(',
-        //                ')' => '\)',
-        //                ']' => '\]',
-        //                '[' => '\[',
-        //            ]
-        //        );
-
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
-            "OnBeforeConvertImageWebp",
+            "OnBeforeConvertImageAvif",
             [&$arFile, &$params]
         );
         $event->send();
@@ -97,7 +83,7 @@ class WebpConvertPhp
         $fileInfo = \pathinfo($src);
         $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
         $arFile["SUBDIR"] = \ltrim($arFile["SUBDIR"], '/');
-        $srcWebp = "/{$uploadDir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.webp";
+        $srcWebp = "/{$uploadDir}/resize_cache/avif/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.avif";
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
 
         if(@\is_file($absSrcWebp)) {
@@ -114,24 +100,31 @@ class WebpConvertPhp
             }
         }
 
-        switch(\mime_content_type($src)) {
-            case 'image/png':
-                $img = \imageCreateFromPng($src);
-                \imagepalettetotruecolor($img);
-                break;
-            case 'image/jpeg':
-                $img = \imageCreateFromJpeg($src);
-                break;
-        }
-        if(empty($img)) {
-            return false;
-        }
-        \imageWebp(
-            $img,
-            $absSrcWebp,
-            $this->quality
-        );
-        \imagedestroy($img);
+        $imagick = new \Imagick();
+        $imagick->readImage($src);
+        $imagick->setImageFormat('avif');
+        $imagick->setCompressionQuality($this->quality);
+        $imagick->writeImage($absSrcWebp);
+        $imagick->destroy();
+
+//        switch(\mime_content_type($src)) {
+//            case 'image/png':
+//                $img = \imageCreateFromPng($src);
+//                \imagepalettetotruecolor($img);
+//                break;
+//            case 'image/jpeg':
+//                $img = \imageCreateFromJpeg($src);
+//                break;
+//        }
+//        if(empty($img)) {
+//            return false;
+//        }
+//        imageavif(
+//            $img,
+//            $absSrcWebp,
+//            $this->quality
+//        );
+//        \imagedestroy($img);
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,

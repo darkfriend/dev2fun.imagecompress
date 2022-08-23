@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.8
+ * @version 0.7.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -166,7 +166,7 @@ class Check
 
             if (!$algorithmJpeg)
                 throw new \Exception(Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NOT_CHOICE', ['#ALGORITHM#' => 'JPEG']));
-            if ($algorithmJpeg == 'jpegoptim' && !Option::get(\Dev2funImageCompress::MODULE_ID, 'path_to_jpegoptim'))
+            if ($algorithmJpeg === 'jpegoptim' && !Option::get(\Dev2funImageCompress::MODULE_ID, 'path_to_jpegoptim'))
                 throw new \Exception(Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NO_PATH', ['#MODULE#' => 'jpegoptim']));
             if (!self::isJPEGOptim($algorithmJpeg)) {
                 if (!self::$lastError)
@@ -177,7 +177,7 @@ class Check
             if (!$algorithmPng) {
                 throw new \Exception(Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NOT_CHOICE', ['#ALGORITHM#' => 'PNG']));
             }
-            if ($algorithmPng == 'optipng' && !Option::get(\Dev2funImageCompress::MODULE_ID, 'path_to_optipng')) {
+            if ($algorithmPng === 'optipng' && !Option::get(\Dev2funImageCompress::MODULE_ID, 'path_to_optipng')) {
                 throw new \Exception('Не указан путь до optipng');
             }
             if (!self::isPNGOptim($algorithmPng)) {

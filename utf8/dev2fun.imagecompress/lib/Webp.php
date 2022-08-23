@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.0
+ * @version 0.7.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -29,7 +29,7 @@ class Webp
         $this->path = Option::get($this->MODULE_ID, 'path_to_cwebp', '/usr/bin');
         $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
 
-        $this->quality = Option::get($this->MODULE_ID, 'webp_quality', 80);
+        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80);
         if(!$this->quality) {
             $this->quality = 80;
         }
@@ -133,16 +133,25 @@ class Webp
             $params['changeChmod'] = 0777;
         }
 
-        $strCommand = '-lossless ';
+        $strCommand = '';
         if(!empty($params['compression']) || $params['compression']===0) {
             $strCommand .= "-m {$params['compression']} ";
         }
         if(!empty($params['multithreading'])) {
             $strCommand .= "-mt ";
         }
-        if(!empty($params['quality'])) {
+        if(!empty($params['quality']) && (int)$params['quality'] !== 100) {
             $strCommand .= "-q {$params['quality']} ";
+        } else {
+            $strCommand .= '-lossless ';
         }
+
+        $event = new \Bitrix\Main\Event(
+            $this->MODULE_ID,
+            "OnBeforeCWebpConvert",
+            [&$src, &$absSrcWebp, &$strCommand]
+        );
+        $event->send();
 
         \exec("{$this->path}/cwebp $strCommand $src -o $absSrcWebp 2>&1", $res);
         if (!empty($params['changeChmod'])) {

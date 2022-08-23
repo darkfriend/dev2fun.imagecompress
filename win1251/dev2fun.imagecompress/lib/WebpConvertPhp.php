@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.0
+ * @version 0.7.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -24,7 +24,7 @@ class WebpConvertPhp
     private function __construct()
     {
         $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
-        $this->quality = Option::get($this->MODULE_ID, 'webp_quality', 80);
+        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80);
         if(!$this->quality) {
             $this->quality = 80;
         }

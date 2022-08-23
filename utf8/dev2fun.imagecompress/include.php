@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.6
+ * @version 0.7.0
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -33,6 +33,8 @@ Loader::registerAutoLoadClasses(
         "Dev2fun\ImageCompress\Gif" => 'lib/Gif.php',
         "Dev2fun\ImageCompress\Svg" => 'lib/Svg.php',
         "Dev2fun\ImageCompress\WebpConvertPhp" => 'lib/WebpConvertPhp.php',
+        "Dev2fun\ImageCompress\AvifConvertPhp" => 'lib/AvifConvertPhp.php',
+        "Dev2fun\ImageCompress\AvifConvertImagick" => 'lib/AvifConvertImagick.php',
     ]
 );
 
@@ -45,6 +47,7 @@ class Dev2funImageCompress
         'png',
         'pdf',
         'webp',
+        'avif',
         'gif',
         'svg',
     ];

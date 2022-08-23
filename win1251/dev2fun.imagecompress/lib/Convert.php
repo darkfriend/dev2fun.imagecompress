@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.6
+ * @version 0.7.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -37,8 +37,11 @@ class Convert
     public static $convertClasses = [
         'cwebp' => '\Dev2fun\ImageCompress\Webp',
         'phpWebp' => '\Dev2fun\ImageCompress\WebpConvertPhp',
+        'phpAvif' => '\Dev2fun\ImageCompress\AvifConvertPhp',
+        'imagickAvif' => '\Dev2fun\ImageCompress\AvifConvertImagick',
     ];
 
+    /** @var self */
     private static $instance;
     /** @var bool state */
     public static $enable = false;
@@ -48,13 +51,13 @@ class Convert
         static::$enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
         $supportAttrs = Option::get($this->MODULE_ID, 'convert_attributes', []);
         if($supportAttrs) {
-            $supportAttrs = \unserialize($supportAttrs);
+            $supportAttrs = \unserialize($supportAttrs, ['allowed_classes' => false]);
         }
         $this->supportAttrs = $supportAttrs;
 
         $convertMode = Option::get($this->MODULE_ID, 'convert_mode');
         if($convertMode) {
-            $convertMode = \unserialize($convertMode);
+            $convertMode = \unserialize($convertMode, ['allowed_classes' => false]);
         } else {
             $convertMode = ['postConvert'];
         }
@@ -79,7 +82,7 @@ class Convert
     /**
      * Get algorithm class
      * @param string $algorithm
-     * @return null|Webp|WebpConvertPhp
+     * @return null|Webp|WebpConvertPhp|AvifConvertImagick|AvifConvertPhp
      */
     public static function getAlgInstance($algorithm)
     {
@@ -91,16 +94,21 @@ class Convert
             case 'phpWebp':
                 $obj = \Dev2fun\ImageCompress\WebpConvertPhp::getInstance();
                 break;
+            case 'imagickAvif':
+                $obj = \Dev2fun\ImageCompress\AvifConvertImagick::getInstance();
+                break;
+            case 'phpAvif':
+                $obj = \Dev2fun\ImageCompress\AvifConvertPhp::getInstance();
+                break;
         }
+
         return $obj;
 //        return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
     }
 
     /**
      * Get exclude pages
-     * @return array|mixed
-     * @throws \Bitrix\Main\ArgumentNullException
-     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     * @return array
      */
     public static function getSettingsExcludePage()
     {
@@ -111,6 +119,21 @@ class Convert
             $pages = [];
         }
         return $pages;
+    }
+
+    /**
+     * Get exclude files
+     * @return array
+     */
+    public static function getSettingsExcludeFiles()
+    {
+        $files = Option::get(\Dev2funImageCompress::MODULE_ID, 'exclude_files');
+        if ($files) {
+            $files = \json_decode($files, true);
+        } else {
+            $files = [];
+        }
+        return $files;
     }
 
     /**
@@ -151,17 +174,65 @@ class Convert
             if ($curPage === '/') {
                 $curPage = 'index.php';
             }
-            if (\in_array(\ltrim($curPage, '/'), $arExcluded)) {
+            if (in_array(ltrim($curPage, '/'), $arExcluded)) {
                 return true;
             }
             foreach ($arExcluded as $exc) {
-                if (\preg_match($exc, $curPage)) {
+                if (preg_match($exc, $curPage)) {
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    /**
+     * Check page on exclude
+     * @param string $file
+     * @return bool
+     */
+    public static function isExcludeFile($file)
+    {
+        $file = ltrim($file, '/');
+        $arExcluded = self::getSettingsExcludeFiles();
+
+        $arExcludedRegExp = array_filter($arExcluded, function($item) {
+            return strpos($item, '#');
+        });
+
+        foreach ($arExcludedRegExp as $item) {
+            if (preg_match($item, $file)) {
+                return true;
+            }
+        }
+
+        return in_array($file, $arExcluded);
+    }
+
+    /**
+     * Save exclude files
+     * @param array $sFields
+     * @return bool
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     */
+    public static function saveSettingsExcludeFile($sFields = [])
+    {
+        if($sFields) {
+            foreach ($sFields as $key => $field) {
+                if (empty($field)) {
+                    unset($sFields[$key]);
+                }
+            }
+        } elseif(!is_array($sFields)) {
+            $sFields = [];
+        }
+        Option::set(
+            \Dev2funImageCompress::MODULE_ID,
+            'exclude_files',
+            json_encode(array_values($sFields))
+        );
+        return true;
     }
 
     /**
@@ -198,6 +269,11 @@ class Convert
 
         $upload_dir = Option::get('main', 'upload_dir', 'upload');
         $res = "/$upload_dir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+
+        // исключение файла из списка исключений
+        if (static::isExcludeFile($res)) {
+            return false;
+        }
 
         $strFilePath = $_SERVER["DOCUMENT_ROOT"] . $res;
         if (!\is_file($strFilePath)) {
@@ -250,9 +326,16 @@ class Convert
                     continue;
                 }
             }
+
             $event = new \Bitrix\Main\Event($this->MODULE_ID, "OnBeforePostConvertImage", [&$file]);
             $event->send();
+
             if(!$file) {
+                continue;
+            }
+
+            // исключение файла из списка исключений
+            if (static::isExcludeFile($file)) {
                 continue;
             }
 
@@ -332,6 +415,13 @@ class Convert
             return false;
         }
 
+        // исключение файла из списка исключений
+        $resFile = "/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        if (static::isExcludeFile($resFile)) {
+            return false;
+        }
+
+        // исключение файла из-за типа файла
         if (!\in_array($arFileConvert["CONTENT_TYPE"], static::$supportContentType)) {
             return false;
         }
@@ -342,9 +432,7 @@ class Convert
             return false;
         }
 
-        $res = "/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
-
-        $strFilePath = $_SERVER["DOCUMENT_ROOT"] . $res;
+        $strFilePath = $_SERVER["DOCUMENT_ROOT"] . $resFile;
         if (!\is_file($strFilePath)) {
             return false;
         }
@@ -374,8 +462,15 @@ class Convert
         if(!\in_array('hitConvert', self::getInstance()->convertMode) || !self::$enable) {
             return false;
         }
-//        if(!static::$enable) return null;
-        if(!$intFileID) return null;
+
+        if(!$intFileID) {
+            return null;
+        }
+
+        // исключение страницы из списка исключений
+        if (self::isExcludePage()) {
+            return false;
+        }
 
         $arFile = \CFile::GetByID($intFileID)->GetNext();
 
@@ -428,12 +523,17 @@ class Convert
      */
     public static function CompressImageOnConvertEvent($arFile)
     {
-        if(!\in_array('hitConvert', self::getInstance()->convertMode) || !self::$enable) {
+        if(
+            !\in_array('hitConvert', self::getInstance()->convertMode)
+            || !self::$enable
+        ) {
             return false;
         }
+
         if(self::isExcludePage()) {
             return false;
         }
+
         return self::getInstance()->process($arFile);
     }
 
@@ -451,8 +551,14 @@ class Convert
      */
     public static function PostConverterEvent(&$content)
     {
-        if(!$content) return $content;
-        if(!\in_array('postConvert', self::getInstance()->convertMode) || !self::$enable) {
+        if(!$content) {
+            return $content;
+        }
+
+        if(
+            !\in_array('postConvert', self::getInstance()->convertMode)
+            || !self::$enable
+        ) {
             return $content;
         }
 
@@ -658,16 +764,9 @@ class Convert
      */
     public static function checkWebpSupport()
     {
-        //        global $APPLICATION;
-        //        if (\preg_match('#\/bitrix\/admin\/#', $APPLICATION->GetCurPage())) {
-        //            return false;
-        //        }
         if(!static::checkSupportWebpCurrentPath()) {
             return false;
         }
-        //        if (\strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) === false) {
-        //            return false;
-        //        }
 
         $supportBrowsers = [
             'chrome',
@@ -680,10 +779,8 @@ class Convert
         );
         $event->send();
 
-        $result = \in_array(
-            self::getBrowserAgentName($_SERVER["HTTP_USER_AGENT"]),
-            $supportBrowsers
-        );
+        $result = \in_array(self::getBrowserAgentName($_SERVER["HTTP_USER_AGENT"]), $supportBrowsers)
+            || self::checkSupportWebpAccept();
 
         $event = new \Bitrix\Main\Event(self::getInstance()->MODULE_ID, "OnAfterCheckWebpSupport", [$result]);
         $event->send();

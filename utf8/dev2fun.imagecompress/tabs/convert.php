@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.2
+ * @version 0.7.0
  */
 
 use \Bitrix\Main\Localization\Loc;
@@ -81,14 +81,14 @@ $convertModes = \Dev2fun\ImageCompress\Convert::$convertModes;
 
 <tr>
     <td width="40%">
-        <label for="webp_quality">
+        <label for="convert_quality">
             <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_WEBP_QUALITY") ?>:
         </label>
     </td>
     <td width="60%">
-        <select name="webp_quality">
+        <select name="convert_quality">
             <?php
-            $webpQuality = Option::get($curModuleName, 'webp_quality', 80);
+            $webpQuality = Option::get($curModuleName, 'convert_quality', 80);
             if(!$webpQuality) $webpQuality = 80;
             for ($i = 60; $i <= 100; $i += 1) { ?>
                 <option value="<?= $i ?>" <?= ($i == $webpQuality ? 'selected' : '') ?>><?= $i ?></option>
@@ -148,6 +148,66 @@ $convertModes = \Dev2fun\ImageCompress\Convert::$convertModes;
                     for (var i in data) {
                         if (i.substring(0, 9) == 'EXCLUDE_PAGES[') {
                             addNewRow('d2f_page_excluded_webp')
+                        }
+                    }
+                });
+            </script>
+            </tbody>
+        </table>
+    </td>
+</tr>
+
+<tr>
+    <td width="40%" class="adm-detail-content-cell-l">
+        <label><?= Loc::getMessage("D2F_COMPRESS_REFERENCES_FILE_EXCLUDED"); ?>:</label>
+    </td>
+    <td width="60%" class="adm-detail-content-cell-r">
+        <table class="nopadding" cellpadding="0" cellspacing="0" border="0" width="100%"
+               id="d2f_file_excluded_webp">
+            <tbody>
+            <?php
+            $excludedPages = \Dev2fun\ImageCompress\Convert::getSettingsExcludeFiles();
+            $serverUrl = \Dev2funImageCompress::getUrl('/');
+            foreach ($excludedPages as $key => $page) {
+                $key = \str_replace('n', '', $key);
+                ?>
+                <tr>
+                    <td>
+                        <label><?= $serverUrl ?></label>
+                        <input
+                            name="EXCLUDE_FILES[n<?= $key ?>]"
+                            value="<?= $page ?>"
+                            size="30"
+                            type="text"
+                        >
+                    </td>
+                </tr>
+            <?php } ?>
+            <tr>
+                <td>
+                    <label><?= $serverUrl ?></label>
+                    <input
+                        name="EXCLUDE_FILES[n<?= count($excludedPages) ?>]"
+                        value=""
+                        size="30"
+                        type="text"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input
+                        type="button"
+                        value="<?= Loc::getMessage("LABEL_ADD"); ?>"
+                        onclick="addNewRow('d2f_file_excluded_webp')"
+                    >
+                </td>
+            </tr>
+            <script type="text/javascript">
+                BX.addCustomEvent('onAutoSaveRestore', function (ob, data) {
+                    for (var i in data) {
+                        if (i.substring(0, 9) == 'EXCLUDE_FILES[') {
+                            addNewRow('d2f_file_excluded_webp')
                         }
                     }
                 });

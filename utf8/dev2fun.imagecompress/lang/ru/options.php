@@ -19,6 +19,7 @@ $MESS["D2F_COMPRESS_REFERENCES_JPEG_COMPRESS"] = "Качество jpeg-файл
 $MESS["D2F_COMPRESS_REFERENCES_PNG_COMPRESS"] = "Степень сжатия у png-файлов";
 $MESS["D2F_COMPRESS_REFERENCES_TEST_BTN"] = "Тестировать конфигурацию сервера";
 $MESS["D2F_COMPRESS_REFERENCES_PAGE_EXCLUDED"] = "Страницы исключения";
+$MESS["D2F_COMPRESS_REFERENCES_FILE_EXCLUDED"] = "Исключаемые файлы (картинки)";
 
 $MESS["D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND"] = "Не найден #MODULE#. Установите на сервере #MODULE#";
 $MESS["D2F_IMAGECOMPRESS_ERROR_NOT_FOUND_ALGORITHM"] = "Не известная проблема с алгоритмом для #MODULE#";
@@ -89,13 +90,14 @@ $MESS['D2F_IMAGECOMPRESS_OPTIONS_RESIZE_IMAGE_ALGORITHM_SELECT'] = "Алгори
 
 $MESS['MAIN_TAB_SET_OPTI'] = "Оптимизация";
 $MESS['MAIN_TAB_CONVERT'] = "Конвертация";
-$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_BASE_CONVERT'] = "Настройки конвертации";
-$MESS['D2F_COMPRESS_REFERENCES_ENABLE_CONVERT'] = "Активность конвертации в webp";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_BASE_CONVERT'] = "Настройки конвертации webp/avif";
+$MESS['D2F_COMPRESS_REFERENCES_ENABLE_CONVERT'] = "Активность конвертации";
 $MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_MODE_CONVERT'] = "Режим конвертации";
 $MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_POST_CONVERT_ATTR'] = "Список поддерживаемых атрибутов (для postConvert)";
-$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_CONVERT'] = "Алгоритм конвертации в webp";
-$MESS['D2F_COMPRESS_REFERENCES_WEBP_QUALITY'] = "Качество картинки в webp";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_CONVERT'] = "Алгоритм конвертации";
+$MESS['D2F_COMPRESS_REFERENCES_WEBP_QUALITY'] = "Качество конечной картинки";
 $MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_POST_CONVERT_CACHE_TIME'] = "Время жизни кэща";
+
 $MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_CWEBP'] = "Настройки для алгоритма cwebp";
 $MESS['D2F_COMPRESS_REFERENCES_PATH_CWEBP'] = "Путь до cwebp";
 $MESS['D2F_COMPRESS_REFERENCES_CWEBP_COMPRESS'] = "Степень оптимизации cwebp (рекомендуется 4)";

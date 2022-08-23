@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.8
+ * @version 0.7.0
  */
 
 namespace Dev2fun\ImageCompress;

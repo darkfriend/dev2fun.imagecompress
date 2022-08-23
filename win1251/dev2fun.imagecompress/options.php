@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.6
+ * @version 0.7.0
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -175,7 +175,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
 
 
             $saveTypes = [
-                //                'webp',
+//                'webp',
                 'gif',
                 'svg',
             ];
@@ -187,7 +187,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 if ($pth) {
                     $pth = \rtrim($pth, '/');
                 }
-                if($enable==='Y') {
+                if($enable === 'Y') {
                     if(!$pth) {
                         throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => $saveType]));
                     }
@@ -206,15 +206,19 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 $advanceSettings = \Dev2fun\ImageCompress\Compress::getAlgInstance($saveType)
                     ->getOptionsSettings($request->getPost($saveType, []));
                 if($advanceSettings && !empty($advanceSettings['checkbox'])) {
-                    $updCheckbox = \array_merge($updCheckbox, $advanceSettings['checkbox']);
+                    $updCheckbox = array_merge($updCheckbox, $advanceSettings['checkbox']);
                 }
                 if($advanceSettings && !empty($advanceSettings['string'])) {
-                    $updString = \array_merge($updString, $advanceSettings['string']);
+                    $updString = array_merge($updString, $advanceSettings['string']);
                 }
             }
 
             if (!empty($_REQUEST["EXCLUDE_PAGES"])) {
                 \Dev2fun\ImageCompress\Convert::saveSettingsExcludePage($_REQUEST["EXCLUDE_PAGES"]);
+            }
+
+            if (!empty($_REQUEST["EXCLUDE_FILES"])) {
+                \Dev2fun\ImageCompress\Convert::saveSettingsExcludeFile($_REQUEST["EXCLUDE_FILES"]);
             }
 
             // set convert options
@@ -236,12 +240,12 @@ if ($request->isPost() && check_bitrix_sessid()) {
 //            }
 
             $updString['convert_algorithm'] = $request->getPost('convert_algorithm', 'phpWebp');
-            $updString['webp_quality'] = $request->getPost('webp_quality', '80');
+            $updString['convert_quality'] = $request->getPost('convert_quality', '80');
             $updString['path_to_cwebp'] = $request->getPost('path_to_cwebp', '/usr/bin');
             if ($updString['path_to_cwebp']) {
                 $updString['path_to_cwebp'] = \rtrim($updString['path_to_cwebp'], '/');
             }
-            if($updString['convert_algorithm']==='cwebp') {
+            if($updString['convert_algorithm'] === 'cwebp') {
                 if(!$updString['path_to_cwebp']) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'cwebp']));
                 }
