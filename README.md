@@ -26,7 +26,7 @@
 
 ## Преимущества модуля:
 
-* модуль использует рекомендуемые google: jpegoptim, optipng, gs, svgo, gifsicle, cwebp
+* модуль использует рекомендуемые google: jpegoptim, optipng, gs, svgo, gifsicle, cwebp, avif
 * сжатие картинок в 5-10 раз
 * пройдете анализ PageSpeed Insights
 * автоматическая оптимизация (на лету)

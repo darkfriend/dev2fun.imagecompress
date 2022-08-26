@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.0
+ * @version 0.7.1
  */
 
 namespace Dev2fun\ImageCompress;
@@ -118,6 +118,7 @@ class Convert
         } else {
             $pages = [];
         }
+        array_unshift($pages, '#(\/bitrix\/.*)#');
         return $pages;
     }
 

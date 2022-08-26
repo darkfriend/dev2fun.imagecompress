@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.0
+ * @version 0.7.1
  */
 
 use \Bitrix\Main\Localization\Loc;
@@ -158,6 +158,17 @@ $convertModes = \Dev2fun\ImageCompress\Convert::$convertModes;
 </tr>
 
 <tr>
+    <td></td>
+    <td>
+        <?php
+        echo BeginNote();
+        echo Loc::getMessage('D2F_COMPRESS_PAGE_EXCLUDED_TEXT');
+        EndNote();
+        ?>
+    </td>
+</tr>
+
+<tr>
     <td width="40%" class="adm-detail-content-cell-l">
         <label><?= Loc::getMessage("D2F_COMPRESS_REFERENCES_FILE_EXCLUDED"); ?>:</label>
     </td>
@@ -214,6 +225,17 @@ $convertModes = \Dev2fun\ImageCompress\Convert::$convertModes;
             </script>
             </tbody>
         </table>
+    </td>
+</tr>
+
+<tr>
+    <td></td>
+    <td>
+        <?php
+        echo BeginNote();
+        echo Loc::getMessage('D2F_COMPRESS_FILE_EXCLUDED_TEXT');
+        EndNote();
+        ?>
     </td>
 </tr>
 

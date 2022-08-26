@@ -103,4 +103,31 @@ $MESS['D2F_COMPRESS_REFERENCES_PATH_CWEBP'] = "Путь до cwebp";
 $MESS['D2F_COMPRESS_REFERENCES_CWEBP_COMPRESS'] = "Степень оптимизации cwebp (рекомендуется 4)";
 $MESS['D2F_COMPRESS_REFERENCES_CWEBP_MULTITHREADING'] = "Активность мультипоточности при конвертации (рекомендуется)";
 
+$MESS['D2F_COMPRESS_PAGE_EXCLUDED_TEXT'] = <<<EO
+	<i>Вы можете указывать как точный путь, так и регулярное выражение.</i>
+	<ul>
+		<li>
+			Пример точного пути: <code>catalog/</code><br>
+			В этом случае модуль не конвертирует на странице <code>catalog/index.php</code>
+		</li>
+		<li>
+			Пример регулярного выражения: <code>#(\/catalog\/.*)#i</code><br>
+			В этом случае модуль не конвертирует на странице и всех подстраницах раздела /catalog.
+		</li>
+	</ul>
+EO;
+$MESS['D2F_COMPRESS_FILE_EXCLUDED_TEXT'] = <<<EO
+	<i>Вы можете указывать как точный путь, так и регулярное выражение.</i>
+	<ul>
+		<li>
+			Пример точного пути: <code>catalog/image.jpeg</code><br>
+			В этом случае модуль не конвертирует картинку <code>/catalog/image.jpeg</code>
+		</li>
+		<li>
+			Пример регулярного выражения: <code>#(\/catalog\/.*)#i</code><br>
+			В этом случае модуль не конвертирует все картинки которые в папке /catalog.
+		</li>
+	</ul>
+EO;
+
 $MESS['LABEL_ADD'] = "Добавить";
