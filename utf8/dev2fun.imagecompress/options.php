@@ -819,6 +819,6 @@ $tabControl->begin();
            onclick="return confirm('<?= AddSlashes(GetMessage("MAIN_HINT_RESTORE_DEFAULTS_WARNING")) ?>')"
            value="<?=Loc::getMessage("MAIN_RESTORE_DEFAULTS") ?>"
     />
-    <? */ ?>
+    <?php */ ?>
     <?php $tabControl->end(); ?>
 </form>

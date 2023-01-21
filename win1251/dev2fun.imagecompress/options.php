@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.0
+ * @version 0.7.2
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -819,6 +819,6 @@ $tabControl->begin();
            onclick="return confirm('<?= AddSlashes(GetMessage("MAIN_HINT_RESTORE_DEFAULTS_WARNING")) ?>')"
            value="<?=Loc::getMessage("MAIN_RESTORE_DEFAULTS") ?>"
     />
-    <? */ ?>
+    <?php */ ?>
     <?php $tabControl->end(); ?>
 </form>

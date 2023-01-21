@@ -38,7 +38,9 @@ $tabControl->BeginNextTab();
                                 </tr>
                                 <tr class="c-table__row">
                                     <td class="c-table__cell">Yandex.Money</td>
-                                    <td class="c-table__cell">410011413398643</td>
+                                    <td class="c-table__cell">
+                                        <a href="https://yoomoney.ru/to/410011413398643">410011413398643</a>
+                                    </td>
                                 </tr>
                                 <tr class="c-table__row">
                                     <td class="c-table__cell">Webmoney WMR (rub)</td>
@@ -70,8 +72,9 @@ $tabControl->BeginNextTab();
                                 </tr>
                                 <tr class="c-table__row">
                                     <td class="c-table__cell">PayPal</td>
-                                    <td class="c-table__cell"><a href="https://www.paypal.me/darkfriend"
-                                                                 target="_blank">paypal.me/@darkfriend</a>
+                                    <td class="c-table__cell">
+                                        <a href="https://www.paypal.me/darkfriend" target="_blank">paypal.me/@darkfriend
+                                        </a>
                                     </td>
                                 </tr>
                                 <tr class="c-table__row">

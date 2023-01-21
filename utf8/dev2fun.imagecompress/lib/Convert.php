@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.1
+ * @version 0.7.2
  */
 
 namespace Dev2fun\ImageCompress;
@@ -15,12 +15,13 @@ IncludeModuleLangFile(__FILE__);
 class Convert
 {
     private $MODULE_ID = 'dev2fun.imagecompress';
+    /** @var string */
     public $LAST_ERROR;
     /** @var string[] support tag attributes */
     public $supportAttrs = [];
     /** @var string[]  */
     public $convertMode = [];
-
+    /** @var int */
     public $cacheTime = 3600;
 
     public static $supportContentType = [
@@ -44,11 +45,12 @@ class Convert
     /** @var self */
     private static $instance;
     /** @var bool state */
-    public static $enable = false;
+    public static $globalEnable = false;
+    public $enable = false;
 
     private function __construct()
     {
-        static::$enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
+        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
         $supportAttrs = Option::get($this->MODULE_ID, 'convert_attributes', []);
         if($supportAttrs) {
             $supportAttrs = \unserialize($supportAttrs, ['allowed_classes' => false]);
@@ -244,7 +246,9 @@ class Convert
      */
     public function process($arFile, $options=[])
     {
-        if(!static::$enable) return false;
+        if(!static::$globalEnable || !$this->enable) {
+            return false;
+        }
         $res = false;
 
         $event = new \Bitrix\Main\Event($this->MODULE_ID, "OnBeforeConvertImage", [&$arFile]);
@@ -306,9 +310,7 @@ class Convert
      */
     public function postProcess($arFiles, $options=[])
     {
-        if(!static::$enable) return false;
-
-        if(!static::checkWebpSupport()) {
+        if(!static::$globalEnable || !$this->enable || !static::checkWebpSupport()) {
             return false;
         }
 
@@ -394,9 +396,14 @@ class Convert
         &$arImageSize
     )
     {
-        if(!static::$enable) return false;
-        if(self::isExcludePage()) return false;
-        if(!static::checkWebpSupport()) return false;
+        if(
+            !static::$globalEnable
+            || !self::getInstance()->enable
+            || static::isExcludePage()
+            || !static::checkWebpSupport()
+        ) {
+            return false;
+        }
 
         $urlFile = \parse_url($cacheImageFile);
         $uploadDir = Option::get('main', 'upload_dir', 'upload');
@@ -456,11 +463,15 @@ class Convert
     /**
      * Compress image by fileID
      * @param integer $intFileID
-     * @return bool|null
+     * @return bool|null|string
      */
     public function convertImageByID($intFileID)
     {
-        if(!\in_array('hitConvert', self::getInstance()->convertMode) || !self::$enable) {
+        if(
+            !self::$globalEnable
+            || !self::getInstance()->enable
+            || !\in_array('hitConvert', self::getInstance()->convertMode)
+        ) {
             return false;
         }
 
@@ -490,8 +501,9 @@ class Convert
      */
     public function resize($fileId, $strFilePath)
     {
-        if(!static::$enable) return false;
-        if (!$strFilePath) return false;
+        if(!static::$globalEnable || !$strFilePath || !static::getInstance()->enable) {
+            return false;
+        }
 
         $width = Option::get($this->MODULE_ID, 'resize_image_width');
         $height = Option::get($this->MODULE_ID, 'resize_image_height');
@@ -525,8 +537,9 @@ class Convert
     public static function CompressImageOnConvertEvent($arFile)
     {
         if(
-            !\in_array('hitConvert', self::getInstance()->convertMode)
-            || !self::$enable
+            !static::$globalEnable
+            || !static::getInstance()->enable
+            || !\in_array('hitConvert', static::getInstance()->convertMode)
         ) {
             return false;
         }
@@ -557,8 +570,9 @@ class Convert
         }
 
         if(
-            !\in_array('postConvert', self::getInstance()->convertMode)
-            || !self::$enable
+            !self::$globalEnable
+            || !static::getInstance()->enable
+            || !\in_array('postConvert', self::getInstance()->convertMode)
         ) {
             return $content;
         }
@@ -728,7 +742,7 @@ class Convert
      */
     public static function setEnable($enable)
     {
-        static::$enable = $enable;
+        static::$globalEnable = $enable;
     }
 
     /**
@@ -737,7 +751,7 @@ class Convert
      */
     public static function getEnable()
     {
-        return static::$enable;
+        return static::$globalEnable;
     }
 
     /**

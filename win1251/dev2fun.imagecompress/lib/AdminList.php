@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.4.0
+ * @version 0.7.2
  */
 
 namespace Dev2fun\ImageCompress;
@@ -370,7 +370,8 @@ class AdminList
     {
         $url = $this->Application()->GetCurPage();
         ?>
-        <form name="find_form" method="get" action="<?= $url; ?>"><?
+        <form name="find_form" method="get" action="<?= $url; ?>">
+        <?php
         $this->oFilter->Begin();
         foreach ($this->arFilter as $k => $arItem) {
             if (isset($arItem['TYPE'])) {
@@ -385,34 +386,34 @@ class AdminList
             <tr>
                 <td><?= $arItem['TITLE'] ?>:</td>
                 <td>
-                    <? if ($type == 'select'): ?>
-                        <select <? if ($arItem["MULTIPLE"] == "Y"){ ?>multiple="multiple"<?
+                    <?php if ($type === 'select'): ?>
+                        <select <?php if ($arItem["MULTIPLE"] === "Y") { ?>multiple="multiple"<?php
                         } ?> name="find_<?= $k ?>">
                             <option value="">(not set)</option>
-                            <? foreach ($arItem['VARIANTS'] as $kv => $vv): ?>
-                                <option value="<?= $kv ?>"<? if ($arItem['VALUE'] == $kv) { ?> selected="selected"<?
+                            <?php foreach ($arItem['VARIANTS'] as $kv => $vv): ?>
+                                <option value="<?= $kv ?>"<?php if ($arItem['VALUE'] == $kv) { ?> selected="selected"<?php
                                 } ?>><?= $vv ?></option>
-                            <?endforeach; ?>
+                            <?php endforeach; ?>
                         </select>
-                    <? elseif ($type == 'calendar'): ?>
+                    <?php elseif ($type == 'calendar'): ?>
                         <?= CalendarPeriod('find_' . $k . '1', $arItem['VALUE1'], 'find_' . $k . '2', $arItem['VALUE2'], 'find_form', 'Y'); ?>
-                    <? elseif ($type == 'checkbox'): ?>
-                        <input name="find_<?= $k ?>" type="checkbox" value="Y" <? if ($arItem["VALUE"] == "Y") {
+                    <?php elseif ($type == 'checkbox'): ?>
+                        <input name="find_<?= $k ?>" type="checkbox" value="Y" <?php if ($arItem["VALUE"] === "Y") {
                             echo "checked";
                         } ?>>
-                    <? else: ?>
+                    <?php else: ?>
                         <input type="text" name="find_<?= $k ?>"
-                               value="<? echo htmlspecialcharsbx($arItem['VALUE']) ?>"/>
-                    <?endif; ?>
+                               value="<?php echo htmlspecialcharsbx($arItem['VALUE']) ?>"/>
+                    <?php endif; ?>
                 </td>
             </tr>
-            <?
+            <?php
         }
         $this->oFilter->Buttons(
             ['table_id' => $this->tableID, 'url' => $url, 'form' => 'find_form']
         );
         $this->oFilter->End();
-        ?></form><?
+        ?></form><?php
     }
 
     public function output()
@@ -460,7 +461,7 @@ class AdminList
     {
         global $APPLICATION, $recCompress;
         $navPageCount = 0;
-        if ($_REQUEST['compress_all']) {
+        if (!empty($_REQUEST['compress_all'])) {
             \CJSCore::Init(['ajax']);
             echo '<div id="compressAllStatus">';
             if ($_REQUEST['AJAX_IC']) {

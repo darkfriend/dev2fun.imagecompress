@@ -1,4 +1,4 @@
-<?
+<?php
 /**
 * 
 * @author dev2fun (darkfriend)

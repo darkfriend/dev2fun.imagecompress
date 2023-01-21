@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.0
+ * @version 0.7.2
  */
 
 namespace Dev2fun\ImageCompress;
@@ -17,12 +17,10 @@ class Compress
     private $jpegoptim = false;
     private $pngoptim = false;
     private $MODULE_ID = 'dev2fun.imagecompress';
-    private $png = false;
     private $tableName = 'b_d2f_imagecompress_files';
-    public $LAST_ERROR;
 
-    private $optiClassJpeg = '';
-    private $optiClassPng = '';
+//    private $optiClassJpeg = '';
+//    private $optiClassPng = '';
 
     private
         $algorithmJpeg = '',
@@ -44,15 +42,7 @@ class Compress
         $jpegOptimCompress,
         $pngOptimCompress;
 
-    private $algorithmClass;
-
-    public static $supportContentType = [
-        'image/jpeg',
-        'image/png',
-        'application/pdf',
-        'image/svg',
-        'image/gif',
-    ];
+//    private $algorithmClass;
 
     private static $optiClasses = [
         'jpegoptim' => '\Dev2fun\ImageCompress\Jpegoptim',
@@ -63,8 +53,21 @@ class Compress
     ];
 
     private static $instance;
+
     /** @var bool state */
     protected static $enable = true;
+
+    /** @var string[] */
+    public static $supportContentType = [
+        'image/jpeg',
+        'image/png',
+        'application/pdf',
+        'image/svg',
+        'image/gif',
+    ];
+
+    /** @var string */
+    public $LAST_ERROR;
 
     private function __construct()
     {
@@ -265,8 +268,9 @@ class Compress
     {
         global $DB;
         $res = false;
-        if(!static::$enable) return null;
-        if (!$intFileID) return null;
+        if(!static::$enable || !$intFileID) {
+            return null;
+        }
 
         $event = new \Bitrix\Main\Event($this->MODULE_ID, "OnBeforeResizeImage", [$intFileID]);
         $event->send();
@@ -440,7 +444,7 @@ class Compress
         if (!$instance->enableElement) {
             return;
         }
-//        var_dump($instance->enableElement); die();
+
         if ((int)$arFields["PREVIEW_PICTURE_ID"] > 0) {
             $instance->compressImageByID($arFields["PREVIEW_PICTURE_ID"]);
         }
@@ -550,6 +554,7 @@ class Compress
      */
     public static function CompressImageOnFileDeleteEvent($arFile)
     {
+        if(!static::$enable) return;
         ImageCompressTable::delete($arFile['ID']);
     }
 

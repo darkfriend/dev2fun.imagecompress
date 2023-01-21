@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.4.0
+ * @version 0.7.2
  */
 require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -28,7 +28,7 @@ if (!$canRead && !$canWrite)
 
 
 $EDITION_RIGHT = $APPLICATION->GetGroupRight($curModuleName);
-if ($EDITION_RIGHT == "D") $APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
+if ($EDITION_RIGHT === "D") $APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
 
 $aTabs = [
     [
@@ -58,7 +58,7 @@ if ($_REQUEST["compress"]) {
         }
     }
 
-} elseif ($_REQUEST["action"] == "compress") {
+} elseif ($_REQUEST["action"] === "compress") {
 
     $arIDs = $_REQUEST["ID"];
     if (is_array($arIDs) && count($arIDs)) {

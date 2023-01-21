@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.1
+ * @version 0.7.2
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 \Bitrix\Main\Localization\Loc::loadMessages(__FILE__);
@@ -39,7 +39,7 @@ class dev2fun_imagecompress extends CModule
     var $MODULE_DESCRIPTION;
     var $MODULE_GROUP_RIGHTS = "Y";
 
-    function __construct()
+    public function __construct()
     {
         $path = \str_replace("\\", "/", __FILE__);
         $path = \substr($path, 0, \strlen($path) - \strlen("/index.php"));
@@ -58,7 +58,7 @@ class dev2fun_imagecompress extends CModule
         $this->PARTNER_URI = "http://dev2fun.com/";
     }
 
-    function DoInstall()
+    public function DoInstall()
     {
         global $APPLICATION;
         //        ini_set('display_errors',true);
@@ -92,7 +92,7 @@ class dev2fun_imagecompress extends CModule
         );
     }
 
-    function DoUninstall()
+    public function DoUninstall()
     {
         global $APPLICATION;
         //        $request = Application::getInstance()->getContext()->getRequest();
