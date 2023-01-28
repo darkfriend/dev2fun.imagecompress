@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.2
+ * @version 0.7.3
  */
 
 namespace Dev2fun\ImageCompress;
@@ -44,8 +44,9 @@ class Convert
 
     /** @var self */
     private static $instance;
-    /** @var bool state */
-    public static $globalEnable = false;
+    /** @var bool global state */
+    public static $globalEnable = true;
+    /** @var bool */
     public $enable = false;
 
     private function __construct()
