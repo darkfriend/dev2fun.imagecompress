@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.4.1
+ * @version 0.7.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -106,21 +106,21 @@ class Optipng
         $event->send();
 
         exec($this->pngOptimPath . "/optipng -v", $out);
-        $execString = "-strip all -o{$quality} $strFilePath 2>&1";
+        $execString = "-strip all -o{$quality} '$strFilePath' 2>&1";
         if (!empty($out[0])) {
             if (preg_match('#optipng.(.*?)\:#i', $out[0], $vMatch)) {
                 $vMatch = preg_replace('#(\.)#', '', $vMatch[1]);
                 if ($vMatch && $vMatch < 70) {
-                    $execString = "-o{$quality} $strFilePath 2>&1";
+                    $execString = "-o{$quality} '$strFilePath' 2>&1";
                 }
             }
         }
-        exec($this->pngOptimPath . "/optipng $execString", $res);
-//		chmod($strFilePath,0777);
-        if (!empty($params['changeChmod']))
+        exec($this->pngOptimPath . "/optipng {$execString}", $res);
+
+        if (!empty($params['changeChmod'])) {
             chmod($strFilePath, $params['changeChmod']);
-//		foreach (GetModuleEvents($this->MODULE_ID, "OnAfterResizeImage", true) as $arEvent)
-//			ExecuteModuleEventEx($arEvent, array(&$strFilePath));
+        }
+
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
             "OnAfterResizeImage",

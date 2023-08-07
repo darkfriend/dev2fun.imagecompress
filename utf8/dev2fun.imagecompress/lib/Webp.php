@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.0
+ * @version 0.7.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -153,7 +153,7 @@ class Webp
         );
         $event->send();
 
-        \exec("{$this->path}/cwebp $strCommand $src -o $absSrcWebp 2>&1", $res);
+        \exec("{$this->path}/cwebp $strCommand '{$src}' -o '{$absSrcWebp}' 2>&1", $res);
         if (!empty($params['changeChmod'])) {
             @\chmod($absSrcWebp, $params['changeChmod']);
         }

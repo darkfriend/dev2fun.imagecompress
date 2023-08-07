@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.4.1
+ * @version 0.7.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -112,11 +112,12 @@ class Jpegoptim
         if ($quality) {
             $strCommand .= " -m{$quality}";
         }
-        exec($this->jpegOptimPath . "/jpegoptim $strCommand $strFilePath 2>&1", $res);
-        if (!empty($params['changeChmod']))
+        exec($this->jpegOptimPath . "/jpegoptim $strCommand '$strFilePath' 2>&1", $res);
+
+        if (!empty($params['changeChmod'])) {
             chmod($strFilePath, $params['changeChmod']);
-//		foreach (GetModuleEvents($this->MODULE_ID, "OnAfterResize", true) as $arEvent)
-//			ExecuteModuleEventEx($arEvent, array(&$strFilePath));
+        }
+
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
             "OnAfterResize",

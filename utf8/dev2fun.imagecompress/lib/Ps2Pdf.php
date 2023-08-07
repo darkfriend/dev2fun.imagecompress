@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.6.5
+ * @version 0.7.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -95,7 +95,7 @@ class Ps2Pdf
         $strFilePathNew = $strFilePath.'.pdf';
         $strCommand = "-sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/{$params['pdfSetting']} -dNOPAUSE -dQUIET -dBATCH";
 
-        \exec($this->path . "/gs {$strCommand} -sOutputFile={$strFilePathNew} {$strFilePath} 2>&1", $res);
+        \exec($this->path . "/gs {$strCommand} -sOutputFile='{$strFilePathNew}' '{$strFilePath}' 2>&1", $res);
 //        exec($this->path . "/ps2pdf $strCommand $strFilePath $strFilePathNew 2>&1", $res);
 
         if(\file_exists($strFilePathNew)) {

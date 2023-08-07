@@ -48,8 +48,8 @@ class dev2fun_imagecompress extends CModule
             $this->MODULE_VERSION = $arModuleVersion["VERSION"];
             $this->MODULE_VERSION_DATE = $arModuleVersion["VERSION_DATE"];
         } else {
-            $this->MODULE_VERSION = '0.1.8';
-            $this->MODULE_VERSION_DATE = '2017-08-06 02:00:00';
+            $this->MODULE_VERSION = '0.7.3';
+            $this->MODULE_VERSION_DATE = '2023-08-06 00:10:00';
         }
         $this->MODULE_NAME = Loc::getMessage("D2F_MODULE_NAME_IMAGECOMPRESS");
         $this->MODULE_DESCRIPTION = Loc::getMessage("D2F_MODULE_DESCRIPTION_IMAGECOMPRESS");

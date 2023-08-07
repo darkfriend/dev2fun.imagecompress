@@ -2,11 +2,11 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.3.0
+ * @version 0.7.4
  * @copyright dev2fun
  */
 set_time_limit(3600);
-$_SERVER['DOCUMENT_ROOT'] = dirname(__FILE__) . '/../../../../';
+$_SERVER['DOCUMENT_ROOT'] = __DIR__ . '/../../../../';
 
 define("NOT_CHECK_PERMISSIONS", true);
 //define("BX_UTF", true);
@@ -29,12 +29,12 @@ $params = getopt('c::', ['limit::']);
 
 $limit = \Bitrix\Main\Config\Option::get('dev2fun.imagecompress', "cnt_step", 30);
 if (isset($params['limit'])) {
-    $limit = intval($params['limit']);
+    $limit = (int)$params['limit'];
 }
 
 $noCompress = true;
 if (isset($params['c'])) {
-    $noCompress = $params['c'] == 'N' ? false : true;
+    $noCompress = $params['c'] === 'N' ? false : true;
 }
 
 $filterList = [
