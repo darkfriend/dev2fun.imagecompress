@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.3
+ * @version 0.7.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -121,7 +121,9 @@ class Convert
         } else {
             $pages = [];
         }
-        array_unshift($pages, '#(\/bitrix\/.*)#');
+        if (!in_array('#(\/bitrix\/.*)#', $pages)) {
+            array_unshift($pages, '#(\/bitrix\/.*)#');
+        }
         return $pages;
     }
 
@@ -149,6 +151,7 @@ class Convert
     public static function saveSettingsExcludePage($sFields = [])
     {
         if($sFields) {
+            $sFields = array_unique($sFields);
             foreach ($sFields as $key => $field) {
                 if (empty($field)) {
                     unset($sFields[$key]);

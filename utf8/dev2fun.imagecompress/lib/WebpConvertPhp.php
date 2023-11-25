@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.0
+ * @version 0.7.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -114,16 +114,18 @@ class WebpConvertPhp
             }
         }
 
-        switch(\mime_content_type($src)) {
+        switch (\mime_content_type($src)) {
             case 'image/png':
                 $img = \imageCreateFromPng($src);
-                \imagepalettetotruecolor($img);
+                if ($img && (is_resource($img) || $img instanceof \GdImage)) {
+                    \imagepalettetotruecolor($img);
+                }
                 break;
             case 'image/jpeg':
                 $img = \imageCreateFromJpeg($src);
                 break;
         }
-        if(empty($img)) {
+        if (empty($img)) {
             return false;
         }
         \imageWebp(
