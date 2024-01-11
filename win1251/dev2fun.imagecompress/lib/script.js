@@ -1,39 +1,46 @@
 /**
- * Created by darkfriend
- * @version 0.2.1
+ * @author darkfriend <hi@darkfriend.ru>
+ * @version 0.8.0
  */
-function SendPropcess(step) {
+function SendPropcess(step, type) {
+    let objRequest = {
+        AJAX_IC : 'Y',
+        PAGEN_1 : step,
+    };
+    let wrapId = 'compressAllStatus';
+    if (type === 'convert') {
+        objRequest.convert_all = 'Y';
+        wrapId = 'convertAllStatus';
+    } else {
+        objRequest.compress_all = 'Y';
+    }
     BX.ajax({
         url: window.location.pathname,
-        data : {
-            AJAX_IC : 'Y',
-            PAGEN_1 : step,
-            compress_all : "Y"
-        },
+        data : objRequest,
         method : 'POST',
         timeout : 600,
         dataType: 'json',
         cache: false,
         onsuccess: function(data) {
-            BX('compressAllStatus').innerHTML = data.html;
+            BX(wrapId).innerHTML = data.html;
             data.step = parseInt(data.step);
             data.allStep = parseInt(data.allStep);
-            if(data.step>0&&data.step<=data.allStep&&!data.error) {
-                SendPropcess(data.step);
+            if (
+                data.step>0
+                && data.step <= data.allStep
+                && !data.error
+            ) {
+                SendPropcess(data.step, type);
             } else {
-                BX.closeWait('compressAllStatus');
+                BX.closeWait(wrapId);
             }
-            if(data.step>data.allStep) {
-                window.location.href = window.location.pathname+'?compress_result=Y&status=success';
+            if (data.step>data.allStep || !(data.step>0)) {
+                window.location.href = window.location.pathname+'?process_result=Y&status=success';
             }
         },
         onfailure: function(){
-            BX.closeWait('compressAllStatus');
-			BX('compressAllStatus').innerHTML = 'Error!';
+            BX.closeWait(wrapId);
+            BX(wrapId).innerHTML = 'Error!';
         }
     });
 }
-BX.ready(function(){
-    BX.showWait('compressAllStatus');
-    SendPropcess(1);
-});

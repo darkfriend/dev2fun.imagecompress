@@ -24,8 +24,8 @@ class Svg
 
     private function __construct()
     {
-        $this->path = Option::get($this->MODULE_ID, 'path_to_svg', '/usr/bin');
-        $this->enable = Option::get($this->MODULE_ID, 'enable_svg', false);
+        $this->path = Option::get($this->MODULE_ID, 'path_to_svg', '/usr/bin', \Dev2funImageCompress::getSiteId());
+        $this->enable = Option::get($this->MODULE_ID, 'enable_svg', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
     }
 
     /**

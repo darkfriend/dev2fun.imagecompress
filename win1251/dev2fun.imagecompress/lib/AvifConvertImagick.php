@@ -23,8 +23,8 @@ class AvifConvertImagick
 
     private function __construct()
     {
-        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
-        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80);
+        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
+        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80, \Dev2funImageCompress::getSiteId());
         if(!$this->quality) {
             $this->quality = 80;
         }
@@ -81,7 +81,8 @@ class AvifConvertImagick
         }
 
         $fileInfo = \pathinfo($src);
-        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
+        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}",'', $arFile["SUBDIR"]);
+//        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
         $arFile["SUBDIR"] = \ltrim($arFile["SUBDIR"], '/');
         $srcWebp = "/{$uploadDir}/resize_cache/avif/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.avif";
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;

@@ -22,7 +22,7 @@ class Optipng
 
     private function __construct()
     {
-        $this->pngOptimPath = Option::get($this->MODULE_ID, 'path_to_optipng');
+        $this->pngOptimPath = Option::get($this->MODULE_ID, 'path_to_optipng', '', \Dev2funImageCompress::getSiteId());
     }
 
     /**

@@ -90,3 +90,52 @@ if(typeof addNewRow === "undefined") {
         }, 10);
     }
 }
+
+document.addEventListener('DOMContentLoaded', function(){
+    const convertModeSelect = document.querySelectorAll('.select__convert_mode');
+    if (convertModeSelect.length) {
+        Array.prototype.forEach.call(convertModeSelect, function(opt) {
+            opt.onchange = function (e) {
+                let el = e.target;
+                let hasLazy = false;
+                Array.prototype.forEach.call(el.options, function(opt) {
+                    if (opt.selected && opt.value === 'lazyConvert') {
+                        hasLazy = true;
+                        return undefined;
+                    }
+                });
+                if (hasLazy) {
+                    // toggleLazyConvertSettings(true);
+                    Array.prototype.forEach.call(el.options, function(opt) {
+                        if (opt.selected && opt.value !== 'lazyConvert') {
+                            opt.selected = false;
+                        }
+                    });
+                } //else {
+                    // toggleLazyConvertSettings(false);
+                //}
+            };
+        });
+
+    }
+
+    // if (document.querySelector(".convert__lazy_settings")) {
+    //     Array.prototype.forEach.call(convertModeSelect.options, function(opt) {
+    //         if (opt.selected && opt.value === 'lazyConvert') {
+    //             toggleLazyConvertSettings(true);
+    //             return undefined;
+    //         }
+    //     });
+    // }
+
+
+    // function toggleLazyConvertSettings(show) {
+    //     Array.prototype.forEach.call(document.querySelectorAll(".convert__lazy_settings"), function(e) {
+    //         if (show) {
+    //             e.style.display = 'table-row';
+    //         } else {
+    //             e.style.display = 'none';
+    //         }
+    //     });
+    // }
+});

@@ -23,23 +23,27 @@ class Webp
     private $quality = 80;
     private $compression = 4;
     private $multithreading = true;
+    private static $isOptim = null;
+    private $origPicturesMode = false;
+    private static $origPictures = [];
 
     private function __construct()
     {
-        $this->path = Option::get($this->MODULE_ID, 'path_to_cwebp', '/usr/bin');
-        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
+        $this->path = Option::get($this->MODULE_ID, 'path_to_cwebp', '/usr/bin', \Dev2funImageCompress::getSiteId());
+        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
+        $this->origPicturesMode = Option::get($this->MODULE_ID, 'orig_pictures_mode', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
 
-        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80);
+        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80, \Dev2funImageCompress::getSiteId());
         if(!$this->quality) {
             $this->quality = 80;
         }
 
-        $this->compression = Option::get($this->MODULE_ID, 'cwebp_compress', 4);
+        $this->compression = Option::get($this->MODULE_ID, 'cwebp_compress', 4, \Dev2funImageCompress::getSiteId());
         if(!$this->compression && $this->compression!==0) {
             $this->compression = 4;
         }
 
-        $this->multithreading = Option::get($this->MODULE_ID, 'cwebp_multithreading', 'Y') === 'Y';
+        $this->multithreading = Option::get($this->MODULE_ID, 'cwebp_multithreading', 'Y', \Dev2funImageCompress::getSiteId()) === 'Y';
     }
 
     /**
@@ -56,13 +60,16 @@ class Webp
     }
 
     /**
-     * Check
+     * Check cwebp
      * @return bool
      */
     public function isOptim()
     {
-        exec($this->path . '/cwebp -version', $s);
-        return ($s ? true : false);
+        if (self::$isOptim === null) {
+            exec($this->path . '/cwebp -version', $s);
+            self::$isOptim = $s ? true : false;
+        }
+        return self::$isOptim;
     }
 
     /**
@@ -102,7 +109,8 @@ class Webp
         }
 
         $fileInfo = \pathinfo($src);
-        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
+        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}",'', $arFile["SUBDIR"]);
+//        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
         $arFile["SUBDIR"] = \ltrim($arFile["SUBDIR"], '/');
         $srcWebp = "/{$uploadDir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.webp";
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
@@ -110,6 +118,9 @@ class Webp
         if(@\is_file($absSrcWebp)) {
             if(\filesize($absSrcWebp)===0) {
                 return false;
+            }
+            if ($this->origPicturesMode) {
+                self::$origPictures[$srcWebp] = "/{$uploadDir}/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}";
             }
             return $srcWebp;
         }
@@ -165,6 +176,10 @@ class Webp
         );
         $event->send();
 
+        if ($this->origPicturesMode) {
+            self::$origPictures[$srcWebp] = "/{$uploadDir}/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}";
+        }
+
         return $srcWebp;
     }
 
@@ -191,5 +206,18 @@ class Webp
             }
         }
         return $post;
+    }
+
+    /**
+     * Get original src by webp src
+     * @param string $srcWebp
+     * @return string
+     */
+    public function getOriginalSrc(string $srcWebp): string
+    {
+        if (!$this->origPicturesMode) {
+            return '';
+        }
+        return self::$origPictures[$srcWebp] ?? '';
     }
 }

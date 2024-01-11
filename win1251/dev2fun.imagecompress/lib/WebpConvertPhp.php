@@ -20,11 +20,15 @@ class WebpConvertPhp
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $enable = false;
     private $quality = 70;
+    private static $isOptim = null;
+    private $origPicturesMode = false;
+    private static $origPictures = [];
 
     private function __construct()
     {
-        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
-        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80);
+        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
+        $this->origPicturesMode = Option::get($this->MODULE_ID, 'orig_pictures_mode', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
+        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80, \Dev2funImageCompress::getSiteId());
         if(!$this->quality) {
             $this->quality = 80;
         }
@@ -44,7 +48,7 @@ class WebpConvertPhp
     }
 
     /**
-     * Check
+     * Check imagewebp and gd
      * @return bool
      */
     public function isOptim()
@@ -95,7 +99,8 @@ class WebpConvertPhp
         }
 
         $fileInfo = \pathinfo($src);
-        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
+        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}",'', $arFile["SUBDIR"]);
+//        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
         $arFile["SUBDIR"] = \ltrim($arFile["SUBDIR"], '/');
         $srcWebp = "/{$uploadDir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.webp";
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
@@ -103,6 +108,9 @@ class WebpConvertPhp
         if(@\is_file($absSrcWebp)) {
             if(\filesize($absSrcWebp)===0) {
                 return false;
+            }
+            if ($this->origPicturesMode) {
+                self::$origPictures[$srcWebp] = "/{$uploadDir}/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}";
             }
             return $srcWebp;
         }
@@ -142,11 +150,80 @@ class WebpConvertPhp
         );
         $event->send();
 
+        if ($this->origPicturesMode) {
+            self::$origPictures[$srcWebp] = "/{$uploadDir}/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}";
+        }
+
         return $srcWebp;
     }
 
     public function getOptionsSettings($advanceSettings=[])
     {
         return [];
+    }
+
+    public function convertPath($srcWebp)
+    {
+        $uploadDir = Option::get('main', 'upload_dir', 'upload');
+        if(!empty($arFile["ABS_PATH"])) {
+            $src = $arFile["ABS_PATH"];
+        } else {
+            $src = "{$_SERVER["DOCUMENT_ROOT"]}/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        }
+
+        $fileInfo = \pathinfo($src);
+//        $srcWebp = "/{$uploadDir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.webp";
+        $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
+
+        if(@\is_file($absSrcWebp)) {
+            if(\filesize($absSrcWebp)===0) {
+                return false;
+            }
+            if ($this->origPicturesMode) {
+                self::$origPictures[$srcWebp] = "/{$uploadDir}/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}";
+            }
+            return $srcWebp;
+        }
+        $dirname = \dirname($absSrcWebp);
+
+        if(!\is_dir($dirname)) {
+            if(!@\mkdir($dirname,0777, true)) {
+                return false;
+            }
+        }
+
+        switch (\mime_content_type($src)) {
+            case 'image/png':
+                $img = \imageCreateFromPng($src);
+                if ($img && (is_resource($img) || $img instanceof \GdImage)) {
+                    \imagepalettetotruecolor($img);
+                }
+                break;
+            case 'image/jpeg':
+                $img = \imageCreateFromJpeg($src);
+                break;
+        }
+        if (empty($img)) {
+            return false;
+        }
+        \imageWebp(
+            $img,
+            $absSrcWebp,
+            $this->quality
+        );
+        \imagedestroy($img);
+    }
+
+    /**
+     * Get original src by webp src
+     * @param string $srcWebp
+     * @return string
+     */
+    public function getOriginalSrc(string $srcWebp): string
+    {
+        if (!$this->origPicturesMode) {
+            return '';
+        }
+        return self::$origPictures[$srcWebp] ?? '';
     }
 }

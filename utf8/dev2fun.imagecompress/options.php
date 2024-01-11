@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.0
+ * @version 0.8.0
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -68,6 +68,7 @@ $aTabs = [
 //    ),
 //));
 
+$arSites = Dev2funImageCompress::getSites();
 $tabControl = new CAdminTabControl("tabControl", $aTabs);
 
 if ($request->isPost() && check_bitrix_sessid()) {
@@ -75,9 +76,10 @@ if ($request->isPost() && check_bitrix_sessid()) {
     if ($request->getPost('test_module')) {
         $text = [];
         $error = false;
-        $algorithmJpeg = Option::get($curModuleName, 'opti_algorithm_jpeg');
-        $algorithmPng = Option::get($curModuleName, 'opti_algorithm_png');
-        foreach (Check::$optiClasses as $algKey=>$algItem) {
+        $arSite = current($arSites);
+        $algorithmJpeg = Option::get($curModuleName, 'opti_algorithm_jpeg', '', $arSite['ID']);
+        $algorithmPng = Option::get($curModuleName, 'opti_algorithm_png', '', $arSite['ID']);
+        foreach (Check::$optiClasses as $algKey => $algItem) {
             if(!Check::isOptim($algKey)) {
                 $text[] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => $algKey]);
             }
@@ -104,223 +106,341 @@ if ($request->isPost() && check_bitrix_sessid()) {
             $updCheckbox = [];
             $updString = [];
 
-            // TODO: do refactor!
-            // save jpeg
-            $enableJpeg = $request->getPost('enable_jpeg');
-            $algorithmJpeg = $request->getPost('opti_algorithm_jpeg');
-            $pthJpeg = $request->getPost('path_to_jpegoptim');
-            if ($pthJpeg) {
-                $pthJpeg = rtrim($pthJpeg, '/');
-            }
-            if($enableJpeg==='Y') {
-                if(!$pthJpeg) {
-                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'jpeg']));
-                }
-                if(!$algorithmJpeg) {
-                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'jpeg']));
-                }
-                if (!Check::isJPEGOptim($algorithmJpeg)) {
-                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'jpegoptim']));
-                }
-            }
-            $updCheckbox['enable_jpeg'] = $enableJpeg;
-            $updString['opti_algorithm_jpeg'] = $algorithmJpeg;
-            $updString['path_to_jpegoptim'] = $pthJpeg;
-
-            // TODO: do refactor!
-            // save png
-            $enablePng = $request->getPost('enable_png');
-            $algorithmPng = $request->getPost('opti_algorithm_png');
-            $pthPng = $request->getPost('path_to_optipng');
-            if ($pthPng) {
-                $pthPng = rtrim($pthPng, '/');
-            }
-            if($enablePng==='Y') {
-                if(!$pthPng) {
-                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'png']));
-                }
-                if(!$algorithmPng) {
-                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'png']));
-                }
-                if (!Check::isPNGOptim($algorithmPng)) {
-                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'jpegoptim']));
-                }
-            }
-            $updCheckbox['enable_png'] = $enablePng;
-            $updString['opti_algorithm_png'] = $algorithmPng;
-            $updString['path_to_optipng'] = $pthPng;
-
-
-            // TODO: do refactor!
-            // save pdf
-            $enablePdf = $request->getPost('enable_pdf');
-            $ps2pdf = $request->getPost('path_to_ps2pdf');
-            if ($ps2pdf) {
-                $ps2pdf = \rtrim($ps2pdf, '/');
-            }
-            if($enablePdf==='Y') {
-                if(!$ps2pdf) {
-                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'pdf']));
-                }
-                if (!Check::isOptim('ps2pdf')) {
-                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'jpegoptim']));
-                }
-            }
-            $updCheckbox['enable_pdf'] = $enablePdf;
-//            $updString['opti_algorithm_png'] = $algorithmPng;
-            $updString['path_to_ps2pdf'] = $ps2pdf;
-
-            $pdfSetting = $request->getPost('pdf_setting');
-            $updString['pdf_setting'] = !empty($pdfSetting) ? $pdfSetting : 'ebook';
-
-
-            $saveTypes = [
-//                'webp',
-                'gif',
-                'svg',
-            ];
-            foreach ($saveTypes as $saveType) {
-                // save type
-                $enable = $request->getPost('enable_'.$saveType, 'N');
-                $algorithm = $request->getPost('opti_algorithm_'.$saveType);
-                $pth = $request->getPost('path_to_'.$saveType, '/usr/bin');
-                if ($pth) {
-                    $pth = \rtrim($pth, '/');
-                }
-                if($enable === 'Y') {
-                    if(!$pth) {
-                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => $saveType]));
-                    }
-                    if(!$algorithm) {
-                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => $saveType]));
-                    }
-                    if (!Check::isOptim($algorithm)) {
-                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => $saveType]));
-                    }
-                }
-                $updCheckbox['enable_'.$saveType] = $enable;
-                $updString['opti_algorithm_'.$saveType] = $algorithm;
-                $updString['path_to_'.$saveType] = $pth;
-
-                // advanced settings
-                $advanceSettings = \Dev2fun\ImageCompress\Compress::getAlgInstance($saveType)
-                    ->getOptionsSettings($request->getPost($saveType, []));
-                if($advanceSettings && !empty($advanceSettings['checkbox'])) {
-                    $updCheckbox = array_merge($updCheckbox, $advanceSettings['checkbox']);
-                }
-                if($advanceSettings && !empty($advanceSettings['string'])) {
-                    $updString = array_merge($updString, $advanceSettings['string']);
-                }
-            }
-
-            if (!empty($_REQUEST["EXCLUDE_PAGES"])) {
-                \Dev2fun\ImageCompress\Convert::saveSettingsExcludePage($_REQUEST["EXCLUDE_PAGES"]);
-            }
-
-            if (!empty($_REQUEST["EXCLUDE_FILES"])) {
-                \Dev2fun\ImageCompress\Convert::saveSettingsExcludeFile($_REQUEST["EXCLUDE_FILES"]);
-            }
-
-            // set convert options
-            $updCheckbox['convert_enable'] = $request->getPost('convert_enable', 'N') === 'Y';
-            $updCheckbox['cwebp_multithreading'] = $request->getPost('cwebp_multithreading', 'N') === 'Y';
-
-            $updString['convert_mode'] = $request->getPost('convert_mode');
-            if(!$updString['convert_mode']) {
-                $updString['convert_mode'] = [];
-            }
-
-//            $updString['convert_attributes'] = $request->getPost('convertAttr');
-//            if(\is_array($updString['convert_attributes'])) {
-//                $updString['convert_attributes'] = \array_filter($updString['convert_attributes'], function($item) {
-//                    return !empty($item);
-//                });
-//            } else {
-//                $updString['convert_attributes'] = [];
+//            $typesOption = [
+//                'enable_jpeg' => 'checkbox',
+//                'opti_algorithm_jpeg' => 'string',
+//                'path_to_jpegoptim' => 'string',
+//
+//                'enable_png' => 'checkbox',
+//                'opti_algorithm_png' => 'string',
+//                'path_to_optipng' => 'string',
+//
+//                'enable_pdf' => 'checkbox',
+//                'path_to_ps2pdf' => 'string',
+//                'pdf_setting' => 'string',
+//            ];
+//            $options = $request->getPost('options');
+//            foreach ($options as $optionKey => $optionValue) {
+//                switch ($optionKey) {
+//                    case '': break;
+//                }
 //            }
 
-            $updString['convert_algorithm'] = $request->getPost('convert_algorithm', 'phpWebp');
-            $updString['convert_quality'] = $request->getPost('convert_quality', '80');
-            $updString['path_to_cwebp'] = $request->getPost('path_to_cwebp', '/usr/bin');
-            if ($updString['path_to_cwebp']) {
-                $updString['path_to_cwebp'] = \rtrim($updString['path_to_cwebp'], '/');
-            }
-            if($updString['convert_algorithm'] === 'cwebp') {
-                if(!$updString['path_to_cwebp']) {
-                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'cwebp']));
+            foreach ($arSites as $arSite) {
+                // TODO: do refactor!
+                // save jpeg
+                $enableJpeg = $_POST['options'][$arSite['ID']]['enable_jpeg'] ?? 'N';
+                //            $enableJpeg =  $request->getPost('enable_jpeg');
+                $algorithmJpeg = $_POST['options'][$arSite['ID']]['opti_algorithm_jpeg'] ?? '';
+                //            $algorithmJpeg = $request->getPost('opti_algorithm_jpeg');
+                $pthJpeg = $_POST['options'][$arSite['ID']]['path_to_jpegoptim'] ?? '';
+                //            $pthJpeg = $request->getPost('path_to_jpegoptim');
+                if ($pthJpeg) {
+                    $pthJpeg = rtrim($pthJpeg, '/');
                 }
-                if (!Check::isOptim('cwebp')) {
-                    throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'cwebp']));
-                }
-            }
-            $updString['cwebp_compress'] = $request->getPost('cwebp_compress', '4');
-            $updString['cache_time'] = $request->getPost('cache_time');
-            if(!$updString['cache_time']) $updString['cache_time'] = 3600;
-
-
-            if($updCheckbox) {
-                foreach ($updCheckbox as $kOption => $vOption) {
-                    Option::set($curModuleName, $kOption, ($vOption ? 'Y' : 'N'));
-                }
-            }
-            if($updString) {
-                foreach ($updString as $kOption => $vOption) {
-                    if(\is_array($vOption)) {
-                        $vOption = \serialize($vOption);
+                if($enableJpeg === 'Y') {
+                    if(!$pthJpeg) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'jpeg']));
                     }
-                    Option::set($curModuleName, $kOption, $vOption);
+                    if(!$algorithmJpeg) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'jpeg']));
+                    }
+                    if (!Check::isJPEGOptim($algorithmJpeg)) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'jpegoptim']));
+                    }
                 }
-            }
+                $updCheckbox['enable_jpeg'] = $enableJpeg;
+                $updString['opti_algorithm_jpeg'] = $algorithmJpeg;
+                $updString['path_to_jpegoptim'] = $pthJpeg;
+
+                // TODO: do refactor!
+                // save png
+                //            $enablePng = $request->getPost('enable_png');
+                //            $algorithmPng = $request->getPost('opti_algorithm_png');
+                //            $pthPng = $request->getPost('path_to_optipng');
+
+                $enablePng = $_POST['options'][$arSite['ID']]['enable_png'] ?? 'N';
+                $algorithmPng = $_POST['options'][$arSite['ID']]['opti_algorithm_png'] ?? '';
+                $pthPng = $_POST['options'][$arSite['ID']]['path_to_optipng'] ?? '';
+                if ($pthPng) {
+                    $pthPng = rtrim($pthPng, '/');
+                }
+                if($enablePng==='Y') {
+                    if(!$pthPng) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'png']));
+                    }
+                    if(!$algorithmPng) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'png']));
+                    }
+                    if (!Check::isPNGOptim($algorithmPng)) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'jpegoptim']));
+                    }
+                }
+                $updCheckbox['enable_png'] = $enablePng;
+                $updString['opti_algorithm_png'] = $algorithmPng;
+                $updString['path_to_optipng'] = $pthPng;
 
 
-            $cntStep = $request->getPost('cnt_step');
-            if (!$cntStep) $cntStep = 30;
-            Option::set($curModuleName, 'cnt_step', $cntStep);
+                // TODO: do refactor!
+                // save pdf
+                //            $enablePdf = $request->getPost('enable_pdf');
+                //            $ps2pdf = $request->getPost('path_to_ps2pdf');
 
-            $chmod = $request->getPost('change_chmod');
-            if (!isset($chmod)) {
-                $chmod = 777;
-            } else {
-                $chmod = (int)$chmod;
-            }
-            Option::set($curModuleName, 'change_chmod', $chmod);
+                $enablePdf = $_POST['options'][$arSite['ID']]['enable_pdf'] ?? 'N';
+                $ps2pdf = $_POST['options'][$arSite['ID']]['path_to_ps2pdf'] ?? '';
+                if ($ps2pdf) {
+                    $ps2pdf = \rtrim($ps2pdf, '/');
+                }
+                if($enablePdf==='Y') {
+                    if(!$ps2pdf) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'pdf']));
+                    }
+                    if (!Check::isOptim('ps2pdf')) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'jpegoptim']));
+                    }
+                }
+                $updCheckbox['enable_pdf'] = $enablePdf;
+                //            $updString['opti_algorithm_png'] = $algorithmPng;
+                $updString['path_to_ps2pdf'] = $ps2pdf;
 
-            $enableElement = $request->getPost('enable_element');
-            Option::set($curModuleName, 'enable_element', ($enableElement ? 'Y' : 'N'));
+                //            $pdfSetting = $request->getPost('pdf_setting');
+                $pdfSetting = $_POST['options'][$arSite['ID']]['pdf_setting'] ?? '';
+                $updString['pdf_setting'] = !empty($pdfSetting) ? $pdfSetting : 'ebook';
 
-            $enableSection = $request->getPost('enable_section');
-            Option::set($curModuleName, 'enable_section', ($enableSection ? 'Y' : 'N'));
 
-            $enableResize = $request->getPost('enable_resize');
-            Option::set($curModuleName, 'enable_resize', ($enableResize ? 'Y' : 'N'));
+                $saveTypes = [
+                    //                'webp',
+                    'gif',
+                    'svg',
+                ];
+                foreach ($saveTypes as $saveType) {
+                    // save type
+                    //                $enable = $request->getPost('enable_'.$saveType, 'N');
+                    //                $algorithm = $request->getPost('opti_algorithm_'.$saveType);
+                    //                $pth = $request->getPost('path_to_'.$saveType, '/usr/bin');
 
-            $enableSave = $request->getPost('enable_save');
-            Option::set($curModuleName, 'enable_save', ($enableSave ? 'Y' : 'N'));
+                    $enable = $_POST['options'][$arSite['ID']]["enable_{$saveType}"] ?? 'N';
+                    $algorithm = $_POST['options'][$arSite['ID']]["opti_algorithm_{$saveType}"] ?? '';
+                    $pth = $_POST['options'][$arSite['ID']]["path_to_{$saveType}"] ?? '/usr/bin';
+                    //                $algorithm = $request->getPost('opti_algorithm_'.$saveType);
+                    //                $pth = $request->getPost('path_to_'.$saveType, '/usr/bin');
+                    if ($pth) {
+                        $pth = \rtrim($pth, '/');
+                    }
+                    if($enable === 'Y') {
+                        if(!$pth) {
+                            throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => $saveType]));
+                        }
+                        if(!$algorithm) {
+                            throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => $saveType]));
+                        }
+                        if (!Check::isOptim($algorithm)) {
+                            throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => $saveType]));
+                        }
+                    }
+                    $updCheckbox['enable_'.$saveType] = $enable;
+                    $updString['opti_algorithm_'.$saveType] = $algorithm;
+                    $updString['path_to_'.$saveType] = $pth;
 
-            Option::set($curModuleName, 'jpegoptim_compress', $request->getPost('jpegoptim_compress'));
-            Option::set($curModuleName, 'optipng_compress', $request->getPost('optipng_compress'));
+                    // advanced settings
+                    $advanceSettings = \Dev2fun\ImageCompress\Compress::getAlgInstance($saveType)
+                        ->getOptionsSettings($_POST['options'][$arSite['ID']][$saveType] ?? []);
+                    //                    ->getOptionsSettings($request->getPost($saveType, []));
+                    if($advanceSettings && !empty($advanceSettings['checkbox'])) {
+                        foreach ($advanceSettings['checkbox'] as $k => $val) {
+                            $updCheckbox[$k] = $val;
+                        }
+//                        $updCheckbox = array_merge($updCheckbox, $advanceSettings['checkbox']);
+                    }
+                    if($advanceSettings && !empty($advanceSettings['string'])) {
+                        foreach ($advanceSettings['string'] as $k => $val) {
+                            $updString[$k] = $val;
+                        }
+//                        $updString = array_merge($updString, $advanceSettings['string']);
+                    }
+                }
 
-            $jpegCompress = $request->getPost('jpeg_progressive');
-            Option::set($curModuleName, 'jpeg_progressive', ($jpegCompress ? 'Y' : 'N'));
+                if (!empty($_POST['options'][$arSite['ID']]["EXCLUDE_PAGES"])) {
+                    \Dev2fun\ImageCompress\Convert::saveSettingsExcludePage(
+                        $_POST['options'][$arSite['ID']]["EXCLUDE_PAGES"] ?? [],
+                        $arSite['ID']
+                    );
+                }
 
-            $resizeImageEnable = $request->getPost('resize_image_enable');
-            Option::set($curModuleName, 'resize_image_enable', ($resizeImageEnable ? 'Y' : 'N'));
-            if ($resizeImageEnable) {
-                $resizeImageWidth = $request->getPost('resize_image_width');
-                if (!$resizeImageWidth) $resizeImageWidth = 1280;
-                Option::set($curModuleName, 'resize_image_width', $resizeImageWidth);
+                if (!empty($_POST['options'][$arSite['ID']]["EXCLUDE_FILES"])) {
+                    \Dev2fun\ImageCompress\Convert::saveSettingsExcludeFile(
+                        $_POST['options'][$arSite['ID']]["EXCLUDE_FILES"] ?? [],
+                        $arSite['ID']
+                    );
+                }
 
-                $resizeImageHeight = $request->getPost('resize_image_height');
-                if (!$resizeImageHeight) $resizeImageHeight = 99999;
-                Option::set($curModuleName, 'resize_image_height', $resizeImageHeight);
+                // set convert options
+                //            $updCheckbox['convert_enable'] = $request->getPost('convert_enable', 'N') === 'Y';
+                //            $updCheckbox['cwebp_multithreading'] = $request->getPost('cwebp_multithreading', 'N') === 'Y';
 
-                $resizeImageAlgorithm = $request->getPost('resize_image_algorithm');
-                if (!$resizeImageAlgorithm) $resizeImageAlgorithm = 0;
-                Option::set($curModuleName, 'resize_image_algorithm', $resizeImageAlgorithm);
-            } else {
-                Option::set($curModuleName, 'resize_image_width', '');
-                Option::set($curModuleName, 'resize_image_height', '');
-                Option::set($curModuleName, 'resize_image_algorithm', 0);
+                $updCheckbox['convert_enable'] = ($_POST['options'][$arSite['ID']]['convert_enable'] ?? 'N') === 'Y';
+                $updCheckbox['cwebp_multithreading'] = ($_POST['options'][$arSite['ID']]['cwebp_multithreading'] ?? 'N') === 'Y';
+
+                //            $updString['convert_mode'] = $request->getPost('convert_mode');
+                $updString['convert_mode'] = $_POST['options'][$arSite['ID']]['convert_mode'] ?? '';
+                if(!$updString['convert_mode']) {
+                    $updString['convert_mode'] = [];
+                }
+
+                //            $updString['convert_attributes'] = $request->getPost('convertAttr');
+                //            if(\is_array($updString['convert_attributes'])) {
+                //                $updString['convert_attributes'] = \array_filter($updString['convert_attributes'], function($item) {
+                //                    return !empty($item);
+                //                });
+                //            } else {
+                //                $updString['convert_attributes'] = [];
+                //            }
+
+                //            $updString['convert_algorithm'] = $request->getPost('convert_algorithm', 'phpWebp');
+                //            $updString['convert_quality'] = $request->getPost('convert_quality', '80');
+                //            $updString['path_to_cwebp'] = $request->getPost('path_to_cwebp', '/usr/bin');
+
+                $updString['convert_algorithm'] = $_POST['options'][$arSite['ID']]['convert_algorithm'] ?? 'phpWebp';
+                $updString['convert_quality'] = $_POST['options'][$arSite['ID']]['convert_quality'] ?? '80';
+                $updString['path_to_cwebp'] = $_POST['options'][$arSite['ID']]['path_to_cwebp'] ?? '/usr/bin';
+
+                if ($updString['path_to_cwebp']) {
+                    $updString['path_to_cwebp'] = \rtrim($updString['path_to_cwebp'], '/');
+                }
+                if($updString['convert_algorithm'] === 'cwebp') {
+                    if(!$updString['path_to_cwebp']) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'cwebp']));
+                    }
+                    if (!Check::isOptim('cwebp')) {
+                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'cwebp']));
+                    }
+                }
+                //            $updString['cwebp_compress'] = $request->getPost('cwebp_compress', '4');
+                $updString['cwebp_compress'] = $_POST['options'][$arSite['ID']]['cwebp_compress'] ?? '4';
+                //            $updString['cache_time'] = $request->getPost('cache_time');
+                $cacheTime = $_POST['options']['cache_time'] ?? '4';
+                if(!$cacheTime) {
+                    $cacheTime = 3600;
+                }
+                Option::set($curModuleName, 'cache_time', $cacheTime);
+
+
+                if($updCheckbox) {
+                    foreach ($updCheckbox as $kOption => $vOption) {
+                        Option::set($curModuleName, $kOption, ($vOption ? 'Y' : 'N'), $arSite['ID']);
+                    }
+                }
+                if($updString) {
+                    foreach ($updString as $kOption => $vOption) {
+                        if(\is_array($vOption)) {
+                            $vOption = \serialize($vOption);
+                        }
+                        Option::set($curModuleName, $kOption, $vOption, $arSite['ID']);
+                    }
+                }
+
+                Option::set(
+                    $curModuleName,
+                    'orig_pictures_mode',
+                    //                $request->getPost('orig_pictures_mode') ? 'Y' : 'N'
+                    ($_POST['options'][$arSite['ID']]['orig_pictures_mode'] ?? '') ? 'Y' : 'N',
+                    $arSite['ID']
+                );
+
+
+                //            $cntStep = $request->getPost('cnt_step');
+                $cntStep = $_POST['cnt_step'] ?? 30;
+                if (!$cntStep) {
+                    $cntStep = 30;
+                }
+                Option::set($curModuleName, 'cnt_step', $cntStep);
+
+                //            $chmod = $request->getPost('change_chmod');
+                $chmod = $_POST['change_chmod'] ?? 777;
+                if (!isset($chmod)) {
+                    $chmod = 777;
+                } else {
+                    $chmod = (int)$chmod;
+                }
+                Option::set($curModuleName, 'change_chmod', $chmod);
+
+                // convert common settings
+                Option::set(
+                    $curModuleName,
+                    'convert_per_page',
+                    $_POST['convert_per_page'] ?? 200
+                );
+                Option::set(
+                    $curModuleName,
+                    'convert_cache_time_find_images',
+                    $_POST['convert_cache_time_find_images'] ?? (3600*24)
+                );
+                Option::set(
+                    $curModuleName,
+                    'convert_cache_time_get_images',
+                    $_POST['convert_cache_time_get_images'] ?? 3600
+                );
+                Option::set(
+                    $curModuleName,
+                    'convert_cache_include_user_groups',
+                    $_POST['convert_cache_include_user_groups'] ?? 'N'
+                );
+
+
+    //            $enableElement = $request->getPost('enable_element');
+                $enableElement = $_POST['options'][$arSite['ID']]['enable_element'] ?? '';
+                Option::set($curModuleName, 'enable_element', ($enableElement ? 'Y' : 'N'), $arSite['ID']);
+
+    //            $enableSection = $request->getPost('enable_section');
+                $enableSection = $_POST['options'][$arSite['ID']]['enable_section'] ?? '';
+                Option::set($curModuleName, 'enable_section', ($enableSection ? 'Y' : 'N'), $arSite['ID']);
+
+    //            $enableResize = $request->getPost('enable_resize');
+                $enableResize = $_POST['options'][$arSite['ID']]['enable_resize'] ?? '';
+                Option::set($curModuleName, 'enable_resize', ($enableResize ? 'Y' : 'N'), $arSite['ID']);
+
+    //            $enableSave = $request->getPost('enable_save');
+                $enableSave = $_POST['options'][$arSite['ID']]['enable_save'] ?? '';
+                Option::set($curModuleName, 'enable_save', ($enableSave ? 'Y' : 'N'), $arSite['ID']);
+
+                //            Option::set($curModuleName, 'jpegoptim_compress', $request->getPost('jpegoptim_compress'));
+                //            Option::set($curModuleName, 'optipng_compress', $request->getPost('optipng_compress'));
+                Option::set($curModuleName, 'jpegoptim_compress', $_POST['options'][$arSite['ID']]['jpegoptim_compress'] ?? '', $arSite['ID']);
+                Option::set($curModuleName, 'optipng_compress', $_POST['options'][$arSite['ID']]['optipng_compress'] ?? '', $arSite['ID']);
+
+    //            $jpegCompress = $request->getPost('jpeg_progressive');
+                $jpegCompress = $_POST['options'][$arSite['ID']]['jpeg_progressive'] ?? '';
+                Option::set($curModuleName, 'jpeg_progressive', ($jpegCompress ? 'Y' : 'N'), $arSite['ID']);
+
+    //            $resizeImageEnable = $request->getPost('resize_image_enable');
+                $resizeImageEnable = $_POST['options'][$arSite['ID']]['resize_image_enable'] ?? '';
+                Option::set($curModuleName, 'resize_image_enable', ($resizeImageEnable ? 'Y' : 'N'), $arSite['ID']);
+                if ($resizeImageEnable) {
+    //                $resizeImageWidth = $request->getPost('resize_image_width');
+                    $resizeImageWidth = $_POST['options'][$arSite['ID']]['resize_image_width'] ?? '';
+                    if (!$resizeImageWidth) {
+                        $resizeImageWidth = 1280;
+                    }
+                    Option::set($curModuleName, 'resize_image_width', $resizeImageWidth, $arSite['ID']);
+
+    //                $resizeImageHeight = $request->getPost('resize_image_height');
+                    $resizeImageHeight = $_POST['options'][$arSite['ID']]['resize_image_height'] ?? '';
+                    if (!$resizeImageHeight) {
+                        $resizeImageHeight = 99999;
+                    }
+                    Option::set($curModuleName, 'resize_image_height', $resizeImageHeight, $arSite['ID']);
+
+    //                $resizeImageAlgorithm = $request->getPost('resize_image_algorithm');
+                    $resizeImageAlgorithm = $_POST['options'][$arSite['ID']]['resize_image_algorithm'] ?? '';
+                    if (!$resizeImageAlgorithm) {
+                        $resizeImageAlgorithm = 0;
+                    }
+                    Option::set($curModuleName, 'resize_image_algorithm', $resizeImageAlgorithm, $arSite['ID']);
+                } else {
+                    Option::set($curModuleName, 'resize_image_width', '', $arSite['ID']);
+                    Option::set($curModuleName, 'resize_image_height', '', $arSite['ID']);
+                    Option::set($curModuleName, 'resize_image_algorithm', 0, $arSite['ID']);
+                }
             }
 
             $msg = Loc::getMessage("D2F_COMPRESS_REFERENCES_OPTIONS_SAVED");
@@ -343,6 +463,21 @@ $tabControl->begin();
 <link rel="stylesheet" href="https://unpkg.com/blaze@4.0.0-6/scss/dist/objects.grid.responsive.min.css">
 <link rel="stylesheet" href="https://unpkg.com/blaze@4.0.0-6/scss/dist/objects.containers.min.css">
 <link rel="stylesheet" href="https://unpkg.com/blaze@4.0.0-6/scss/dist/components.tables.min.css">
+
+<script type="text/javascript">
+    <?=file_get_contents(__DIR__.'/install/js/script.js');?>
+</script>
+<style>
+    .accordion_heading {
+        position: relative;
+        cursor: pointer;
+    }
+    .accordion_heading .adm-detail-title-setting {
+        bottom: 0;
+        top: 50%;
+        margin-top: -23px;
+    }
+</style>
 
 <form
     method="post"
@@ -383,419 +518,8 @@ $tabControl->begin();
         \BX_RESIZE_IMAGE_PROPORTIONAL_ALT => Loc::getMessage('LABEL_SETTING_OG_BX_RESIZE_IMAGE_PROPORTIONAL_ALT'),
     ];
     ?>
-    <!-- JPEG-->
-    <tr class="heading">
-        <td colspan="2">
-            <b><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_SETTINGS', ['#MODULE#' => 'JPEG']) ?></b>
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="enable_jpeg">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_ENABLE_OPTIMIZE_TO", ['#MODULE#' => 'jpeg']) ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="checkbox"
-                   name="enable_jpeg"
-                   value="Y"
-                <?php
-                if (Option::get($curModuleName, "enable_jpeg") === 'Y') {
-                    echo 'checked';
-                }
-                ?>
-            />
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_SELECT') ?>:</label>
-        </td>
-        <td width="60%">
-            <select name="opti_algorithm_jpeg">
-                <?php
-                $selectAlgorithmJpeg = Option::get($curModuleName, "opti_algorithm_jpeg");
-                foreach ($optiAlgorithmJpeg as $k => $v) { ?>
-                    <option value="<?= $k ?>" <?= ($k === $selectAlgorithmJpeg ? 'selected' : '') ?>><?= $v ?></option>
-                <?php } ?>
-            </select>
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="path_to_jpegoptim">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_PATH_JPEGOPTI") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="text"
-                   size="50"
-                   name="path_to_jpegoptim"
-                   value="<?= Option::get($curModuleName, "path_to_jpegoptim", '/usr/bin'); ?>"
-            /> /jpegoptim
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="jpegoptim_compress">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_JPEG_COMPRESS") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <select name="jpegoptim_compress">
-                <?php
-                $jpgCompress = (int)Option::get($curModuleName, "jpegoptim_compress", '80');
-                for ($i = 0; $i <= 100; $i += 5) { ?>
-                    <option value="<?= $i ?>" <?= ($i === $jpgCompress ? 'selected' : '') ?>><?= $i ?></option>
-                <?php } ?>
-            </select>
-        </td>
-    </tr>
-    <!--    JPEG SETTINGS-->
-    <tr>
-        <td width="40%">
-            <label for="enable_element">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_JPEG_PROGRESSIVE") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="checkbox"
-                   name="jpeg_progressive"
-                   value="Y"
-                <?php
-                if (Option::get($curModuleName, "jpeg_progressive") === 'Y') {
-                    echo 'checked';
-                }
-                ?>
-            />
-        </td>
-    </tr>
 
-
-    <!--    PNG-->
-    <tr class="heading">
-        <td colspan="2">
-            <b><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_SETTINGS', ['#MODULE#' => 'PNG']) ?></b>
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="enable_png">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_ENABLE_OPTIMIZE_TO", ['#MODULE#' => 'png']) ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="checkbox"
-                   name="enable_png"
-                   value="Y"
-                <?php
-                if (Option::get($curModuleName, "enable_png") === 'Y') {
-                    echo 'checked';
-                }
-                ?>
-            />
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_SELECT') ?>:</label>
-        </td>
-        <td width="60%">
-            <select name="opti_algorithm_png">
-                <?php
-                $selectAlgorithmPng = Option::get($curModuleName, "opti_algorithm_png");
-                foreach ($optiAlgorithmPng as $k => $v) { ?>
-                    <option value="<?= $k ?>" <?= ($k === $selectAlgorithmPng ? 'selected' : '') ?>><?= $v ?></option>
-                <?php } ?>
-            </select>
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="path_to_optipng">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_PATH_PNGOPTI") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="text"
-                   size="50"
-                   name="path_to_optipng"
-                   value="<?= Option::get($curModuleName, "path_to_optipng", '/usr/bin'); ?>"
-            /> /optipng
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="optipng_compress">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_PNG_COMPRESS") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <select name="optipng_compress">
-                <?php
-                $pngCompress = (int)Option::get($curModuleName, "optipng_compress", '3');
-                for ($i = 1; $i <= 7; $i++) { ?>
-                    <option value="<?= $i ?>" <?= ($i === $pngCompress ? 'selected' : '') ?>><?= $i ?></option>
-                <?php } ?>
-            </select>
-        </td>
-    </tr>
-
-
-    <!-- PDF -->
-    <tr class="heading">
-        <td colspan="2">
-            <b><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_SETTINGS', ['#MODULE#' => 'PDF']) ?></b>
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="enable_pdf">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_ENABLE_OPTIMIZE_TO", ['#MODULE#' => 'pdf']) ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="checkbox"
-                   name="enable_pdf"
-                   value="Y"
-                <?php
-                if (Option::get($curModuleName, "enable_pdf") === 'Y') {
-                    echo 'checked';
-                }
-                ?>
-            />
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="path_to_ps2pdf">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_PATH_TO", ['#MODULE#' => 'gs']) ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="text"
-                   size="50"
-                   name="path_to_ps2pdf"
-                   value="<?= Option::get($curModuleName, "path_to_ps2pdf", '/usr/bin'); ?>"
-            /> /gs
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="pdf_setting">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_PDF_SETTING_HEADING") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <select name="pdf_setting">
-                <?php
-                $pdfSetting = Option::get($curModuleName, "pdf_setting", 'ebook');
-                $pdfTypeSettings = [
-                    'screen' => 'screen (72 dpi)',
-                    'ebook' => 'ebook (150 dpi)',
-                    'prepress' => 'prepress (300 dpi)',
-                    'printer' => 'printer (300 dpi)',
-                    'default' => 'default',
-                ];
-                foreach ($pdfTypeSettings as $key => $val) { ?>
-                    <option value="<?= $key ?>" <?= ($key === $pdfSetting ? 'selected' : '') ?>>
-                        <?= $val ?>
-                    </option>
-                <?php } ?>
-            </select>
-        </td>
-    </tr>
-    <!-- /PDF -->
-
-    <?php
-    foreach (Dev2funImageCompress::$supportFormats as $optType) {
-        if(!file_exists(__DIR__."/include/options/{$optType}.php")) {
-            continue;
-        }
-        echo "<!-- $optType -->";
-        include __DIR__."/include/options/{$optType}.php";
-        echo "<!-- /$optType -->";
-    }
-    ?>
-
-
-    <tr class="heading">
-        <td colspan="2">
-            <b><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_BASE_SETTINGS') ?></b>
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="enable_element">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_ENABLE_ELEMENT") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="checkbox"
-                   name="enable_element"
-                   value="Y"
-                <?php
-                if (Option::get($curModuleName, "enable_element") === 'Y') {
-                    echo 'checked';
-                }
-                ?>
-            />
-        </td>
-    </tr>
-
-    <tr>
-        <td width="40%">
-            <label for="enable_section">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_ENABLE_SECTION") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="checkbox"
-                   name="enable_section"
-                   value="Y"
-                <?php
-                if (Option::get($curModuleName, "enable_section") === 'Y') {
-                    echo 'checked';
-                }
-                ?>
-            />
-        </td>
-    </tr>
-
-    <tr>
-        <td width="40%">
-            <label for="enable_resize">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_ENABLE_RESIZE") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="checkbox"
-                   name="enable_resize"
-                   value="Y"
-                <?php
-                if (Option::get($curModuleName, "enable_resize") === 'Y') {
-                    echo 'checked';
-                }
-                ?>
-            />
-        </td>
-    </tr>
-
-    <tr>
-        <td width="40%">
-            <label for="enable_save">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_ENABLE_SAVE") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="checkbox"
-                   name="enable_save"
-                   value="Y"
-                <?php
-                if (Option::get($curModuleName, "enable_save") === 'Y') {
-                    echo 'checked';
-                }
-                ?>
-            />
-        </td>
-    </tr>
-
-    <tr>
-        <td width="40%">
-            <label for="cnt_step">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_CNT_STEP") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="text"
-                   name="cnt_step"
-                   value="<?= Option::get($curModuleName, "cnt_step", 30) ?>"
-            />
-        </td>
-    </tr>
-
-    <tr>
-        <td width="40%">
-            <label for="cnt_step">
-                <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_CHMOD") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="text"
-                   name="change_chmod"
-                   value="<?= Option::get($curModuleName, 'change_chmod', '777') ?>"
-            />
-        </td>
-    </tr>
-
-
-    <tr class="heading">
-        <td colspan="2">
-            <b><?= Loc::getMessage("D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_HEADING") ?></b>
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="resize_image_enable">
-                <?= Loc::getMessage("D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_ENABLE") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="checkbox"
-                   name="resize_image_enable"
-                   value="Y"
-                <?php
-                if (Option::get($curModuleName, "resize_image_enable") == 'Y') {
-                    echo 'checked';
-                }
-                ?>
-            />
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="resize_image_width">
-                <?= Loc::getMessage("D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_WIDTH") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="text"
-                   name="resize_image_width"
-                   value="<?= Option::get($curModuleName, "resize_image_width") ?>"
-            />
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label for="resize_image_height">
-                <?= Loc::getMessage("D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_HEIGHT") ?>:
-            </label>
-        </td>
-        <td width="60%">
-            <input type="text"
-                   name="resize_image_height"
-                   value="<?= Option::get($curModuleName, "resize_image_height") ?>"
-            />
-        </td>
-    </tr>
-    <tr>
-        <td width="40%">
-            <label><?= Loc::getMessage('D2F_IMAGECOMPRESS_OPTIONS_RESIZE_IMAGE_ALGORITHM_SELECT') ?>:</label>
-        </td>
-        <td width="60%">
-            <?php
-            $selectResizeAlgorithm = Option::get($curModuleName, "resize_image_algorithm");
-            foreach ($resizeAlgorithm as $k => $v) { ?>
-                <label>
-                    <input type="radio" name="resize_image_algorithm"
-                           value="<?= $k ?>" <?= ($selectResizeAlgorithm == $k) ? 'checked' : '' ?>>
-                    <?= $v ?>
-                </label>
-                <br>
-            <?php } ?>
-        </td>
-    </tr>
-
+    <?php include __DIR__.'/tabs/optimize.php'?>
     <?php include __DIR__.'/tabs/convert.php'?>
     <?php include __DIR__.'/tabs/donate.php'?>
 

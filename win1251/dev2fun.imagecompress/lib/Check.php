@@ -48,7 +48,9 @@ class Check
         }
         //$obj = self::$optiClasses[$algorithm]::getInstance(); // PHP7+
         $check = $obj->isPNGOptim();
-        if (!$check) self::$lastError = $obj->lastError;
+        if (!$check) {
+            self::$lastError = $obj->LAST_ERROR;
+        }
         return $check;
     }
 
@@ -72,7 +74,9 @@ class Check
         }
         //$obj = self::$optiClasses[$algorithm]::getInstance(); // PHP7+
         $check = $obj->isJPEGOptim();
-        if (!$check) self::$lastError = $obj->lastError;
+        if (!$check) {
+            self::$lastError = $obj->LAST_ERROR;
+        }
         return $check;
     }
 
@@ -109,34 +113,37 @@ class Check
         }
         //$obj = self::$optiClasses[$algorithm]::getInstance(); // PHP7+
         $check = $obj->isOptim();
-        if (!$check) self::$lastError = $obj->lastError;
+        if (!$check) {
+            self::$lastError = $obj->lastError;
+        }
         return $check;
     }
 
     /**
      * Return check active mode for mime type
      * @param string $mimeType
+     * @param string $siteId
      * @return bool
      * @throws \Bitrix\Main\ArgumentNullException
      * @throws \Bitrix\Main\ArgumentOutOfRangeException
      */
-    public static function isActiveByMimeType($mimeType)
+    public static function isActiveByMimeType(string $mimeType, string $siteId)
     {
         switch ($mimeType) {
             case 'image/jpeg' :
-                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_jpeg', 'N') === 'Y';
+                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_jpeg', 'N', $siteId) === 'Y';
                 break;
             case 'image/png' :
-                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_png', 'N') === 'Y';
+                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_png', 'N', $siteId) === 'Y';
                 break;
             case 'application/pdf' :
-                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_pdf', 'N') === 'Y';
+                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_pdf', 'N', $siteId) === 'Y';
                 break;
             case 'image/svg' :
-                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_svg', 'N') === 'Y';
+                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_svg', 'N', $siteId) === 'Y';
                 break;
             case 'image/gif' :
-                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_gif', 'N') === 'Y';
+                return Option::get(\Dev2funImageCompress::MODULE_ID, 'enable_gif', 'N', $siteId) === 'Y';
         }
 
         return false;

@@ -22,7 +22,7 @@ class Jpegoptim
 
     private function __construct()
     {
-        $this->jpegOptimPath = Option::get($this->MODULE_ID, 'path_to_jpegoptim');
+        $this->jpegOptimPath = Option::get($this->MODULE_ID, 'path_to_jpegoptim', '', \Dev2funImageCompress::getSiteId());
     }
 
     /**

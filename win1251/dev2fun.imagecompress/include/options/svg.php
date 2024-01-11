@@ -4,8 +4,7 @@
  * @copyright dev2fun
  * @version 0.5.0
  */
-?>
-<?php
+
 /**
  * @var string $optType
  */
@@ -24,12 +23,13 @@ use \Bitrix\Main\Config\Option;
         </label>
     </td>
     <td width="60%">
-        <input type="checkbox"
-               name="enable_<?=$optType?>"
-               id="enable_<?=$optType?>"
-               value="Y"
+        <input
+            type="checkbox"
+            name="options[<?=$arSite['ID']?>][enable_<?=$optType?>]"
+            id="enable_<?=$optType?>"
+            value="Y"
             <?php
-            if (Option::get($curModuleName, "enable_{$optType}") === 'Y') {
+            if (Option::get($curModuleName, "enable_{$optType}", '', $arSite['ID']) === 'Y') {
                 echo 'checked';
             }
             ?>
@@ -41,9 +41,9 @@ use \Bitrix\Main\Config\Option;
         <label><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_SELECT') ?>:</label>
     </td>
     <td width="60%">
-        <select name="opti_algorithm_<?=$optType?>">
+        <select name="options[<?=$arSite['ID']?>][opti_algorithm_<?=$optType?>]">
             <?php
-            $selectAlgorithm = Option::get($curModuleName, "opti_algorithm_{$optType}");
+            $selectAlgorithm = Option::get($curModuleName, "opti_algorithm_{$optType}", '', $arSite['ID']);
             foreach ($optiAlgorithmList[$optType] as $v) { ?>
                 <option value="<?= $v ?>" <?= ($v == $selectAlgorithm ? 'selected' : '') ?>><?= $v ?></option>
             <?php } ?>
@@ -59,8 +59,8 @@ use \Bitrix\Main\Config\Option;
     <td width="60%">
         <input type="text"
                size="50"
-               name="path_to_<?=$optType?>"
-               value="<?= Option::get($curModuleName, "path_to_{$optType}", '/usr/bin'); ?>"
+               name="options[<?=$arSite['ID']?>][path_to_<?=$optType?>]"
+               value="<?= Option::get($curModuleName, "path_to_{$optType}", '/usr/bin', $arSite['ID']); ?>"
         /> /svgo
     </td>
 </tr>

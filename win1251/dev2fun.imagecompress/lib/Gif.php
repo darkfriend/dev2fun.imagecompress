@@ -20,11 +20,12 @@ class Gif
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $path = '';
     private $enable = false;
+    private static $isOptim = null;
 
     private function __construct()
     {
-        $this->path = Option::get($this->MODULE_ID, 'path_to_gif', '/usr/bin');
-        $this->enable = Option::get($this->MODULE_ID, 'enable_gif', false);
+        $this->path = Option::get($this->MODULE_ID, 'path_to_gif', '/usr/bin', \Dev2funImageCompress::getSiteId());
+        $this->enable = Option::get($this->MODULE_ID, 'enable_gif', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
     }
 
     /**
@@ -41,13 +42,16 @@ class Gif
     }
 
     /**
-     * Проверка возможности оптимизации pdf
+     * Check optimize for gif
      * @return bool
      */
     public function isOptim()
     {
-        exec($this->path . '/gifsicle --version', $s);
-        return ($s ? true : false);
+        if (self::$isOptim === null) {
+            exec($this->path . '/gifsicle --version', $s);
+            self::$isOptim = $s ? true : false;
+        }
+        return self::$isOptim;
     }
 
     /**
@@ -72,7 +76,7 @@ class Gif
         );
 
         if(empty($params['compression'])) {
-            $params['compression'] = Option::get($this->MODULE_ID, 'gif_compress', 2);
+            $params['compression'] = Option::get($this->MODULE_ID, 'gif_compress', 2, \Dev2funImageCompress::getSiteId());
         }
 
         $event = new \Bitrix\Main\Event(

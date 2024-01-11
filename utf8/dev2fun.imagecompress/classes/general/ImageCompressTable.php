@@ -1,11 +1,9 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: darkfriend <hi@darkfriend.ru>
- * Date: 04.05.2017
- * Time: 18:51
+ * @author darkfriend <hi@darkfriend.ru>
+ * @version 0.8.0
  */
+
 namespace Dev2fun\ImageCompress;
 
 use Bitrix\Main;
@@ -15,8 +13,8 @@ use Bitrix\Main\Localization\Loc;
 //Loc::loadMessages(__FILE__);
 IncludeModuleLangFile(__FILE__);
 
-class ImageCompressTable extends Entity\DataManager {
-
+class ImageCompressTable extends Entity\DataManager
+{
     static $module_id = "dev2fun.imagecompress";
 
     public static function getFilePath()

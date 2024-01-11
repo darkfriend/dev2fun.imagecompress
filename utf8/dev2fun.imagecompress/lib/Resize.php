@@ -22,12 +22,15 @@ class Resize
 	private $algorithm = '';
 	private $enable = false;
 
-	private function __construct() {
-		$this->width = Option::get($this->MODULE_ID,'resize_width');
-		$this->height = Option::get($this->MODULE_ID,'resize_height');
-		$this->algorithm = Option::get($this->MODULE_ID,'resize_algorithm');
-		$this->enable = Option::get($this->MODULE_ID,'resize_enable')=='Y';
-		if(!$this->algorithm) $this->algorithm = BX_RESIZE_IMAGE_PROPORTIONAL;
+	private function __construct()
+    {
+		$this->width = Option::get($this->MODULE_ID,'resize_width', '', \Dev2funImageCompress::getSiteId());
+		$this->height = Option::get($this->MODULE_ID,'resize_height', '', \Dev2funImageCompress::getSiteId());
+		$this->algorithm = Option::get($this->MODULE_ID,'resize_algorithm', '', \Dev2funImageCompress::getSiteId());
+		$this->enable = Option::get($this->MODULE_ID,'resize_enable', 'N', \Dev2funImageCompress::getSiteId())==='Y';
+		if (!$this->algorithm) {
+            $this->algorithm = BX_RESIZE_IMAGE_PROPORTIONAL;
+        }
 	}
 
 	/**
