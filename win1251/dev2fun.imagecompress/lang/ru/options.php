@@ -52,6 +52,10 @@ $MESS["D2F_COMPRESS_OPTIONS_NO_TESTED"] = "Конфигурация сервера не соответствует
 $MESS["D2F_IMAGECOMPRESS_COMPRESS_IMAGE_PROGRESSBAR"] = "Процесс оптимизации картинок";
 $MESS["D2F_COMPRESS_REFERENCES_JPEG_PROGRESSIVE"] = "Включить progressive jpeg";
 
+$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT"] = "Модули для которых работает оптимизация";
+$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT_MODULE"] = "Модуль \"#MODULE#\"";
+$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT_MODULE_OTHER"] = "Другие модули";
+
 
 $MESS['LABEL_TITLE_HELP_BEGIN'] = 'Вы используете бесплатный модуль разработанный командой <a href="//dev2fun.com" class="c-badge c-badge--rounded c-badge--ghost c-badge--brand" target="_blank">Dev2Fun</a>';
 $MESS['LABEL_TITLE_HELP_BEGIN_TEXT'] = <<<EOT
@@ -162,7 +166,7 @@ EO;
 $MESS['LABEL_ADD'] = "Добавить";
 
 
-$MESS['D2F_COMPRESS_GLOBAL_SETTINGS'] = "Глобальные настройки";
+$MESS['D2F_COMPRESS_GLOBAL_SETTINGS'] = "Общие настройки";
 $MESS['D2F_COMPRESS_CRONTAB_TEXT'] = <<<TEXT
     <b>Сейчас у вас агенты работают на хитах! Крайне рекомендуется перевести агенты на крон!</b><br>
     Рекомендуется использовать "Обобщённое решение" - <a href="https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=2943" target="_blank">подробнее</a>

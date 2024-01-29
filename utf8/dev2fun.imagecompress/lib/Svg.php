@@ -15,17 +15,20 @@ IncludeModuleLangFile(__FILE__);
 class Svg
 {
     private static $instance;
+    private static $isOptim = null;
     public $lastError;
     public $binaryName = 'svgo';
-
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $path = '';
-    private $enable = false;
+    private $active = false;
 
-    private function __construct()
+    /**
+     * @param string|null $siteId
+     */
+    public function __construct()
     {
-        $this->path = Option::get($this->MODULE_ID, 'path_to_svg', '/usr/bin', \Dev2funImageCompress::getSiteId());
-        $this->enable = Option::get($this->MODULE_ID, 'enable_svg', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
+        $this->path = Option::get($this->MODULE_ID, 'path_to_svg', '/usr/bin');
+        $this->active = Option::get($this->MODULE_ID, 'enable_svg', 'N') === 'Y';
     }
 
     /**
@@ -42,13 +45,29 @@ class Svg
     }
 
     /**
-     * Проверка возможности оптимизации pdf
+     * Return has active state
      * @return bool
      */
-    public function isOptim()
+    public function isActive(): bool
     {
-        exec($this->path . "/{$this->binaryName} -v", $s);
-        return ($s ? true : false);
+        return $this->active;
+    }
+
+    /**
+     * Check available optimization svg
+     * @param string|null $path
+     * @return bool
+     */
+    public function isOptim(?string $path = null)
+    {
+        if (!$path) {
+            $path = $this->path;
+        }
+        if (self::$isOptim === null || $path !== $this->path) {
+            exec($path . "/{$this->binaryName} -v", $s);
+            self::$isOptim = (bool)$s;
+        }
+        return self::$isOptim;
     }
 
     /**
@@ -60,7 +79,10 @@ class Svg
      */
     public function compress($strFilePath, $params = [])
     {
-        if(!$this->enable) return false;
+        if (!$this->active) {
+            $this->lastError = 'no_active';
+            return false;
+        }
         $strFilePath = strtr(
             $strFilePath,
             [

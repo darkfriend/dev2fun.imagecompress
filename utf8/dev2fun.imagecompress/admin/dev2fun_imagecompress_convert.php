@@ -71,6 +71,7 @@ if (!empty($_REQUEST["convert"]) || ($_REQUEST["action"] ?? '') === "convert") {
                 'ID' => $imagesId,
             ],
         ])->fetchAll();
+
         if ($arImages) {
             foreach ($arImages as $k => &$arFile) {
                 $pathFile = Convert::getNormalizePathFile($arFile['IMAGE_PATH']);
@@ -119,24 +120,7 @@ $list = new AdminList($curModuleName);
 $list->generalKey = 'ID';
 $list->setRights();
 $list->setTitle(Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_TITLE'));
-//$list->SetGroupAction([
-//    'convert_all' => function ($hash)
-//    {
-//    },
-//]);
-//$list->getlAdmin()->SetContextMenu([
-//    'convert_all' => [
-//        'TEXT' => Loc::getMessage(
-//            'DEV2FUN_IMAGECOMPRESS_CONVERT_ALL',
-//            [
-//                '#IMAGE_TYPE#' => Convert::getInstance()->getImageTypeByAlgorithm(Convert::getInstance()->algorithm)
-//            ]
-//        ),
-//        'LINK' => $APPLICATION->GetCurPageParam('convert_all=Y', ['convert_all']),
-////'/bitrix/admin/dev2fun_imagecompress_pages.php?convert_all=Y',
-//    ],
-//]);
-// SetContextMenu(false);
+
 //$list->setContextMenu(false);
 $list->getlAdmin()->AddAdminContextMenu([
     'convert_all' => [
@@ -217,39 +201,43 @@ $rsFiles = \Dev2fun\ImageCompress\ImageCompressImagesTable::getList([
 ]);
 
 //$list->setContextMenu();
-
-$list->setList(
-    $rsFiles,
-    [
-        'IMAGE' => function ($val, $arRec) {
-            $path = $_SERVER['DOCUMENT_ROOT'] . $arRec['IMAGE_PATH'];
-            if (file_exists($path)) {
-                $name = basename($path);
-                $mimeType = mime_content_type($path);
-                if (strpos($mimeType, 'image') !== false) {
-                    if ($arRec['CONVERTED_IMAGE_PROCESSED'] === 'Y') {
-                        $btnText = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_RECONVERT_BTN_ACTION');
-                    } else {
-                        $btnText = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_BTN_ACTION');
-                    }
-                    return "
+if ($rsFiles->getSelectedRowsCount()>0) {
+    $list->setList(
+        $rsFiles,
+        [
+            'IMAGE' => function ($val, $arRec)
+            {
+                $path = $_SERVER['DOCUMENT_ROOT'] . $arRec['IMAGE_PATH'];
+                if (file_exists($path)) {
+                    $name = basename($path);
+                    $mimeType = mime_content_type($path);
+                    if (strpos($mimeType, 'image') !== false) {
+                        if ($arRec['CONVERTED_IMAGE_PROCESSED'] === 'Y') {
+                            $btnText = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_RECONVERT_BTN_ACTION');
+                        } else {
+                            $btnText = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_BTN_ACTION');
+                        }
+                        return "
                         <button name='convert' value='{$arRec['ID']}' data-image-id='{$arRec['ID']}'>{$btnText}</button>
                         <br>
                         <img style='max-width: 200px; height: auto;' src='{$arRec['IMAGE_PATH']}'>
                     ";
+                    } else {
+                        return "<a href=\"{$arRec['IMAGE_PATH']}\" target='_blank'>{$name}</a>";
+                    }
                 } else {
-                    return "<a href=\"{$arRec['IMAGE_PATH']}\" target='_blank'>{$name}</a>";
+                    return "<span class='text-error'>" . Loc::getMessage(
+                            'DEV2FUN_IMAGECOMPRESS_FILE_NOT_FOUND'
+                        ) . "</span>";
                 }
-            } else {
-                return "<span class='text-error'>" . Loc::getMessage('DEV2FUN_IMAGECOMPRESS_FILE_NOT_FOUND') . "</span>";
-            }
-        },
-    ],
-    [
-        'edit' => false,
-        'delete' => false,
-    ]
-);
+            },
+        ],
+        [
+            'edit' => false,
+            'delete' => false,
+        ]
+    );
+}
 $list->setFooter([
     'convert' => Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_BTN_ACTION'),
 ]);

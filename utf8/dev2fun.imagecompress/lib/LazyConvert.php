@@ -60,15 +60,20 @@ class LazyConvert
                 'CONVERTED_IMAGE_PROCESSED' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_PROCESSED',
             ],
             'filter' => [
-                [
-                    'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE_PROCESSED', 'in', ['N', null],
-                ],
-                [
-                    'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE',
-                    '!=',
-//                    $currentImageType === 'webp' ? 'avif' : 'webp',
-                    $currentImageType === Convert::TYPE_WEBP ? Convert::TYPE_AVIF : Convert::TYPE_WEBP,
-                ],
+                '!=Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_PROCESSED' => 'Y',
+//                [
+//                    'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_PROCESSED', '!=', 'Y',
+//                ],
+                '!=Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE'  => $currentImageType === Convert::TYPE_WEBP
+                    ? Convert::TYPE_AVIF
+                    : Convert::TYPE_WEBP,
+                '!=IMAGE_IGNORE' => 'Y',
+//                [
+//                    'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE',
+//                    '!=',
+////                    $currentImageType === 'webp' ? 'avif' : 'webp',
+//
+//                ],
 //                'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE' => $instance->getImageTypeByAlgorithm($instance->algorithm),
         //        'IMAGE_PROCESSED' => 'Y',
             ],
@@ -78,6 +83,8 @@ class LazyConvert
         if (!$images) {
             return;
         }
+
+//        DebugHelper::print_pre($images, 1);
 
         $event = new \Bitrix\Main\Event(
             \Dev2funImageCompress::MODULE_ID,
@@ -118,7 +125,6 @@ class LazyConvert
             }
             unset($duplicateImages);
         }
-
         foreach ($images as $arImage) {
             self::convertItem($arImage, $algImageType, $arDuplicateImages);
         }
@@ -137,7 +143,10 @@ class LazyConvert
     public static function convertItem(array $arImage, string $algImageType, array &$arDuplicateImages = [])
     {
         global $DB;
+//        \darkfriend\helpers\DebugHelper::print_pre($arImage);
         $convertedFile = Convert::getInstance()->convertFile($arImage['IMAGE_PATH']);
+//        \darkfriend\helpers\DebugHelper::print_pre($convertedFile);
+//        \darkfriend\helpers\DebugHelper::print_pre(Convert::getInstance()->LAST_ERROR, 1);
         if (!$convertedFile) {
             ImageCompressImagesTable::update($arImage['ID'], [
                 'IMAGE_IGNORE' => 'Y',
@@ -178,6 +187,7 @@ class LazyConvert
             }
 
             $res = ImageCompressImagesTable::update($arImage['ID'], [
+                'IMAGE_IGNORE' => 'N',
                 'DATE_UPDATE' => new SqlExpression("NOW()"),
                 'DATE_CHECK' => new SqlExpression("NOW()"),
             ]);
@@ -221,5 +231,56 @@ class LazyConvert
         }
 
         return null;
+    }
+
+    /**
+     * @param array $arFiles
+     * @return array
+     * @throws \Bitrix\Main\ArgumentException
+     * @throws \Bitrix\Main\ObjectPropertyException
+     * @throws \Bitrix\Main\SystemException
+     */
+    public static function findFiles(array $arFiles = []): array
+    {
+        if (!$arFiles) {
+            return $arFiles;
+        }
+        $filter = [
+            'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE' => Convert::getInstance()->getImageTypeByAlgorithm(
+                Convert::getInstance()->algorithm
+            ),
+        ];
+        $imagesHash = [];
+        foreach ($arFiles as $file) {
+            $isUrl = !empty(parse_url($file, PHP_URL_HOST));
+            if ($isUrl) {
+                $imagesHash[] = md5_file($file);
+            } else {
+                $imagesHash[] = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
+            }
+        }
+        if (!$imagesHash) {
+            return [];
+        }
+        $filter[] = [
+            'IMAGE_HASH', 'in', $imagesHash,
+        ];
+        $images = ImageCompressImagesTable::getList([
+                'select' => [
+                    'CONVERTED_IMAGE_HASH' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.ORIGINAL_IMAGE_HASH',
+                ],
+                'filter' => $filter,
+            ])
+            ->fetchAll();
+
+        $result = [];
+        foreach ($images as $image) {
+            if (empty($image['CONVERTED_IMAGE_HASH'])) {
+                continue;
+            }
+            $result[$image['CONVERTED_IMAGE_HASH']] = true;
+        }
+
+        return $result;
     }
 }

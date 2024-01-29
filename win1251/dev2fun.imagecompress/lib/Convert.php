@@ -7,11 +7,10 @@
 
 namespace Dev2fun\ImageCompress;
 
-use Bitrix\Main\Application;
 use Bitrix\Main\DB\SqlExpression;
-use Bitrix\Main\Entity\ExpressionField;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Config\Option;
+use Dev2funImageCompress;
 
 IncludeModuleLangFile(__FILE__);
 
@@ -71,16 +70,26 @@ class Convert
     /** @var bool */
     public $cacheIncludeUserGroups = true;
 
-    private function __construct()
+    public $siteId;
+
+    /**
+     * @param string|null $siteId
+     */
+    public function __construct(?string $siteId = null)
     {
-        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
-        $supportAttrs = Option::get($this->MODULE_ID, 'convert_attributes', [], \Dev2funImageCompress::getSiteId());
+        if (!$siteId) {
+            $siteId = \Dev2funImageCompress::getSiteId();
+        }
+        $this->siteId = $siteId;
+
+        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', $siteId) === 'Y';
+        $supportAttrs = Option::get($this->MODULE_ID, 'convert_attributes', [], $siteId);
         if($supportAttrs) {
             $supportAttrs = \unserialize($supportAttrs, ['allowed_classes' => false]);
         }
         $this->supportAttrs = $supportAttrs;
 
-        $convertMode = Option::get($this->MODULE_ID, 'convert_mode', [], \Dev2funImageCompress::getSiteId());
+        $convertMode = Option::get($this->MODULE_ID, 'convert_mode', [], $siteId);
         if($convertMode) {
             $convertMode = \unserialize($convertMode, ['allowed_classes' => false]);
         } else {
@@ -88,9 +97,9 @@ class Convert
         }
         $this->convertMode = $convertMode;
 
-        $this->algorithm = Option::get($this->MODULE_ID, 'convert_algorithm', 'phpWebp', \Dev2funImageCompress::getSiteId());
+        $this->algorithm = Option::get($this->MODULE_ID, 'convert_algorithm', 'phpWebp', $siteId);
 
-        $this->cacheTime = Option::get($this->MODULE_ID, 'cache_time', 3600, \Dev2funImageCompress::getSiteId());
+        $this->cacheTime = Option::get($this->MODULE_ID, 'cache_time', 3600, $siteId);
 
         if (\in_array('lazyConvert', $this->convertMode)) {
             $this->convertPerPage = Option::get($this->MODULE_ID, 'convert_per_page', 500);
@@ -162,11 +171,15 @@ class Convert
 
     /**
      * Get exclude pages
+     * @param string|null $siteId
      * @return array
      */
-    public static function getSettingsExcludePage()
+    public static function getSettingsExcludePage(?string $siteId = null)
     {
-        $pages = Option::get(\Dev2funImageCompress::MODULE_ID, 'exclude_pages', \Dev2funImageCompress::getSiteId());
+        if (!$siteId) {
+            $siteId = Dev2funImageCompress::getSiteId();
+        }
+        $pages = Option::get(\Dev2funImageCompress::MODULE_ID, 'exclude_pages', '', $siteId);
         if ($pages) {
             $pages = \json_decode($pages, true);
         } else {
@@ -180,11 +193,15 @@ class Convert
 
     /**
      * Get exclude files
+     * @param string|null $siteId
      * @return array
      */
-    public static function getSettingsExcludeFiles()
+    public static function getSettingsExcludeFiles(?string $siteId = null)
     {
-        $files = Option::get(\Dev2funImageCompress::MODULE_ID, 'exclude_files', \Dev2funImageCompress::getSiteId());
+        if (!$siteId) {
+            $siteId = Dev2funImageCompress::getSiteId();
+        }
+        $files = Option::get(\Dev2funImageCompress::MODULE_ID, 'exclude_files', '', $siteId);
         if ($files) {
             $files = \json_decode($files, true);
         } else {
@@ -322,7 +339,7 @@ class Convert
             return false;
         }
 
-        $alg = Option::get($this->MODULE_ID, 'convert_algorithm', 'phpWebp', \Dev2funImageCompress::getSiteId());
+        $alg = Option::get($this->MODULE_ID, 'convert_algorithm', 'phpWebp', $this->siteId);
         $algInstance = static::getAlgInstance($alg);
         if (!$algInstance->isOptim()) {
             $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NO_MODULE', ['#MODULE#' => $alg]);
@@ -393,7 +410,7 @@ class Convert
      */
     public function convertFile(string $file, array $options = [])
     {
-        $alg = Option::get($this->MODULE_ID, 'convert_algorithm', 'phpWebp', \Dev2funImageCompress::getSiteId());
+        $alg = Option::get($this->MODULE_ID, 'convert_algorithm', 'phpWebp', $this->siteId);
         $algInstance = static::getAlgInstance($alg);
 
         if (!$algInstance->isOptim()) {
@@ -424,7 +441,6 @@ class Convert
         if(!\is_file($absFile)) {
             return null;
         }
-
         $fileInfo = \pathinfo($absFile);
         $arFile = [
             'CONTENT_TYPE' => \mime_content_type($absFile),
@@ -439,7 +455,6 @@ class Convert
         if (!\is_file($absFile)) {
             return null;
         }
-
         return $algInstance->convert(
             $arFile,
             \array_merge(
@@ -585,9 +600,9 @@ class Convert
             return false;
         }
 
-        $width = Option::get($this->MODULE_ID, 'resize_image_width', '', \Dev2funImageCompress::getSiteId());
-        $height = Option::get($this->MODULE_ID, 'resize_image_height', '', \Dev2funImageCompress::getSiteId());
-        $algorithm = Option::get($this->MODULE_ID, 'resize_image_algorithm', '', \Dev2funImageCompress::getSiteId());
+        $width = Option::get($this->MODULE_ID, 'resize_image_width', '', $this->siteId);
+        $height = Option::get($this->MODULE_ID, 'resize_image_height', '', $this->siteId);
+        $algorithm = Option::get($this->MODULE_ID, 'resize_image_algorithm', '', $this->siteId);
         if (!$algorithm) $algorithm = BX_RESIZE_IMAGE_PROPORTIONAL;
 
         $destinationFile = $_SERVER['DOCUMENT_ROOT'] . "/upload/{$this->MODULE_ID}/" . basename($strFilePath);
@@ -734,7 +749,7 @@ class Convert
 
             $jsonFiles = json_encode($arFiles);
             $cacheId = [
-                'v0.6.9',
+                'v0.6.10',
                 'findImages',
                 $jsonFiles,
             ];
@@ -744,6 +759,8 @@ class Convert
                     $cacheId,
                 '/find-images',
                 function () use ($arFiles) {
+                    $currentFiles = LazyConvert::findFiles($arFiles);
+//                    DebugHelper::print_pre($currentFiles, 1);
                     $connection = \Bitrix\Main\Application::getInstance()->getConnection();
                     $rows = [];
                     foreach ($arFiles as $file) {
@@ -754,14 +771,16 @@ class Convert
                             $md5 = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
                         }
 
-                        $rows[] = [
-                            'SITE_ID' => \Dev2funImageCompress::getSiteId(),
-                            'IMAGE_PATH' => $file,
-                            'IMAGE_HASH' => $md5,
-                            'DATE_CREATE' => new SqlExpression("NOW()"),
-                            'IMAGE_IGNORE' => 'N',
-//                            'IMAGE_PROCESSED' => 'N',
-                        ];
+                        if (empty($currentFiles[$md5])) {
+                            $rows[] = [
+                                'SITE_ID' => \Dev2funImageCompress::getSiteId(),
+                                'IMAGE_PATH' => $file,
+                                'IMAGE_HASH' => $md5,
+                                'DATE_CREATE' => new SqlExpression("NOW()"),
+                                'IMAGE_IGNORE' => 'N',
+                                //                            'IMAGE_PROCESSED' => 'N',
+                            ];
+                        }
                     }
                     $sql = MySqlHelper::getInsertIgnoreMulti(
                         ImageCompressImagesTable::getTableName(),
@@ -786,9 +805,6 @@ class Convert
                 'v0.1.5',
                 'getImages',
                 $jsonFiles,
-//                $USER->IsAuthorized() ? $USER->GetGroups() : 'guest',
-//                $userGroups,
-//                $curUri,
             ];
             $cacheId = implode('|',$cacheId);
             $arFileReplace = LazyConvert::cache(
@@ -1111,11 +1127,15 @@ class Convert
     /**
      * Get original src by webp src
      * @param string $srcWebp
+     * @param string|null $siteId
      * @return string
      */
-    public static function getOriginalSrc(string $srcWebp): string
+    public static function getOriginalSrc(string $srcWebp, ?string $siteId = null): string
     {
-        $alg = Option::get(self::getInstance()->MODULE_ID, 'convert_algorithm', 'phpWebp', \Dev2funImageCompress::getSiteId());
+        if (!$siteId) {
+            $siteId = Dev2funImageCompress::getSiteId();
+        }
+        $alg = Option::get(self::getInstance()->MODULE_ID, 'convert_algorithm', 'phpWebp', $siteId);
         $algInstance = static::getAlgInstance($alg);
         return $algInstance ? $algInstance->getOriginalSrc($srcWebp) : '';
     }

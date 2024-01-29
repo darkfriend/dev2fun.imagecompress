@@ -9,6 +9,7 @@ namespace Dev2fun\ImageCompress;
 
 
 use Bitrix\Main\Config\Option;
+use Dev2funImageCompress;
 
 IncludeModuleLangFile(__FILE__);
 
@@ -21,11 +22,14 @@ class AvifConvertImagick
     private $enable = false;
     private $quality = 80;
 
-    private function __construct()
+    public function __construct(?string $siteId = null)
     {
-        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
-        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80, \Dev2funImageCompress::getSiteId());
-        if(!$this->quality) {
+        if (!$siteId) {
+            $siteId = Dev2funImageCompress::getSiteId();
+        }
+        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', $siteId) === 'Y';
+        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80, $siteId);
+        if (!$this->quality) {
             $this->quality = 80;
         }
     }

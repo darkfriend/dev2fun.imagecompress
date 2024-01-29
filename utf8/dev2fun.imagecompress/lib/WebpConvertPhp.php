@@ -24,12 +24,18 @@ class WebpConvertPhp
     private $origPicturesMode = false;
     private static $origPictures = [];
 
-    private function __construct()
+    /**
+     * @param string|null $siteId
+     */
+    public function __construct(?string $siteId = null)
     {
-        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
-        $this->origPicturesMode = Option::get($this->MODULE_ID, 'orig_pictures_mode', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
-        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80, \Dev2funImageCompress::getSiteId());
-        if(!$this->quality) {
+        if (!$siteId) {
+            $siteId = \Dev2funImageCompress::getSiteId();
+        }
+        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', $siteId) === 'Y';
+        $this->origPicturesMode = Option::get($this->MODULE_ID, 'orig_pictures_mode', 'N', $siteId) === 'Y';
+        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80, $siteId);
+        if (!$this->quality) {
             $this->quality = 80;
         }
     }
@@ -72,7 +78,7 @@ class WebpConvertPhp
     public function convert($arFile, $params = [])
     {
         if(!$this->enable) return false;
-
+//        \darkfriend\helpers\DebugHelper::print_pre($arFile, 1);
         //        $strFilePath = strtr(
         //            $strFilePath,
         //            [

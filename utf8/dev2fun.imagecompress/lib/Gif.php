@@ -19,13 +19,13 @@ class Gif
 
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $path = '';
-    private $enable = false;
+    private $active = false;
     private static $isOptim = null;
 
-    private function __construct()
+    public function __construct()
     {
-        $this->path = Option::get($this->MODULE_ID, 'path_to_gif', '/usr/bin', \Dev2funImageCompress::getSiteId());
-        $this->enable = Option::get($this->MODULE_ID, 'enable_gif', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
+        $this->path = Option::get($this->MODULE_ID, 'path_to_gif', '/usr/bin');
+        $this->active = Option::get($this->MODULE_ID, 'enable_gif', 'N') === 'Y';
     }
 
     /**
@@ -42,14 +42,27 @@ class Gif
     }
 
     /**
-     * Check optimize for gif
+     * Return has active state
      * @return bool
      */
-    public function isOptim()
+    public function isActive(): bool
     {
-        if (self::$isOptim === null) {
-            exec($this->path . '/gifsicle --version', $s);
-            self::$isOptim = $s ? true : false;
+        return $this->active;
+    }
+
+    /**
+     * Check optimize for gif
+     * @param string|null $path
+     * @return bool
+     */
+    public function isOptim(?string $path = null)
+    {
+        if (!$path) {
+            $path = $this->path;
+        }
+        if (self::$isOptim === null || $path !== $this->path) {
+            exec($path . '/gifsicle --version', $s);
+            self::$isOptim = (bool)$s;
         }
         return self::$isOptim;
     }
@@ -63,7 +76,10 @@ class Gif
      */
     public function compress($strFilePath, $params = [])
     {
-        if(!$this->enable) return false;
+        if(!$this->isActive()) {
+            $this->lastError = 'no_active';
+            return false;
+        }
         $strFilePath = strtr(
             $strFilePath,
             [
@@ -76,7 +92,7 @@ class Gif
         );
 
         if(empty($params['compression'])) {
-            $params['compression'] = Option::get($this->MODULE_ID, 'gif_compress', 2, \Dev2funImageCompress::getSiteId());
+            $params['compression'] = Option::get($this->MODULE_ID, 'gif_compress', 2);
         }
 
         $event = new \Bitrix\Main\Event(

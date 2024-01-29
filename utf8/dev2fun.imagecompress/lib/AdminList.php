@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.0
+ * @version 0.7.2
  */
 
 namespace Dev2fun\ImageCompress;
@@ -12,6 +12,7 @@ use Bitrix\Main\DB\SqlExpression;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Config\Option;
 use Bitrix\Main\ORM\Query\Filter\Condition;
+use darkfriend\helpers\DebugHelper;
 
 IncludeModuleLangFile(__FILE__);
 
@@ -313,7 +314,7 @@ class AdminList
     {
         $this->lAdmin->AddFooter(
             [
-                ['title' => GetMessage('MAIN_ADMIN_LIST_SELECTED'), 'value' => $this->rsRec->SelectedRowsCount()],
+                ['title' => GetMessage('MAIN_ADMIN_LIST_SELECTED'), 'value' => $this->rsRec ? $this->rsRec->SelectedRowsCount() : ''],
                 ['counter' => true, 'title' => GetMessage('MAIN_ADMIN_LIST_CHECKED'), 'value' => '0'],
             ]
         );
@@ -458,14 +459,8 @@ class AdminList
             case 'convert':
                 $this->convertAll();
                 $this->processResult(Loc::getMessage('D2F_IMAGECOMPRESS_CONVERT_IMAGE_STATUS_SUCCESS'));
-                if ($recCompress === false) {
-                    if (empty($GLOBALS['msgError'])) {
-                        $GLOBALS['msgError'] = Loc::getMessage('D2F_IMAGECOMPRESS_CONVERT_DEFAULT_TEXT_ERRROR');
-                    }
-                    \CAdminMessage::ShowMessage([
-                        "MESSAGE" => $GLOBALS['msgError'],
-                        "TYPE" => "ERROR",
-                    ]);
+                if ($recCompress === false && empty($GLOBALS['msgError'])) {
+                    $GLOBALS['msgError'] = Loc::getMessage('D2F_IMAGECOMPRESS_CONVERT_DEFAULT_TEXT_ERRROR');
                 }
                 break;
             default:
@@ -477,6 +472,13 @@ class AdminList
                         "TYPE" => "ERROR",
                     ]);
                 }
+        }
+
+        if ($recCompress === false && !empty($GLOBALS['msgError'])) {
+            \CAdminMessage::ShowMessage([
+                "MESSAGE" => $GLOBALS['msgError'],
+                "TYPE" => "ERROR",
+            ]);
         }
 
         echo $this->topNote;
@@ -623,29 +625,7 @@ class AdminList
             \CJSCore::Init(['ajax']);
             echo '<div id="convertAllStatus">';
             if ($_REQUEST['AJAX_IC']) {
-//                $APPLICATION->RestartBuffer();
-//                ob_start();
-//                $q = ImageCompressImagesTable::query()
-//                    ->setSelect([
-//                        '*',
-//                        'CONVERTED_IMAGE_PATH' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.IMAGE_PATH',
-//                        'CONVERTED_IMAGE_ID' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.ID',
-//                        'CONVERTED_IMAGE_HASH' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.ORIGINAL_IMAGE_HASH',
-//                        'CONVERTED_IMAGE_PROCESSED' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_PROCESSED',
-//                        'CONVERTED_IMAGE_TYPE' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE',
-//                    ])
-//                    ->setOrder([
-//                        'ID' => 'ASC',
-//                    ])
-//                    ->setLimit($arParams['PAGE_CNT'])
-//                    ->setFilter([
-//                        'CONVERTED_IMAGE_PROCESSED' => 'N',
-//                    ]);
-//
-//                $q->
-
                 try {
-//                    var_dump(__LINE__);
                     $rsRes = ImageCompressImagesTable::getList([
                         'select' => [
                             '*',
@@ -657,72 +637,14 @@ class AdminList
                         ],
                         'filter' => [
                             '=IMAGE_IGNORE' => 'N',
-//                            '=CONVERTED_IMAGE_PROCESSED' => ['N', Filter],
                             '!=CONVERTED_IMAGE_PROCESSED' => 'Y',
                             '!=CONVERTED_IMAGE_TYPE' => Convert::TYPE_WEBP,
-//                            '=CONVERTED_IMAGE_PROCESSED' => ['N', 'NULL'],
-//                            'CONVERTED_IMAGE_TYPE' => [
-//                                $algImageType === Convert::TYPE_WEBP ? Convert::TYPE_AVIF : Convert::TYPE_WEBP,
-//                                'NULL',
-//                            ],
-//                            '@CONVERTED_IMAGE_TYPE' => [
-//                                $algImageType === Convert::TYPE_WEBP ? Convert::TYPE_AVIF : Convert::TYPE_WEBP,
-//                                new Condition('CONVERTED_IMAGE_TYPE', '=', null)
-//                            ],
-//                            [
-//                                'logic' => 'or',
-//                                ['CONVERTED_IMAGE_TYPE', '!=', Convert::TYPE_WEBP],
-//                                [\Bitrix\Main\ORM\Query\Filter\ConditionTree::createFromArray([])->whereNull('CONVERTED_IMAGE_TYPE')],
-////                                [new Condition('CONVERTED_IMAGE_TYPE', '=', null)],
-//                            ],
-//                            'CONVERTED_IMAGE_TYPE' => \Bitrix\Main\Entity\Query\Filter\ConditionTree::createFromArray(),
-//                            [
-//                                'logic' => 'or',
-//                                [
-//                                    '=CONVERTED_IMAGE_TYPE' =>
-////                                    '=',
-//                                    $algImageType === Convert::TYPE_WEBP ? Convert::TYPE_AVIF : Convert::TYPE_WEBP,
-//                                    '==CONVERTED_IMAGE_TYPE' => null,
-//                                ],
-////                                [
-//////                                    '==CONVERTED_IMAGE_TYPE' => null,
-//////                                    'IS NULL',
-//////                                    ''
-////                                ]
-//                            ],
-//                            [
-//                                'CONVERTED_IMAGE_PROCESSED', 'in', ['N', null],
-//                            ],
-//                            [
-////                                'logic' => 'OR',
-////                                [
-////                                    'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE',
-////                                    '!=',
-////                                    $algImageType
-////                                ],
-////                                [
-//                                'CONVERTED_IMAGE_TYPE',
-//                                'in',
-//                                [
-//                                    $algImageType === Convert::TYPE_WEBP ? Convert::TYPE_AVIF : Convert::TYPE_WEBP,
-//                                    null
-//                                ]
-////                                ]
-//                            ],
                         ],
                     ]);
 
                     $pageSize = Option::get('dev2fun.imagecompress', "cnt_step", 30);
                     $rsRes = new \CDBResult($rsRes);
                     $rsRes->NavStart($pageSize, false, $_REQUEST['PAGEN_1'] ?? 1);
-
-//                    var_dump($algImageType === Convert::TYPE_WEBP ? Convert::TYPE_AVIF : Convert::TYPE_WEBP);
-//                    var_dump($rsRes->NavRecordCount);
-//                    var_dump($rsRes->NavPageCount);
-//                    var_dump($rsRes->NavPageNomer);
-//                    var_dump((100 / $rsRes->NavPageCount) * $rsRes->NavPageNomer);
-                    //                    var_dump($rsRes->fetchAll());
-//                    die();
 
                     if (empty($_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT'])) {
                         $_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT'] = $rsRes->NavPageCount;
@@ -789,44 +711,6 @@ class AdminList
                     $recCompress = false;
                     $msgError = $e->getMessage();
                 }
-
-
-
-//                var_dump($rsRes->GetNext());
-//                var_dump($rsRes->NavPageNomer);
-//                var_dump($rsRes->NavPageCount);
-//                var_dump($rsRes->NavRecordCount);
-//                die();
-
-
-
-
-//                $rsRes->fetchCollection()->
-
-//                $rsRes->getCount();
-//                $rsRes = Compress::getInstance()->getFileList(
-//                    [],
-//                    [
-//                        'COMRESSED' => 'N',
-//                        '@CONTENT_TYPE' => [
-//                            'image/jpeg',
-//                            'image/png',
-//                            'application/pdf',
-//                            'image/svg',
-//                            'image/gif',
-//                        ],
-//                    ]
-//                );
-//                $pageSize = Option::get('dev2fun.imagecompress', "cnt_step", 30);
-//                $rsRes->NavStart($pageSize, false, $_REQUEST['PAGEN_1']);
-//                if (empty($_SESSION['DEV2FUN_COMPRESS_NAVPAGECOUNT'])) {
-//                    $_SESSION['DEV2FUN_COMPRESS_NAVPAGECOUNT'] = $rsRes->NavPageCount;
-//                    $navPageCount = $rsRes->NavPageCount;
-//                    if (!$navPageCount) $navPageCount = 0;
-//                    $recCompress = true;
-//                } else {
-//                    $navPageCount = $_SESSION['DEV2FUN_COMPRESS_NAVPAGECOUNT'];
-//                }
 
             }
             if ($recCompress === false) {

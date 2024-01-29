@@ -13,8 +13,6 @@ use Bitrix\Main\Type\DateTime;
 
 IncludeModuleLangFile(__FILE__);
 
-//class ImageCompressImagesToConvertedTable extends Entity\DataManager
-//class ImageCompressConvertImagesTable extends Entity\DataManager
 class ImageCompressImagesToConvertedTable extends Entity\DataManager
 {
     static $module_id = "dev2fun.imagecompress";
@@ -67,8 +65,10 @@ class ImageCompressImagesToConvertedTable extends Entity\DataManager
 
             (new Entity\EnumField('IMAGE_TYPE'))
                 ->configureValues([
-                    Convert::TYPE_WEBP,
-                    Convert::TYPE_AVIF,
+//                    Convert::TYPE_WEBP,
+//                    Convert::TYPE_AVIF,
+                    'webp',
+                    'avif',
                 ])
                 ->configureRequired(),
 

@@ -19,15 +19,27 @@ class Ps2Pdf
 
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $path = '';
-    private $enable = false;
     private $pdfSetting = 'ebook';
     private static $isOptim = null;
+    private $active = false;
 
-    private function __construct()
+    /**
+     * @param string|null $siteId
+     */
+    public function __construct()
     {
-        $this->path = Option::get($this->MODULE_ID, 'path_to_ps2pdf', '', \Dev2funImageCompress::getSiteId());
-        $this->enable = Option::get($this->MODULE_ID, 'enable_pdf', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
-        $this->pdfSetting = Option::get($this->MODULE_ID, 'pdf_setting', 'ebook', \Dev2funImageCompress::getSiteId());
+        $this->path = Option::get($this->MODULE_ID, 'path_to_ps2pdf', '');
+        $this->active = Option::get($this->MODULE_ID, 'enable_pdf', 'N') === 'Y';
+        $this->pdfSetting = Option::get($this->MODULE_ID, 'pdf_setting', 'ebook');
+    }
+
+    /**
+     * Return has active state
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
     }
 
     /**
@@ -44,25 +56,31 @@ class Ps2Pdf
     }
 
     /**
-     * Check available convert ro pdf
+     * Check available optimization pdf
      * @return bool
+     * @deprecated
+     * @uses isOptim()
      */
     public function isPdfOptim()
     {
-        if (self::$isOptim === null) {
-            \exec($this->path . '/gs -v', $s);
-            self::$isOptim = $s ? true : false;
-        }
-        return self::$isOptim;
+        return $this->isOptim();
     }
 
     /**
-     * Проверка возможности оптимизации pdf
+     * Check available optimization pdf
+     * @param string|null $path
      * @return bool
      */
-    public function isOptim()
+    public function isOptim(?string $path = null)
     {
-        return $this->isPdfOptim();
+        if (!$path) {
+            $path = $this->path;
+        }
+        if (self::$isOptim === null || $path !== $this->path) {
+            \exec($path . '/gs -v', $s);
+            self::$isOptim = (bool)$s;;
+        }
+        return self::$isOptim;
     }
 
     /**
@@ -74,7 +92,10 @@ class Ps2Pdf
      */
     public function compress($strFilePath, $params = [])
     {
-        if(!$this->enable) return false;
+        if(!$this->active) {
+            $this->lastError = 'no_active';
+            return false;
+        }
         $strFilePath = \strtr(
             $strFilePath,
             [

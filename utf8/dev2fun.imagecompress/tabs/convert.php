@@ -127,6 +127,9 @@ $convertInstance = \Dev2fun\ImageCompress\Convert::getInstance();
 </tr>
 
 <?php foreach ($arSites as $arSite) { ?>
+    <?php
+    $convert = new \Dev2fun\ImageCompress\Convert($arSite['ID']);
+    ?>
 
     <tr class="heading">
         <td colspan="2" class="accordion_heading" data-site="<?=$arSite['ID']?>">
@@ -179,7 +182,7 @@ $convertInstance = \Dev2fun\ImageCompress\Convert::getInstance();
                     multiple
                 >
                     <?php
-                    $selectConvertMode = \Dev2fun\ImageCompress\Convert::getInstance()->convertMode;
+                    $selectConvertMode = $convert->convertMode;
                     foreach ($convertModes as $v) { ?>
                         <option
                             value="<?=$v?>"
@@ -253,7 +256,7 @@ $convertInstance = \Dev2fun\ImageCompress\Convert::getInstance();
                 >
                     <tbody>
                     <?php
-                    $excludedPages = \Dev2fun\ImageCompress\Convert::getSettingsExcludePage();
+                    $excludedPages = \Dev2fun\ImageCompress\Convert::getSettingsExcludePage($arSite['ID']);
                     $serverUrl = \Dev2funImageCompress::getUrl('/');
                     foreach ($excludedPages as $key => $page) {
                         $key = \str_replace('n', '', $key);
@@ -332,7 +335,7 @@ $convertInstance = \Dev2fun\ImageCompress\Convert::getInstance();
                 >
                     <tbody>
                     <?php
-                    $excludedPages = \Dev2fun\ImageCompress\Convert::getSettingsExcludeFiles();
+                    $excludedPages = \Dev2fun\ImageCompress\Convert::getSettingsExcludeFiles($arSite['ID']);
                     $serverUrl = \Dev2funImageCompress::getUrl('/');
                     foreach ($excludedPages as $key => $page) {
                         $key = \str_replace('n', '', $key);

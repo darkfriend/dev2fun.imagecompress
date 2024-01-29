@@ -130,7 +130,9 @@ class Dev2funImageCompress
                         return $v['DEF'] === 'Y';
                     }
                 );
-                $siteId = $site['ID'] ?? '';
+                if ($site) {
+                    $siteId = current($site)['ID'] ?? '';
+                }
             }
             self::$siteId = $siteId;
         }

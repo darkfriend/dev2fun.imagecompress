@@ -23,9 +23,18 @@ Loader::registerAutoLoadClasses(
     "dev2fun.imagecompress",
     [
         'Dev2fun\ImageCompress\ImageCompressTable' => 'classes/general/ImageCompressTable.php',
+        'Dev2fun\ImageCompress\ImageCompressImagesTable' => 'classes/general/ImageCompressImagesTable.php',
+        'Dev2fun\ImageCompress\ImageCompressImagesConvertedTable' => 'classes/general/ImageCompressImagesConvertedTable.php',
+        'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable' => 'classes/general/ImageCompressImagesToConvertedTable.php',
+
+        'Dev2fun\ImageCompress\MySqlHelper' => 'classes/general/MySqlHelper.php',
+
         'Dev2fun\ImageCompress\AdminList' => 'lib/AdminList.php',
         'Dev2fun\ImageCompress\Check' => 'lib/Check.php',
         'Dev2fun\ImageCompress\Compress' => 'lib/Compress.php',
+        'Dev2fun\ImageCompress\Convert' => 'lib/Convert.php',
+        "Dev2fun\ImageCompress\LazyConvert" => 'lib/LazyConvert.php',
+        'Dev2fun\ImageCompress\Process' => 'lib/Process.php',
         "Dev2funImageCompress" => 'include.php',
 
         "Dev2fun\ImageCompress\Jpegoptim" => 'lib/Jpegoptim.php',
@@ -161,14 +170,11 @@ class dev2fun_imagecompress extends CModule
     public function saveFields()
     {
         $pth = '/usr/bin';
-        $sites = Dev2funImageCompress::getSites();
-        foreach ($sites as $site) {
-            Option::set($this->MODULE_ID, 'path_to_jpegoptim', $pth, $site['ID']);
-            Option::set($this->MODULE_ID, 'opti_algorithm_jpeg', 'jpegoptim', $site['ID']);
+        Option::set($this->MODULE_ID, 'path_to_jpegoptim', $pth);
+        Option::set($this->MODULE_ID, 'opti_algorithm_jpeg', 'jpegoptim');
 
-            Option::set($this->MODULE_ID, 'path_to_optipng', $pth, $site['ID']);
-            Option::set($this->MODULE_ID, 'opti_algorithm_png', 'optipng', $site['ID']);
-        }
+        Option::set($this->MODULE_ID, 'path_to_optipng', $pth);
+        Option::set($this->MODULE_ID, 'opti_algorithm_png', 'optipng');
     }
 
     /**
@@ -207,20 +213,17 @@ class dev2fun_imagecompress extends CModule
             ImageCompressImagesToConvertedTable::createTable();
         }
 
+        Option::set($this->MODULE_ID, 'enable_element', 'Y');
+        Option::set($this->MODULE_ID, 'enable_section', 'Y');
+        Option::set($this->MODULE_ID, 'enable_resize', 'Y');
+        Option::set($this->MODULE_ID, 'enable_save', 'Y');
+
+        Option::set($this->MODULE_ID, 'jpegoptim_compress', '80');
+        Option::set($this->MODULE_ID, 'jpeg_progressive', 'Y');
+        Option::set($this->MODULE_ID, 'optipng_compress', '3');
+
         $sites = Dev2funImageCompress::getSites();
         foreach ($sites as $site) {
-//            Option::set($this->MODULE_ID,'path_to_optipng','/usr/bin', $site['ID']);
-//            Option::set($this->MODULE_ID,'path_to_jpegoptim','/usr/bin', $site['ID']);
-
-            Option::set($this->MODULE_ID, 'enable_element', 'Y', $site['ID']);
-            Option::set($this->MODULE_ID, 'enable_section', 'Y', $site['ID']);
-            Option::set($this->MODULE_ID, 'enable_resize', 'Y', $site['ID']);
-            Option::set($this->MODULE_ID, 'enable_save', 'Y', $site['ID']);
-
-            Option::set($this->MODULE_ID, 'jpegoptim_compress', '80', $site['ID']);
-            Option::set($this->MODULE_ID, 'jpeg_progressive', 'Y', $site['ID']);
-            Option::set($this->MODULE_ID, 'optipng_compress', '3', $site['ID']);
-
             Option::set(
                 $this->MODULE_ID,
                 'convert_mode',

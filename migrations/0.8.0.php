@@ -19,6 +19,7 @@ $curModuleName = 'dev2fun.imagecompress';
         'Dev2fun\ImageCompress\ImageCompressImagesTable' => 'classes/general/ImageCompressImagesTable.php',
         'Dev2fun\ImageCompress\ImageCompressImagesConvertedTable' => 'classes/general/ImageCompressImagesConvertedTable.php',
         'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable' => 'classes/general/ImageCompressImagesToConvertedTable.php',
+        'Dev2fun\ImageCompress\ImageCompressTable' => 'classes/general/ImageCompressTable.php',
 
         'Dev2fun\ImageCompress\MySqlHelper' => 'classes/general/MySqlHelper.php',
         "Dev2fun\ImageCompress\LazyConvert" => 'lib/LazyConvert.php',
@@ -45,8 +46,8 @@ try {
     }
 
     // copy files
-    CopyDirFiles(__DIR__ . "/admin", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/admin", true, true);
-    CopyDirFiles(__DIR__ . "/themes", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/themes", true, true);
+    CopyDirFiles($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/dev2fun.imagecompress/install/admin", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/admin", true, true);
+    CopyDirFiles($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/dev2fun.imagecompress/install/themes", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/themes", true, true);
 
     // add options
     $options = \Bitrix\Main\Config\Option::getForModule(Dev2funImageCompress::MODULE_ID, false);
@@ -107,5 +108,4 @@ try {
 
 } catch (Throwable $e) {
     ShowError($e->getMessage());
-//    throw $e;
 }

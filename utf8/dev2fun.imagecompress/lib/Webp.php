@@ -27,23 +27,30 @@ class Webp
     private $origPicturesMode = false;
     private static $origPictures = [];
 
-    private function __construct()
+    /**
+     * @param string|null $siteId
+     */
+    public function __construct(?string $siteId = null)
     {
-        $this->path = Option::get($this->MODULE_ID, 'path_to_cwebp', '/usr/bin', \Dev2funImageCompress::getSiteId());
-        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
-        $this->origPicturesMode = Option::get($this->MODULE_ID, 'orig_pictures_mode', 'N', \Dev2funImageCompress::getSiteId()) === 'Y';
+        if (!$siteId) {
+            $siteId = \Dev2funImageCompress::getSiteId();
+        }
 
-        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80, \Dev2funImageCompress::getSiteId());
+        $this->path = Option::get($this->MODULE_ID, 'path_to_cwebp', '/usr/bin', $siteId);
+        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', $siteId) === 'Y';
+        $this->origPicturesMode = Option::get($this->MODULE_ID, 'orig_pictures_mode', 'N', $siteId) === 'Y';
+
+        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80, $siteId);
         if(!$this->quality) {
             $this->quality = 80;
         }
 
-        $this->compression = Option::get($this->MODULE_ID, 'cwebp_compress', 4, \Dev2funImageCompress::getSiteId());
+        $this->compression = Option::get($this->MODULE_ID, 'cwebp_compress', 4, $siteId);
         if(!$this->compression && $this->compression!==0) {
             $this->compression = 4;
         }
 
-        $this->multithreading = Option::get($this->MODULE_ID, 'cwebp_multithreading', 'Y', \Dev2funImageCompress::getSiteId()) === 'Y';
+        $this->multithreading = Option::get($this->MODULE_ID, 'cwebp_multithreading', 'Y', $siteId) === 'Y';
     }
 
     /**
@@ -60,14 +67,18 @@ class Webp
     }
 
     /**
-     * Check cwebp
+     * Check available cwebp
+     * @param string|null $path
      * @return bool
      */
-    public function isOptim()
+    public function isOptim(?string $path = null)
     {
-        if (self::$isOptim === null) {
-            exec($this->path . '/cwebp -version', $s);
-            self::$isOptim = $s ? true : false;
+        if (!$path) {
+            $path = $this->path;
+        }
+        if (self::$isOptim === null || $path !== $this->path) {
+            exec($path . '/cwebp -version', $s);
+            self::$isOptim = (bool)$s;
         }
         return self::$isOptim;
     }
