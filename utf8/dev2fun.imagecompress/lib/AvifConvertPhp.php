@@ -21,11 +21,17 @@ class AvifConvertPhp
     private $enable = false;
     private $quality = 80;
 
-    private function __construct()
+    /**
+     * @param string|null $siteId
+     */
+    public function __construct(?string $siteId = null)
     {
-        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N') === 'Y';
-        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80);
-        if(!$this->quality) {
+        if (!$siteId) {
+            $siteId = \Dev2funImageCompress::getSiteId();
+        }
+        $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', $siteId) === 'Y';
+        $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80, $siteId);
+        if (!$this->quality) {
             $this->quality = 80;
         }
     }
@@ -44,7 +50,7 @@ class AvifConvertPhp
     }
 
     /**
-     * Check
+     * Check imageavif and gd
      * @return bool
      */
     public function isOptim()
@@ -84,7 +90,8 @@ class AvifConvertPhp
         }
 
         $fileInfo = \pathinfo($src);
-        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
+        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}",'', $arFile["SUBDIR"]);
+//        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
         $arFile["SUBDIR"] = \ltrim($arFile["SUBDIR"], '/');
         $srcWebp = "/{$uploadDir}/resize_cache/avif/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.avif";
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;

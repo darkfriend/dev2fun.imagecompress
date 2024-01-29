@@ -24,7 +24,7 @@ class Process
      * @throws \Bitrix\Main\ArgumentNullException
      * @throws \Bitrix\Main\ArgumentOutOfRangeException
      */
-    public static function start($params = [])
+    public static function start(array $params = [])
     {
         if(!Compress::getEnable()) return false;
         $params['filters'] = array_merge(
@@ -95,7 +95,7 @@ class Process
      * ]
      * @return bool|\CDBResult
      */
-    public static function getQuery($params = array())
+    public static function getQuery(array $params = [])
     {
         if(!isset($params['sort'])) {
             $params['sort'] = array();

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.2
+ * @version 0.8.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -18,9 +18,6 @@ class Compress
     private $pngoptim = false;
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $tableName = 'b_d2f_imagecompress_files';
-
-//    private $optiClassJpeg = '';
-//    private $optiClassPng = '';
 
     private
         $algorithmJpeg = '',
@@ -42,8 +39,13 @@ class Compress
         $jpegOptimCompress,
         $pngOptimCompress;
 
-//    private $algorithmClass;
+    public $enableJpeg = false;
+    public $enablePng = false;
+    public $enablePdf = false;
+    public $enableGif = false;
+    public $enableSvg = false;
 
+    /** @var string[] */
     private static $optiClasses = [
         'jpegoptim' => '\Dev2fun\ImageCompress\Jpegoptim',
         'optipng' => '\Dev2fun\ImageCompress\Optipng',
@@ -69,24 +71,38 @@ class Compress
     /** @var string */
     public $LAST_ERROR;
 
-    private function __construct()
+    /** @var bool */
+    protected static $hasDisk;
+
+    public function __construct()
     {
+//        if (!$siteId) {
+//            $siteId = \Dev2funImageCompress::getSiteId();
+//        }
+//        $this->siteId = $siteId;
+
         $this->algorithmJpeg = Option::get($this->MODULE_ID, 'opti_algorithm_jpeg', 'jpegoptim');
         $this->algorithmPng = Option::get($this->MODULE_ID, 'opti_algorithm_png', 'optipng');
 
-        $this->pngOptimPath = Option::get($this->MODULE_ID, 'path_to_optipng');
-        $this->jpegOptimPath = Option::get($this->MODULE_ID, 'path_to_jpegoptim');
+        $this->pngOptimPath = Option::get($this->MODULE_ID, 'path_to_optipng', '');
+        $this->jpegOptimPath = Option::get($this->MODULE_ID, 'path_to_jpegoptim', '');
 
-        $this->enableElement = (Option::get($this->MODULE_ID, 'enable_element') === 'Y');
-        $this->enableSection = (Option::get($this->MODULE_ID, 'enable_section') === 'Y');
-        $this->enableResize = (Option::get($this->MODULE_ID, 'enable_resize') === 'Y');
-        $this->enableSave = (Option::get($this->MODULE_ID, 'enable_save') === 'Y');
+        $this->enableJpeg = Option::get($this->MODULE_ID, 'enable_jpeg', 'N') === 'Y';
+        $this->enablePng = Option::get($this->MODULE_ID, 'enable_png', 'N') === 'Y';
+        $this->enablePdf = Option::get($this->MODULE_ID, 'enable_pdf', 'N') === 'Y';
+        $this->enableGif = Option::get($this->MODULE_ID, 'enable_gif', 'N') === 'Y';
+        $this->enableSvg = Option::get($this->MODULE_ID, 'enable_svg', 'N') === 'Y';
+
+        $this->enableElement = (Option::get($this->MODULE_ID, 'enable_element', 'N') === 'Y');
+        $this->enableSection = (Option::get($this->MODULE_ID, 'enable_section', 'N') === 'Y');
+        $this->enableResize = (Option::get($this->MODULE_ID, 'enable_resize', 'N') === 'Y');
+        $this->enableSave = (Option::get($this->MODULE_ID, 'enable_save', 'N') === 'Y');
 
         $this->jpegOptimCompress = Option::get($this->MODULE_ID, 'jpegoptim_compress', 80);
         $this->pngOptimCompress = Option::get($this->MODULE_ID, 'optipng_compress', 3);
 
-        $this->jpegProgress = (Option::get($this->MODULE_ID, 'jpeg_progressive') === 'Y');
-        $this->enableImageResize = (Option::get($this->MODULE_ID, 'resize_image_enable') === 'Y');
+        $this->jpegProgress = (Option::get($this->MODULE_ID, 'jpeg_progressive', 'N') === 'Y');
+        $this->enableImageResize = (Option::get($this->MODULE_ID, 'resize_image_enable', 'N') === 'Y');
     }
 
     /**
@@ -107,7 +123,7 @@ class Compress
      * @param string $algorithm
      * @return null|Jpegoptim|Optipng|Ps2Pdf|Webp|Gif|Svg
      */
-    public static function getAlgInstance($algorithm)
+    public static function getAlgInstance(string $algorithm)
     {
         $obj = null;
         switch ($algorithm) {
@@ -159,9 +175,11 @@ class Compress
         return $this->jpegoptim;
     }
 
-    public function compressJPG($strFilePath)
+    public function compressJPG(string $strFilePath)
     {
-        if(!static::$enable) return null;
+        if(!static::$enable || !$this->enableJpeg) {
+            return null;
+        }
         $res = false;
         if (!$this->isJPEGOptim()) {
             if (empty($this->LAST_ERROR)) {
@@ -183,30 +201,35 @@ class Compress
         return $res;
     }
 
-    public function compressPNG($strFilePath)
+    public function compressPNG(string $strFilePath)
     {
-        if(!static::$enable) return null;
+        if(!static::$enable || !$this->enablePng) {
+            return null;
+        }
         $res = false;
         if (!$this->isPNGOptim()) {
             $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NO_MODULE', ['#MODULE#' => 'optipng']);
             return $res;
         }
         if (\file_exists($strFilePath)) {
-            $algInstance = static::getAlgInstance($this->algorithmPng);
-            $res = $algInstance->compressPNG(
+            $res = static::getAlgInstance($this->algorithmPng)->compressPNG(
                 $strFilePath,
                 $this->pngOptimCompress,
                 [
-                    'changeChmod' => $this->getChmod(Option::get($this->MODULE_ID, 'change_chmod', 777)),
+                    'changeChmod' => $this->getChmod(
+                        Option::get($this->MODULE_ID, 'change_chmod', 777)
+                    ),
                 ]
             );
         }
         return $res;
     }
 
-    public function compressPdf($strFilePath)
+    public function compressPdf(string $strFilePath)
     {
-        if(!static::$enable) return null;
+        if(!static::$enable || !$this->enablePdf) {
+            return null;
+        }
         $res = false;
         $algInstance = static::getAlgInstance('ps2pdf');
         if (!$algInstance->isPdfOptim()) {
@@ -217,7 +240,9 @@ class Compress
             $res = $algInstance->compress(
                 $strFilePath,
                 [
-                    'changeChmod' => $this->getChmod(Option::get($this->MODULE_ID, 'change_chmod', 777)),
+                    'changeChmod' => $this->getChmod(
+                        Option::get($this->MODULE_ID, 'change_chmod', 777)
+                    ),
                 ]
             );
         }
@@ -227,13 +252,13 @@ class Compress
     /**
      * Запускает процесс
      * @param string $strFilePath
-     * @param string $alg
+     * @param string|null $alg
      * @param array $options
      * @return bool|null
      * @throws \Bitrix\Main\ArgumentNullException
      * @throws \Bitrix\Main\ArgumentOutOfRangeException
      */
-    public function process($strFilePath, $alg=null, $options=[])
+    public function process(string $strFilePath, ?string $alg=null, array $options=[])
     {
         if(!static::$enable) return null;
         $res = false;
@@ -245,12 +270,18 @@ class Compress
             $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_NO_MODULE', ['#MODULE#' => $alg]);
             return $res;
         }
+        if (!$algInstance->isActive()) {
+            $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_ERROR_NO_ACTIVE', ['#TYPE#' => $alg]);
+            return $res;
+        }
         if (\file_exists($strFilePath)) {
             $res = $algInstance->compress(
                 $strFilePath,
                 \array_merge(
                     [
-                        'changeChmod' => $this->getChmod(Option::get($this->MODULE_ID, 'change_chmod', 777)),
+                        'changeChmod' => $this->getChmod(
+                            Option::get($this->MODULE_ID, 'change_chmod', 777)
+                        ),
                     ],
                     $options
                 )
@@ -261,12 +292,11 @@ class Compress
 
     /**
      * Compress image by fileID
-     * @param integer $intFileID
+     * @param int $intFileID
      * @return bool|null
      */
-    public function compressImageByID($intFileID)
+    public function compressImageByID(int $intFileID)
     {
-        global $DB;
         $res = false;
         if(!static::$enable || !$intFileID) {
             return null;
@@ -276,10 +306,12 @@ class Compress
         $event->send();
 
         $arFile = \CFile::GetByID($intFileID)->GetNext();
-        if (
-            !\in_array($arFile["CONTENT_TYPE"], static::$supportContentType)
-            || !Check::isActiveByMimeType($arFile["CONTENT_TYPE"])
-        ) {
+        if (!\in_array($arFile["CONTENT_TYPE"], static::$supportContentType)) {
+            return null;
+        }
+
+        if (!Check::isActiveByMimeType($arFile["CONTENT_TYPE"])) {
+            $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_ERROR_NO_ACTIVE', ['#TYPE#' => $arFile["CONTENT_TYPE"]]);
             return null;
         }
 
@@ -291,30 +323,30 @@ class Compress
                 $this->resize($intFileID, $strFilePath);
             }
             switch ($arFile["CONTENT_TYPE"]) {
-                case 'image/jpeg' :
+                case 'image/jpeg':
                     $isCompress = $this->compressJPG($strFilePath);
                     break;
-                case 'image/png' :
+                case 'image/png':
                     $isCompress = $this->compressPNG($strFilePath);
                     break;
-                case 'application/pdf' :
+                case 'application/pdf':
                     $isCompress = $this->compressPdf($strFilePath);
                     break;
-                case 'image/svg' :
+                case 'image/svg':
                     $isCompress = $this->process(
                         $strFilePath,
                         Option::get($this->MODULE_ID, 'opti_algorithm_svg', '')
                     );
                     break;
-                case 'image/gif' :
+                case 'image/gif':
                     $isCompress = $this->process(
                         $strFilePath,
                         Option::get($this->MODULE_ID, 'opti_algorithm_gif', '')
                     );
                     break;
-                default :
+                default:
                     $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONTENT_TYPE', [
-                        '#TYPE#' => $arFile["CONTENT_TYPE"]
+                        '#TYPE#' => $arFile["CONTENT_TYPE"],
                     ]);
                     return null;
             }
@@ -333,11 +365,12 @@ class Compress
                 ];
                 $rs = ImageCompressTable::getById($intFileID);
                 if ($rs->getSelectedRowsCount() <= 0) {
-                    $el = new ImageCompressTable();
-                    $res = $el->add($arFields);
+                    $res = ImageCompressTable::add($arFields);
                 } else {
                     $res = ImageCompressTable::update($intFileID, $arFields);
                 }
+            } else {
+                $this->LAST_ERROR = '';
             }
         } else {
             $res = $this->addCompressTable($intFileID, [
@@ -351,19 +384,19 @@ class Compress
 
     /**
      * Resize image file
-     * @param integer $fileId
+     * @param int $fileId
      * @param string $strFilePath
      * @return bool
      */
-    public function resize($fileId, $strFilePath)
+    public function resize(int $fileId, string $strFilePath)
     {
         if(!static::$enable) return false;
         if (!$strFilePath) return false;
         if (!$this->enableImageResize) return false;
 
-        $width = Option::get($this->MODULE_ID, 'resize_image_width');
-        $height = Option::get($this->MODULE_ID, 'resize_image_height');
-        $algorithm = Option::get($this->MODULE_ID, 'resize_image_algorithm');
+        $width = Option::get($this->MODULE_ID, 'resize_image_width', '');
+        $height = Option::get($this->MODULE_ID, 'resize_image_height', '');
+        $algorithm = Option::get($this->MODULE_ID, 'resize_image_algorithm', '');
         if (!$algorithm) $algorithm = BX_RESIZE_IMAGE_PROPORTIONAL;
 
         $destinationFile = $_SERVER['DOCUMENT_ROOT'] . "/upload/{$this->MODULE_ID}/" . basename($strFilePath);
@@ -385,33 +418,46 @@ class Compress
         return $res;
     }
 
-    public function saveWidthHeight($fileId, $filepath)
+    /**
+     * @param int $fileId
+     * @param string $filepath
+     * @return \CDBResult|false|null
+     */
+    public function saveWidthHeight(int $fileId, string $filepath)
     {
         global $DB;
         \clearstatcache(true, $filepath);
         $arImageSize = \CFile::GetImageSize($filepath);
-        return $DB->Query("UPDATE b_file SET HEIGHT='" . \round((float)$arImageSize[1]) . "', WIDTH='" . \round((float)$arImageSize[0]) . "' WHERE ID=" . (int)$fileId);
+        return $DB->Query("UPDATE b_file SET HEIGHT='" . \round((float)$arImageSize[1]) . "', WIDTH='" . \round((float)$arImageSize[0]) . "' WHERE ID=" . $fileId);
     }
 
     /**
      * Save filesize in table b_file
-     * @param integer $fileId
-     * @param integer $newSize
+     * @param int $fileId
+     * @param int $newSize
      * @return mixed
      */
-    public function saveSizeBitrix($fileId, $newSize)
+    public function saveSizeBitrix(int $fileId, int $newSize)
     {
         global $DB;
+        $this->updateSizeDiskModule($fileId, $newSize);
         return $DB->Query("UPDATE b_file SET FILE_SIZE='" . $DB->ForSql($newSize, 255) . "' WHERE ID=" . (int)$fileId);
     }
 
-    public function addCompressTable($intFileID, $arFields)
+    /**
+     * @param int $intFileID
+     * @param array $arFields
+     * @return \Bitrix\Main\ORM\Data\AddResult|\Bitrix\Main\ORM\Data\UpdateResult
+     * @throws \Bitrix\Main\ArgumentException
+     * @throws \Bitrix\Main\ObjectPropertyException
+     * @throws \Bitrix\Main\SystemException
+     */
+    public function addCompressTable(int $intFileID, array $arFields)
     {
         $rs = ImageCompressTable::getById($intFileID);
 
         if ($rs->getSelectedRowsCount() <= 0) {
-            $el = new ImageCompressTable();
-            $res = $el->add($arFields);
+            $res = ImageCompressTable::add($arFields);
         } else {
             $res = ImageCompressTable::update($intFileID, $arFields);
         }
@@ -516,27 +562,28 @@ class Compress
         if (!\in_array($arFile["type"], static::$supportContentType)) {
             return;
         }
+
         if(!Check::isActiveByMimeType($arFile["type"])) {
             return null;
         }
 
         switch ($arFile["type"]) {
-            case 'image/jpeg' :
+            case 'image/jpeg':
                 $isCompress = $instance->compressJPG($arFile["tmp_name"]);
                 break;
-            case 'image/png' :
+            case 'image/png':
                 $isCompress = $instance->compressPNG($arFile["tmp_name"]);
                 break;
-            case 'application/pdf' :
+            case 'application/pdf':
                 $isCompress = $instance->compressPdf($arFile["tmp_name"]);
                 break;
-            case 'image/svg' :
+            case 'image/svg':
                 $isCompress = $instance->process(
                     $arFile["tmp_name"],
                     Option::get($instance->MODULE_ID, 'opti_algorithm_svg', '')
                 );
                 break;
-            case 'image/gif' :
+            case 'image/gif':
                 $isCompress = $instance->process(
                     $arFile["tmp_name"],
                     Option::get($instance->MODULE_ID, 'opti_algorithm_gif', '')
@@ -550,14 +597,28 @@ class Compress
     }
 
     /**
-     *  delete picture
+     * Delete picture
+     * @param array $arFile
+     * @return void
+     * @throws \Exception
      */
-    public static function CompressImageOnFileDeleteEvent($arFile)
+    public static function CompressImageOnFileDeleteEvent(array $arFile)
     {
         if(!static::$enable) return;
         ImageCompressTable::delete($arFile['ID']);
     }
 
+    /**
+     * @param array $arFile
+     * @param array $arParams
+     * @param $callbackData
+     * @param $cacheImageFile
+     * @param $cacheImageFileTmp
+     * @param $arImageSize
+     * @return void|null
+     * @throws \Bitrix\Main\ArgumentNullException
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     */
     public static function CompressImageOnResizeEvent(
         $arFile,
         $arParams,
@@ -565,8 +626,7 @@ class Compress
         &$cacheImageFile,
         &$cacheImageFileTmp,
         &$arImageSize
-    )
-    {
+    ) {
         if(!static::$enable) return;
         $instance = self::getInstance();
         if (!$instance->enableResize) return;
@@ -583,22 +643,22 @@ class Compress
             return null;
         }
         switch ($arFile["CONTENT_TYPE"]) {
-            case 'image/jpeg' :
+            case 'image/jpeg':
                 $instance->compressJPG($cacheImageFileTmp);
                 break;
-            case 'image/png' :
+            case 'image/png':
                 $instance->compressPNG($cacheImageFileTmp);
                 break;
-            case 'application/pdf' :
+            case 'application/pdf':
                 $instance->compressPdf($cacheImageFileTmp);
                 break;
-            case 'image/svg' :
+            case 'image/svg':
                 $instance->process(
                     $cacheImageFileTmp,
                     Option::get($instance->MODULE_ID, 'opti_algorithm_svg', '')
                 );
                 break;
-            case 'image/gif' :
+            case 'image/gif':
                 $instance->process(
                     $cacheImageFileTmp,
                     Option::get($instance->MODULE_ID, 'opti_algorithm_gif', '')
@@ -607,12 +667,17 @@ class Compress
         }
     }
 
-    public function queryBuilder($arOrder = [], $arFilter = [])
+    /**
+     * @param array $arOrder
+     * @param array $arFilter
+     * @return string
+     */
+    public function queryBuilder(array $arOrder = [], array $arFilter = []): string
     {
         global $DB;
         $arSqlSearch = [];
         $arSqlOrder = [];
-        $strSqlSearch = $strSqlOrder = "";
+        $strSqlSearch = "";
 
         if (\is_array($arFilter)) {
             foreach ($arFilter as $key => $val) {
@@ -706,8 +771,9 @@ class Compress
                     $arSqlOrder[] = "f." . $by . " " . (\strtoupper($ord) === "DESC" ? "DESC" : "ASC");
             }
         }
-        if (empty($arSqlOrder))
+        if (empty($arSqlOrder)) {
             $arSqlOrder[] = "f.ID ASC";
+        }
         $strSqlOrder = " ORDER BY " . \implode(", ", $arSqlOrder);
 
         $strSql =
@@ -720,7 +786,14 @@ class Compress
         return $strSql;
     }
 
-    public function getFileList($arOrder = [], $arFilter = [], $limit = 100, $offset = 0)
+    /**
+     * @param array $arOrder
+     * @param array $arFilter
+     * @param int $limit
+     * @param int $offset
+     * @return \CDBResult|false|null
+     */
+    public function getFileList(array $arOrder = [], array $arFilter = [], int $limit = 100, int $offset = 0)
     {
         global $DB;
         $strSql = $this->queryBuilder($arOrder, $arFilter);
@@ -734,8 +807,16 @@ class Compress
         return $DB->Query($strSql, false, "FILE: " . __FILE__ . "<br> LINE: " . __LINE__);
     }
 
-    public function getNiceFileSize($fileSize, $digits = 2)
+    /**
+     * @param int|null $fileSize
+     * @param int $digits
+     * @return string
+     */
+    public function getNiceFileSize(?int $fileSize, int $digits = 2): string
     {
+        if (!$fileSize) {
+            return '';
+        }
         $sizes = ["TB", "GB", "MB", "KB", "B"];
         $total = \count($sizes);
         while ($total-- && $fileSize > 1024) {
@@ -744,6 +825,10 @@ class Compress
         return \round($fileSize, $digits) . " " . $sizes[$total];
     }
 
+    /**
+     * @param int $num
+     * @return int
+     */
     public function getChmod($num)
     {
         if (!$num) return 0777;
@@ -785,7 +870,7 @@ class Compress
      * Set state module
      * @param bool $enable
      */
-    public static function setEnable($enable)
+    public static function setEnable(bool $enable)
     {
         static::$enable = $enable;
     }
@@ -794,8 +879,73 @@ class Compress
      * Get current state module
      * @return bool
      */
-    public static function getEnable()
+    public static function getEnable(): bool
     {
         return static::$enable;
+    }
+
+    /**
+     * @param int $fileId
+     * @param int $size
+     * @return void
+     * @throws \Bitrix\Main\LoaderException
+     */
+    public function updateSizeDiskModule(int $fileId, int $size)
+    {
+        if (!self::availableDiskModule()) {
+            return;
+        }
+        global $DB;
+        $DB->Query("UPDATE b_disk_object SET SIZE='" . $DB->ForSql($size, 255) . "' WHERE FILE_ID=" . $fileId);
+        $DB->Query("UPDATE b_disk_version SET SIZE='" . $DB->ForSql($size, 255) . "' WHERE FILE_ID=" . $fileId);
+    }
+
+    /**
+     * @return bool
+     * @throws \Bitrix\Main\LoaderException
+     */
+    public static function availableDiskModule(): bool
+    {
+        if (self::$hasDisk === null) {
+            self::$hasDisk = \Bitrix\Main\Loader::includeModule('disk');
+        }
+        return self::$hasDisk;
+    }
+
+    /**
+     * Get IBLOCK_ID by file id
+     * @param int $fileId
+     * @return int|null
+     */
+    public function getIblockIdByFileId(int $fileId): ?int
+    {
+        global $DB;
+        $sql = <<<SQL
+    SELECT p.IBLOCK_ID FROM b_iblock_property p 
+        INNER JOIN b_iblock_element_property e ON e.IBLOCK_PROPERTY_ID=p.ID 
+        WHERE p.PROPERTY_TYPE='F' AND e.VALUE={$fileId}
+    UNION
+    SELECT b.IBLOCK_ID FROM b_iblock_element b WHERE b.PREVIEW_PICTURE={$fileId} OR b.DETAIL_PICTURE={$fileId}
+    UNION
+    SELECT s.IBLOCK_ID FROM b_iblock_section s WHERE s.PICTURE={$fileId}
+SQL;
+        $result = $DB->Query($sql);
+        if ($result) {
+            return (int)($result->Fetch()['IBLOCK_ID'] ?? 0);
+        }
+        return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getError()
+    {
+        switch ($this->LAST_ERROR) {
+            case 'no_active':
+                return Loc::getMessage('DEV2FUN_IMAGECOMPRESS_ERROR_NO_ACTIVE');
+        }
+
+        return $this->LAST_ERROR;
     }
 }

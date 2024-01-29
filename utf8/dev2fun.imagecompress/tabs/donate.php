@@ -2,8 +2,9 @@
 /**
  * Created by PhpStorm.
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.7.0
+ * @version 0.8.0
  */
+defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 
 use \Bitrix\Main\Localization\Loc;
 

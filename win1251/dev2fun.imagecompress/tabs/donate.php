@@ -2,8 +2,9 @@
 /**
  * Created by PhpStorm.
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.7.0
+ * @version 0.8.0
  */
+defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 
 use \Bitrix\Main\Localization\Loc;
 
@@ -73,7 +74,8 @@ $tabControl->BeginNextTab();
                                 <tr class="c-table__row">
                                     <td class="c-table__cell">PayPal</td>
                                     <td class="c-table__cell">
-                                        <a href="https://www.paypal.me/darkfriend" target="_blank">paypal.me/@darkfriend</a>
+                                        <a href="https://www.paypal.me/darkfriend" target="_blank">paypal.me/@darkfriend
+                                        </a>
                                     </td>
                                 </tr>
                                 <tr class="c-table__row">

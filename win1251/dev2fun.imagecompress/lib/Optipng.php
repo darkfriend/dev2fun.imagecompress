@@ -15,14 +15,18 @@ IncludeModuleLangFile(__FILE__);
 class Optipng
 {
     private static $instance;
+    private static $isOptim = null;
+
     public $lastError;
 
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $pngOptimPath = '';
+    private $active = false;
 
-    private function __construct()
+    public function __construct()
     {
-        $this->pngOptimPath = Option::get($this->MODULE_ID, 'path_to_optipng');
+        $this->pngOptimPath = Option::get($this->MODULE_ID, 'path_to_optipng', '');
+        $this->active = Option::get($this->MODULE_ID, 'enable_png', 'N') === 'Y';
     }
 
     /**
@@ -39,6 +43,15 @@ class Optipng
     }
 
     /**
+     * Return has active state
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
      * Проверка возможности оптимизации PNG
      * @return bool
      * @deprecated
@@ -50,13 +63,20 @@ class Optipng
     }
 
     /**
-     * Проверка возможности оптимизации PNG
+     * Check available optimization PNG
+     * @param string|null $path
      * @return bool
      */
-    public function isOptim()
+    public function isOptim(?string $path = null)
     {
-        exec($this->pngOptimPath . '/optipng -v', $s);
-        return ($s ? true : false);
+        if (!$path) {
+            $path = $this->pngOptimPath;
+        }
+        if (self::$isOptim === null || $path !== $this->pngOptimPath) {
+            exec($path . '/optipng -v', $s);
+            self::$isOptim = (bool)$s;
+        }
+        return self::$isOptim;
     }
 
 
@@ -85,6 +105,10 @@ class Optipng
      */
     public function compress($strFilePath, $quality = 3, $params = [])
     {
+        if (!$this->isActive()) {
+            $this->lastError = 'no_active';
+            return false;
+        }
         $strFilePath = strtr(
             $strFilePath,
             [

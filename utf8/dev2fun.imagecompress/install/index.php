@@ -2,14 +2,17 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.2
+ * @version 0.8.0
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 \Bitrix\Main\Localization\Loc::loadMessages(__FILE__);
 
 use Bitrix\Main\ModuleManager,
     Bitrix\Main\EventManager,
-    Dev2fun\ImageCompress\ImageCompressTable;
+    Dev2fun\ImageCompress\ImageCompressTable,
+    Dev2fun\ImageCompress\ImageCompressImagesTable,
+    Dev2fun\ImageCompress\ImageCompressImagesConvertedTable,
+    Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable;
 use Bitrix\Main\Application;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc,
@@ -20,9 +23,18 @@ Loader::registerAutoLoadClasses(
     "dev2fun.imagecompress",
     [
         'Dev2fun\ImageCompress\ImageCompressTable' => 'classes/general/ImageCompressTable.php',
+        'Dev2fun\ImageCompress\ImageCompressImagesTable' => 'classes/general/ImageCompressImagesTable.php',
+        'Dev2fun\ImageCompress\ImageCompressImagesConvertedTable' => 'classes/general/ImageCompressImagesConvertedTable.php',
+        'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable' => 'classes/general/ImageCompressImagesToConvertedTable.php',
+
+        'Dev2fun\ImageCompress\MySqlHelper' => 'classes/general/MySqlHelper.php',
+
         'Dev2fun\ImageCompress\AdminList' => 'lib/AdminList.php',
         'Dev2fun\ImageCompress\Check' => 'lib/Check.php',
         'Dev2fun\ImageCompress\Compress' => 'lib/Compress.php',
+        'Dev2fun\ImageCompress\Convert' => 'lib/Convert.php',
+        "Dev2fun\ImageCompress\LazyConvert" => 'lib/LazyConvert.php',
+        'Dev2fun\ImageCompress\Process' => 'lib/Process.php',
         "Dev2funImageCompress" => 'include.php',
 
         "Dev2fun\ImageCompress\Jpegoptim" => 'lib/Jpegoptim.php',
@@ -58,6 +70,9 @@ class dev2fun_imagecompress extends CModule
         $this->PARTNER_URI = "http://dev2fun.com/";
     }
 
+    /**
+     * @return false|void
+     */
     public function DoInstall()
     {
         global $APPLICATION;
@@ -76,7 +91,24 @@ class dev2fun_imagecompress extends CModule
             $this->installDB();
             $this->registerEvents();
             ModuleManager::registerModule($this->MODULE_ID);
-//            }
+
+            $startTime = ConvertTimeStamp(time() + \CTimeZone::GetOffset() + 60, 'FULL');
+            $agentId = CAgent::AddAgent(
+                \Dev2fun\ImageCompress\LazyConvert::class . '::agentRun();',
+                $this->MODULE_ID,
+                'Y',
+                60,
+                '',
+                'Y',
+                $startTime,
+                100,
+                false,
+                false
+            );
+            if (!$agentId) {
+                throw new Exception('Error when add agent');
+            }
+            Option::set($this->MODULE_ID, 'convert_agent', $agentId);
         } catch (Exception $e) {
             $GLOBALS['D2F_COMPRESSIMAGE_ERROR'] = $e->getMessage();
             $GLOBALS['D2F_COMPRESSIMAGE_ERROR_NOTES'] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND_NOTES');
@@ -92,12 +124,17 @@ class dev2fun_imagecompress extends CModule
         );
     }
 
+    /**
+     * @return void
+     */
     public function DoUninstall()
     {
         global $APPLICATION;
-        //        $request = Application::getInstance()->getContext()->getRequest();
-        //        ModuleManager::unRegisterModule($this->MODULE_ID);
-        if (!check_bitrix_sessid()) return;
+//        $request = Application::getInstance()->getContext()->getRequest();
+//        ModuleManager::unRegisterModule($this->MODULE_ID);
+        if (!check_bitrix_sessid()) {
+            return;
+        }
         if (empty($_REQUEST['UNSTEP']) || $_REQUEST['UNSTEP'] == 1) {
             $APPLICATION->IncludeAdminFile(
                 Loc::getMessage("D2F_MODULE_IMAGECOMPRESS_UNSTEP1"),
@@ -108,8 +145,13 @@ class dev2fun_imagecompress extends CModule
             if (!empty($_REQUEST['D2F_UNSTEP_FIELDS']['DB'])) {
                 $this->unInstallDB();
             }
+
             $this->unRegisterEvents();
+
+            CAgent::RemoveModuleAgents($this->MODULE_ID);
+
             ModuleManager::unRegisterModule($this->MODULE_ID);
+
             $admMsg = new CAdminMessage(false);
             $admMsg->ShowMessage([
                 "MESSAGE" => Loc::getMessage('D2F_IMAGECOMPRESS_UNINSTALL_SUCCESS'),
@@ -117,19 +159,22 @@ class dev2fun_imagecompress extends CModule
             ]);
             echo BeginNote();
             echo Loc::getMessage("D2F_IMAGECOMPRESS_UNINSTALL_LAST_MSG");
-            EndNote();
+            echo EndNote();
         }
     }
 
+    /**
+     * @return void
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     */
     public function saveFields()
     {
-//        if($pthJpeg = $_REQUEST['D2F_FIELDS']['path_to_jpegoptim']) {}
         $pth = '/usr/bin';
-        Option::set($this->MODULE_ID,'path_to_jpegoptim',$pth);
-        Option::set($this->MODULE_ID,'opti_algorithm_jpeg','jpegoptim');
-//        if($pthPng = $_REQUEST['D2F_FIELDS']['path_to_optipng']) {}
-        Option::set($this->MODULE_ID,'path_to_optipng',$pth);
-        Option::set($this->MODULE_ID,'opti_algorithm_png','optipng');
+        Option::set($this->MODULE_ID, 'path_to_jpegoptim', $pth);
+        Option::set($this->MODULE_ID, 'opti_algorithm_jpeg', 'jpegoptim');
+
+        Option::set($this->MODULE_ID, 'path_to_optipng', $pth);
+        Option::set($this->MODULE_ID, 'opti_algorithm_png', 'optipng');
     }
 
     /**
@@ -147,13 +192,26 @@ class dev2fun_imagecompress extends CModule
         }
     }
 
+    /**
+     * @return true
+     * @throws \Bitrix\Main\ArgumentException
+     * @throws \Bitrix\Main\ArgumentOutOfRangeException
+     * @throws \Bitrix\Main\SystemException
+     */
     public function installDB()
     {
         if (!ImageCompressTable::getEntity()->getConnection()->isTableExists(ImageCompressTable::getTableName())) {
             ImageCompressTable::getEntity()->createDbTable();
         }
-//        Option::set($this->MODULE_ID,'path_to_optipng','/usr/bin');
-//        Option::set($this->MODULE_ID,'path_to_jpegoptim','/usr/bin');
+        if (!ImageCompressImagesTable::getEntity()->getConnection()->isTableExists(ImageCompressImagesTable::getTableName())) {
+            ImageCompressImagesTable::createTable();
+        }
+        if (!ImageCompressImagesConvertedTable::getEntity()->getConnection()->isTableExists(ImageCompressImagesConvertedTable::getTableName())) {
+            ImageCompressImagesConvertedTable::createTable();
+        }
+        if (!ImageCompressImagesToConvertedTable::getEntity()->getConnection()->isTableExists(ImageCompressImagesToConvertedTable::getTableName())) {
+            ImageCompressImagesToConvertedTable::createTable();
+        }
 
         Option::set($this->MODULE_ID, 'enable_element', 'Y');
         Option::set($this->MODULE_ID, 'enable_section', 'Y');
@@ -164,11 +222,16 @@ class dev2fun_imagecompress extends CModule
         Option::set($this->MODULE_ID, 'jpeg_progressive', 'Y');
         Option::set($this->MODULE_ID, 'optipng_compress', '3');
 
-        Option::set(
-            $this->MODULE_ID,
-            'convert_mode',
-            \serialize(['hitConvert', 'postConvert'])
-        );
+        $sites = Dev2funImageCompress::getSites();
+        foreach ($sites as $site) {
+            Option::set(
+                $this->MODULE_ID,
+                'convert_mode',
+                \serialize(['hitConvert', 'postConvert']),
+                $site['ID']
+            );
+        }
+
         return true;
     }
 
@@ -189,10 +252,10 @@ class dev2fun_imagecompress extends CModule
 
         $eventManager->registerEventHandler("main", "OnBuildGlobalMenu", $this->MODULE_ID, "Dev2funImageCompress", "DoBuildGlobalMenu");
 
-        $eventManager->registerEventHandler("main", "OnGetFileSRC", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "CompressImageOnConvertEvent");
-        $eventManager->registerEventHandler("main", "OnAfterResizeImage", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "CompressImageCacheOnConvertEvent", 10);
+        $eventManager->registerEventHandler("main", "OnGetFileSRC", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "CompressImageOnConvertEvent", 999);
+        $eventManager->registerEventHandler("main", "OnAfterResizeImage", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "CompressImageCacheOnConvertEvent", 999);
 
-        $eventManager->registerEventHandler("main", "OnEndBufferContent", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "PostConverterEvent");
+        $eventManager->registerEventHandler("main", "OnEndBufferContent", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "PostConverterEvent", 999);
 
         return true;
     }
@@ -207,7 +270,22 @@ class dev2fun_imagecompress extends CModule
     public function unInstallDB()
     {
         $connection = Application::getInstance()->getConnection();
-        $connection->dropTable(ImageCompressTable::getTableName());
+//        $connection->dropTable(ImageCompressTable::getTableName());
+        if (ImageCompressTable::getEntity()->getConnection()->isTableExists(ImageCompressTable::getTableName())) {
+            $connection->dropTable(ImageCompressTable::getTableName());
+        }
+//        $connection->dropTable(ImageCompressPagesTable::getTableName());
+
+        if (ImageCompressImagesTable::getEntity()->getConnection()->isTableExists(ImageCompressImagesTable::getTableName())) {
+            ImageCompressImagesTable::dropTable();
+        }
+        if (ImageCompressImagesConvertedTable::getEntity()->getConnection()->isTableExists(ImageCompressImagesConvertedTable::getTableName())) {
+            ImageCompressImagesConvertedTable::dropTable();
+        }
+        if (ImageCompressImagesToConvertedTable::getEntity()->getConnection()->isTableExists(ImageCompressImagesToConvertedTable::getTableName())) {
+            ImageCompressImagesToConvertedTable::dropTable();
+        }
+
         Option::delete($this->MODULE_ID);
         return true;
     }
@@ -215,6 +293,7 @@ class dev2fun_imagecompress extends CModule
     public function deleteFiles()
     {
         DeleteDirFilesEx('/bitrix/admin/dev2fun_imagecompress_files.php');
+        DeleteDirFilesEx('/bitrix/admin/dev2fun_imagecompress_convert.php');
         DeleteDirFilesEx('/bitrix/themes/.default/icons/dev2fun.imagecompress');
         DeleteDirFilesEx('/bitrix/themes/.default/dev2fun.imagecompress.css');
         return true;

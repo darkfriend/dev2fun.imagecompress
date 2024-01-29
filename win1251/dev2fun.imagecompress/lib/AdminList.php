@@ -8,8 +8,11 @@
 namespace Dev2fun\ImageCompress;
 
 //\Bitrix\Main\Localization\Loc::loadMessages(__FILE__);
+use Bitrix\Main\DB\SqlExpression;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Config\Option;
+use Bitrix\Main\ORM\Query\Filter\Condition;
+use darkfriend\helpers\DebugHelper;
 
 IncludeModuleLangFile(__FILE__);
 
@@ -197,13 +200,23 @@ class AdminList
         }
     }
 
+    /**
+     * @return string
+     */
     private function getOrderOrd()
     {
         $order = strtolower($GLOBALS['order']);
-        return $order == 'desc' || $order == 'asc' ? $order : 'desc';
+        return $order === 'desc' || $order === 'asc' ? $order : 'desc';
     }
 
-    public function setList($rsRec = null, $arVisual = [], $arAddActions = [], $arEditable = [])
+    /**
+     * @param mixed $rsRec
+     * @param array $arVisual
+     * @param array|null $arAddActions
+     * @param array $arEditable
+     * @return void
+     */
+    public function setList($rsRec = null, array $arVisual = [], ?array $arAddActions = [], array $arEditable = [])
     {
         if ($rsRec === null && $this->d7class !== false) {
             $rsRec = call_user_func([$this->d7class, 'getList'], ['order' => [$this->getOrderBy() => $this->getOrderOrd()]]);
@@ -239,7 +252,7 @@ class AdminList
             if (!empty($arEditable)) {
                 foreach ($arEditable as $editCode) {
                     if (is_array($editCode)) {
-                        if ($editCode['TYPE'] == 'textarea') {
+                        if ($editCode['TYPE'] === 'textarea') {
                             //$row->AddTextField($editCode['CODE']);
                         } else {
                             $row->AddInputField($editCode['CODE'], ['size' => 30]);
@@ -258,7 +271,7 @@ class AdminList
                 }
             }
 
-            if ($arAddActions !== false) {
+            if ($arAddActions !== null) {
                 $arActions = [];
                 $arActions['edit'] = [
                     'ICON' => 'edit',
@@ -279,7 +292,7 @@ class AdminList
                         }
                         if (isset($arAction['LINK'])) {
                             $arAction['LINK'] = str_replace(['#EDIT_URL#', '#ID#'], [htmlspecialcharsback($editFile), $f_ID], $arAction['LINK']);
-                        } elseif ($arAction['ACTION'] == 'group') {
+                        } elseif ($arAction['ACTION'] === 'group') {
                             if (isset($arAction['ACTION_ALERT'])) {
                                 $arAction['ACTION'] = "if(confirm('" . $arAction['ACTION_ALERT'] . "')) " . $this->lAdmin->ActionDoGroup($f_ID, $arAction['ACTION_VAR']);
                             } else {
@@ -297,38 +310,54 @@ class AdminList
         }
     }
 
-    public function setFooter($arActions = ['delete' => ''])
+    public function setFooter(array $arActions = ['delete' => ''])
     {
         $this->lAdmin->AddFooter(
             [
-                ['title' => GetMessage('MAIN_ADMIN_LIST_SELECTED'), 'value' => $this->rsRec->SelectedRowsCount()],
+                ['title' => GetMessage('MAIN_ADMIN_LIST_SELECTED'), 'value' => $this->rsRec ? $this->rsRec->SelectedRowsCount() : ''],
                 ['counter' => true, 'title' => GetMessage('MAIN_ADMIN_LIST_CHECKED'), 'value' => '0'],
             ]
         );
         $this->lAdmin->AddGroupActionTable($arActions, ['disable_action_target' => true]);
     }
 
-    public function makeFilter()
+    public function makeFilter(): array
     {
         $arFilter = [];
 
         foreach ($this->arFilter as $k => $arItem) {
-            if ($arItem['TYPE'] == 'calendar') {
-                if (strlen($arItem['VALUE1'])) {
-                    $arFilter[strtoupper($k) . '1'] = $arItem['VALUE1'];
-                }
-                if (strlen($arItem['VALUE2'])) {
-                    $arFilter[strtoupper($k) . '2'] = $arItem['VALUE2'];
-                }
-            } elseif ($k == "content_type") {
-                if (strlen($arItem["VALUE"]) <= 0) {
-                    $arItem["VALUE"] = array_keys($arItem["VARIANTS"]);
-                }
-                $arFilter[(isset($arItem['OPER']) ? $arItem['OPER'] : '') . strtoupper($k)] = $arItem['VALUE'];
-            } else {
-                if (strlen($arItem['VALUE'])) {
+            switch ($arItem['TYPE']) {
+                case 'calendar':
+                    if (strlen($arItem['VALUE1'])) {
+                        $arFilter[strtoupper($k) . '1'] = $arItem['VALUE1'];
+                    }
+                    if (strlen($arItem['VALUE2'])) {
+                        $arFilter[strtoupper($k) . '2'] = $arItem['VALUE2'];
+                    }
+                    break;
+                case 'content_type':
+                    if (strlen($arItem["VALUE"]) <= 0) {
+                        $arItem["VALUE"] = array_keys($arItem["VARIANTS"]);
+                    }
                     $arFilter[(isset($arItem['OPER']) ? $arItem['OPER'] : '') . strtoupper($k)] = $arItem['VALUE'];
-                }
+                    break;
+                default:
+                    switch ($k) {
+                        case 'CONVERTED_IMAGE_PROCESSED':
+                            if (strlen($arItem['VALUE'])) {
+                                if ($arItem['VALUE'] === 'Y') {
+                                    $arFilter['=' . strtoupper($k)] = $arItem['VALUE'];
+                                } else {
+                                    $arFilter['!=' . strtoupper($k)] = 'Y';
+                                }
+                            }
+                            break;
+                        default:
+                            if (strlen($arItem['VALUE'])) {
+                                $arFilter[(isset($arItem['OPER']) ? $arItem['OPER'] : '') . strtoupper($k)] = $arItem['VALUE'];
+                            }
+                    }
+
             }
         }
 
@@ -342,7 +371,7 @@ class AdminList
         $arInit = [];
         foreach ($arFilter as $k => $arItem) {
             $arTitles[$k] = $arItem['TITLE'];
-            if ($arItem['TYPE'] == 'calendar') {
+            if ($arItem['TYPE'] === 'calendar') {
                 $arInit[] = 'find_' . $k . '1';
                 $arInit[] = 'find_' . $k . '2';
             } else {
@@ -354,7 +383,7 @@ class AdminList
 
         $arSessionVars = $_SESSION['SESS_ADMIN'][$this->tableID];
         foreach ($this->arFilter as $k => &$arItem) {
-            if ($arItem['TYPE'] == 'calendar') {
+            if ($arItem['TYPE'] === 'calendar') {
                 $value1 = isset($_REQUEST['find_' . $k . '1']) && !isset($_REQUEST['del_filter']) ? $_REQUEST['find_' . $k . '1'] : (isset($arSessionVars['find_' . $k . '1']) ? $arSessionVars['find_' . $k . '1'] : '');
                 $arItem['VALUE1'] = $value1;
                 $value2 = isset($_REQUEST['find_' . $k . '2']) && !isset($_REQUEST['del_filter']) ? $_REQUEST['find_' . $k . '2'] : (isset($arSessionVars['find_' . $k . '2']) ? $arSessionVars['find_' . $k . '2'] : '');
@@ -364,6 +393,7 @@ class AdminList
                 $arItem['VALUE'] = $value;
             }
         }
+        unset($arItem);
     }
 
     private function outputFilter()
@@ -416,24 +446,41 @@ class AdminList
         ?></form><?php
     }
 
-    public function output()
+    public function output($type = 'optimize')
     {
         global $APPLICATION, $adminPage, $USER, $adminMenu, $adminChain, $recCompress;
+        $GLOBALS['msgError'] = '';
         $this->lAdmin->CheckListMode();
         require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_admin_after.php');
         if ($this->oFilter !== null) {
             $this->OutputFilter();
         }
-        $this->compressAll();
-        $this->compressResult();
-        //		$rs = ImageCompressTable::getList();
-        //		var_dump($rs->fetchAll());
-        if ($recCompress === false) {
+        switch ($type) {
+            case 'convert':
+                $this->convertAll();
+                $this->processResult(Loc::getMessage('D2F_IMAGECOMPRESS_CONVERT_IMAGE_STATUS_SUCCESS'));
+                if ($recCompress === false && empty($GLOBALS['msgError'])) {
+                    $GLOBALS['msgError'] = Loc::getMessage('D2F_IMAGECOMPRESS_CONVERT_DEFAULT_TEXT_ERRROR');
+                }
+                break;
+            default:
+                $this->compressAll();
+                $this->processResult(Loc::getMessage('D2F_IMAGECOMPRESS_COMPRESS_IMAGE_STATUS_SUCCESS'));
+                if ($recCompress === false) {
+                    \CAdminMessage::ShowMessage([
+                        "MESSAGE" => Compress::getInstance()->LAST_ERROR,
+                        "TYPE" => "ERROR",
+                    ]);
+                }
+        }
+
+        if ($recCompress === false && !empty($GLOBALS['msgError'])) {
             \CAdminMessage::ShowMessage([
-                "MESSAGE" => Compress::getInstance()->LAST_ERROR,
+                "MESSAGE" => $GLOBALS['msgError'],
                 "TYPE" => "ERROR",
             ]);
         }
+
         echo $this->topNote;
         $this->lAdmin->DisplayList();
         if (strlen($this->bottomNote)) {
@@ -444,16 +491,18 @@ class AdminList
         require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/epilog_admin.php');
     }
 
-    public function compressResult()
+    /**
+     * @example process_result=Y&status=success
+     * @param string $message
+     * @return void
+     */
+    public function processResult(string $message)
     {
-        //        compress_result=Y&status=success
-        if ($_REQUEST['compress_result']) {
-            if ($_REQUEST['status'] == 'success') {
-                \CAdminMessage::ShowMessage([
-                    "MESSAGE" => Loc::getMessage('D2F_IMAGECOMPRESS_COMPRESS_IMAGE_STATUS_SUCCESS'),
-                    "TYPE" => "OK",
-                ]);
-            }
+        if (!empty($_REQUEST['process_result']) && $_REQUEST['status'] === 'success') {
+            \CAdminMessage::ShowMessage([
+                "MESSAGE" => $message,
+                "TYPE" => "OK",
+            ]);
         }
     }
 
@@ -524,7 +573,8 @@ class AdminList
                     "PROGRESS_VALUE" => $rsRes->NavPageNomer,
                 ];
                 if ($rsRes->NavPageCount) {
-                    $admFields['PROGRESS_TEMPLATE'] = '<span>Шаг: #PROGRESS_VALUE# из #PROGRESS_TOTAL# (#PROGRESS_PERCENT#)</span>';
+//                    $admFields['PROGRESS_TEMPLATE'] = '<span>Шаг: #PROGRESS_VALUE# из #PROGRESS_TOTAL# (#PROGRESS_PERCENT#)</span>';
+                    $admFields['PROGRESS_TEMPLATE'] = '<span>' . Loc::getMessage('D2F_IMAGECOMPRESS_PROGRESS_TEMPLATE') . '</span>';
                 }
                 \CAdminMessage::ShowMessage($admFields);
             } else {
@@ -553,7 +603,173 @@ class AdminList
             }
             echo '</div>';
             echo '<script type="text/javascript">';
-            include_once(__DIR__ . '/script.js');
+                include_once(__DIR__ . '/script.js');
+                echo "
+                    BX.ready(function(){
+                        BX.showWait('compressAllStatus');
+                        SendPropcess(1);
+                    });
+                ";
+            echo '</script>';
+        }
+    }
+
+    public function convertAll()
+    {
+        global $APPLICATION, $recCompress, $msgError;
+        $navPageCount = 0;
+        $msgError = '';
+        $instance = Convert::getInstance();
+        $algImageType = $instance->getImageTypeByAlgorithm($instance->algorithm);
+        if (!empty($_REQUEST['convert_all'])) {
+            \CJSCore::Init(['ajax']);
+            echo '<div id="convertAllStatus">';
+            if ($_REQUEST['AJAX_IC']) {
+                try {
+                    $rsRes = ImageCompressImagesTable::getList([
+                        'select' => [
+                            '*',
+                            'CONVERTED_IMAGE_PATH' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.IMAGE_PATH',
+                            'CONVERTED_IMAGE_ID' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.ID',
+                            'CONVERTED_IMAGE_HASH' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.ORIGINAL_IMAGE_HASH',
+                            'CONVERTED_IMAGE_PROCESSED' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_PROCESSED',
+                            'CONVERTED_IMAGE_TYPE' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE',
+                        ],
+                        'filter' => [
+                            '=IMAGE_IGNORE' => 'N',
+                            '!=CONVERTED_IMAGE_PROCESSED' => 'Y',
+                            '!=CONVERTED_IMAGE_TYPE' => Convert::TYPE_WEBP,
+                        ],
+                    ]);
+
+                    $pageSize = Option::get('dev2fun.imagecompress', "cnt_step", 30);
+                    $rsRes = new \CDBResult($rsRes);
+                    $rsRes->NavStart($pageSize, false, $_REQUEST['PAGEN_1'] ?? 1);
+
+                    if (empty($_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT'])) {
+                        $_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT'] = $rsRes->NavPageCount;
+                        $navPageCount = $rsRes->NavPageCount;
+                        if (!$navPageCount) $navPageCount = 0;
+                        //                    $recCompress = true;
+                    } else {
+                        $navPageCount = $_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT'];
+                    }
+
+                    if ((int)$rsRes->NavPageCount === 0) {
+                        unset($_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT']);
+                        $recCompress = true;
+                        $navPageCount = 0;
+                    }
+
+                    if ($navPageCount) {
+                        $progressValue = (100 / $navPageCount) * $rsRes->NavPageNomer;
+                    } else {
+                        $progressValue = 100;
+                    }
+
+//                    $stepOnPage = 0;
+                    $images = [];
+                    while ($arFile = $rsRes->NavNext(true)) {
+                        $pathFile = Convert::getNormalizePathFile($arFile['IMAGE_PATH']);
+                        if ($pathFile === null) {
+                            ImageCompressImagesTable::update($arFile['ID'], [
+                                'IMAGE_IGNORE' => 'Y',
+                                'DATE_UPDATE' => new SqlExpression("NOW()"),
+                                'DATE_CHECK' => new SqlExpression("NOW()"),
+                            ]);
+                            continue;
+                        }
+
+                        if ($arFile['IMAGE_PATH'] !== $pathFile) {
+                            $arFile['IMAGE_PATH'] = $pathFile;
+                        }
+
+                        if (empty($arFile['IMAGE_HASH'])) {
+                            $absPath = $_SERVER['DOCUMENT_ROOT'] . $arFile['IMAGE_PATH'];
+                            if (is_file($absPath)) {
+                                $imageHash = md5_file($absPath);
+                                ImageCompressImagesTable::update($arFile['ID'], [
+                                    'IMAGE_HASH' => $imageHash,
+                                ]);
+                                $arFile['IMAGE_HASH'] = $imageHash;
+                            } else {
+                                ImageCompressImagesTable::update($arFile['ID'], [
+                                    'IMAGE_IGNORE' => 'Y',
+                                    'DATE_UPDATE' => new SqlExpression("NOW()"),
+                                    'DATE_CHECK' => new SqlExpression("NOW()"),
+                                ]);
+                                continue;
+                            }
+                        }
+
+                        $images[] = $arFile;
+                    }
+                    if ($images) {
+                        LazyConvert::convertItems($images);
+                    }
+                } catch (\Throwable $e) {
+                    $recCompress = false;
+                    $msgError = $e->getMessage();
+                }
+
+            }
+            if ($recCompress === false) {
+//                $msgError = Compress::getInstance()->LAST_ERROR;
+                if (!$msgError) {
+                    $msgError = Loc::getMessage('D2F_IMAGECOMPRESS_CONVERT_DEFAULT_TEXT_ERRROR');
+                }
+                \CAdminMessage::ShowMessage([
+                    "MESSAGE" => $msgError,
+                    "TYPE" => "ERROR",
+                ]);
+            } elseif ($navPageCount > 0) {
+                $admFields = [
+                    "MESSAGE" => Loc::getMessage('D2F_IMAGECOMPRESS_CONVERT_IMAGE_PROGRESSBAR', ['#IMAGE_TYPE#' => $algImageType]),
+                    "DETAILS" => "#PROGRESS_BAR#",
+                    "HTML" => true,
+                    "TYPE" => "PROGRESS",
+                    "PROGRESS_TOTAL" => $navPageCount,
+//                    "PROGRESS_TOTAL" => $rsRes->NavPageCount,
+                    "PROGRESS_VALUE" => $rsRes->NavPageNomer,
+                ];
+                if ($rsRes->NavPageCount) {
+                    $admFields['PROGRESS_TEMPLATE'] = '<span>' . Loc::getMessage('D2F_IMAGECOMPRESS_PROGRESS_TEMPLATE') . '</span>';
+                }
+                \CAdminMessage::ShowMessage($admFields);
+            } else {
+                \CAdminMessage::ShowMessage([
+                    "MESSAGE" => Loc::getMessage('D2F_IMAGECOMPRESS_COMPRESS_IMAGE_STATUS_SUCCESS'),
+                    "TYPE" => "OK",
+                ]);
+            }
+//            if ($rsRes->NavPageNomer >= $navPageCount) {
+//                $_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT'] = false;
+//                unset($_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT']);
+//            }
+            if ($_REQUEST['AJAX_IC']) {
+                $html = ob_get_clean();
+                echo \CUtil::PhpToJSObject([
+                    'html' => $html,
+                    'error' => $recCompress === false ? true : false,
+                    'step' => $rsRes->NavPageNomer,
+//                    'step' => ($rsRes->NavPageNomer + 1),
+                    'allStep' => $navPageCount,
+//                    'allStep' => $rsRes->NavPageCount,
+//                    'pageCount' => $stepOnPage,
+                    'count' => $rsRes->SelectedRowsCount(),
+                    'progressValue' => $progressValue,
+                ]);
+                die();
+            }
+            echo '</div>';
+            echo '<script type="text/javascript">';
+                include_once(__DIR__ . '/script.js');
+                echo "
+                    BX.ready(function(){
+                        BX.showWait('convertAllStatus');
+                        SendPropcess(1, 'convert');
+                    });
+                ";
             echo '</script>';
         }
     }

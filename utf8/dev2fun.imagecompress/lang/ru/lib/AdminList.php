@@ -8,3 +8,4 @@
 
 $MESS["D2F_COMPRESS_BTN_ALL"] = "Сжать все картинки";
 $MESS["D2F_IMAGECOMPRESS_COMPRESS_IMAGE_STATUS_SUCCESS"] = "Файлы успешно оптимизированы";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_IMAGE_STATUS_SUCCESS"] = "Файлы успешно сконвертированы";

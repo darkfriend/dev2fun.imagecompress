@@ -19,12 +19,13 @@ class Gif
 
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $path = '';
-    private $enable = false;
+    private $active = false;
+    private static $isOptim = null;
 
-    private function __construct()
+    public function __construct()
     {
         $this->path = Option::get($this->MODULE_ID, 'path_to_gif', '/usr/bin');
-        $this->enable = Option::get($this->MODULE_ID, 'enable_gif', false);
+        $this->active = Option::get($this->MODULE_ID, 'enable_gif', 'N') === 'Y';
     }
 
     /**
@@ -41,13 +42,29 @@ class Gif
     }
 
     /**
-     * Проверка возможности оптимизации pdf
+     * Return has active state
      * @return bool
      */
-    public function isOptim()
+    public function isActive(): bool
     {
-        exec($this->path . '/gifsicle --version', $s);
-        return ($s ? true : false);
+        return $this->active;
+    }
+
+    /**
+     * Check optimize for gif
+     * @param string|null $path
+     * @return bool
+     */
+    public function isOptim(?string $path = null)
+    {
+        if (!$path) {
+            $path = $this->path;
+        }
+        if (self::$isOptim === null || $path !== $this->path) {
+            exec($path . '/gifsicle --version', $s);
+            self::$isOptim = (bool)$s;
+        }
+        return self::$isOptim;
     }
 
     /**
@@ -59,7 +76,10 @@ class Gif
      */
     public function compress($strFilePath, $params = [])
     {
-        if(!$this->enable) return false;
+        if(!$this->isActive()) {
+            $this->lastError = 'no_active';
+            return false;
+        }
         $strFilePath = strtr(
             $strFilePath,
             [

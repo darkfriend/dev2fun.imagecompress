@@ -2,7 +2,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.7.4
+ * @version 0.8.0
  * @since 0.7.4
  * @example ./convert.php -l=10
  */
@@ -37,7 +37,7 @@ if (!empty($params['l'])) {
 $connection = \Bitrix\Main\Application::getConnection();
 $sqlHelper = $connection->getSqlHelper();
 $cnt = $connection->queryScalar(
-    "SELECT COUNT(*) FROM b_file WHERE CONTENT_TYPE IN ('image/jpeg', 'image/png')"
+    "SELECT COUNT(*) FROM b_file WHERE CONTENT_TYPE IN ('image/jpeg', 'image/png', 'image/gif')"
 );
 
 echo "Found {$cnt} files" . PHP_EOL;
@@ -57,7 +57,7 @@ $upload_dir = \Bitrix\Main\Config\Option::get('main', 'upload_dir', 'upload');
 //$files = [];
 $stepOnPage = 0;
 for ($i=1; $i<=$cnt; $i+=$limit) {
-    $sql = "SELECT f.* FROM b_file f WHERE f.CONTENT_TYPE IN ('image/jpeg', 'image/png')";
+    $sql = "SELECT f.* FROM b_file f WHERE f.CONTENT_TYPE IN ('image/jpeg', 'image/png', 'image/gif')";
     if ($lastId) {
         $sql .= " AND f.ID>{$sqlHelper->forSql($lastId)}";
     }

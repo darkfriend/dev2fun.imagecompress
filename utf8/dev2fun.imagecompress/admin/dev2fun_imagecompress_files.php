@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.7.2
+ * @version 0.8.0
  */
 require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -28,7 +28,9 @@ if (!$canRead && !$canWrite)
 
 
 $EDITION_RIGHT = $APPLICATION->GetGroupRight($curModuleName);
-if ($EDITION_RIGHT === "D") $APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
+if ($EDITION_RIGHT === "D") {
+    $APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
+}
 
 $aTabs = [
     [
@@ -46,30 +48,33 @@ $APPLICATION->SetTitle(GetMessage("SEC_IMG_COMPRESS_TITLE"));
 
 //require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");
 $recCompress = null;
-if ($_REQUEST["compress"]) {
-
-    if ($compress = $_REQUEST["compress"]) {
-        if (!is_array($compress)) {
-            $compress = [$compress];
-        }
-        foreach ($compress as $fileID) {
-            $fileID = intval($fileID);
-            $recCompress = Compress::getInstance()->compressImageByID($fileID);
+if (!empty($_REQUEST["compress"]) && $compress = $_REQUEST["compress"]) {
+    if (!is_array($compress)) {
+        $compress = [$compress];
+    }
+    foreach ($compress as $fileID) {
+        $recCompress = Compress::getInstance()->compressImageByID($fileID);
+        if (empty($recCompress) && Compress::getInstance()->LAST_ERROR) {
+            $GLOBALS['msgError'] = Compress::getInstance()->getError();
+            $recCompress = false;
+            break;
         }
     }
-
 } elseif ($_REQUEST["action"] === "compress") {
-
     $arIDs = $_REQUEST["ID"];
     if (is_array($arIDs) && count($arIDs)) {
         set_time_limit(0);
         foreach ($arIDs as $fileID) {
             $recCompress = Compress::getInstance()->compressImageByID($fileID);
+            if (empty($recCompress) && Compress::getInstance()->LAST_ERROR) {
+                $GLOBALS['msgError'] = Compress::getInstance()->getError();
+                $recCompress = false;
+                break;
+            }
         }
     }
-
 } elseif (!empty($_REQUEST['compress_file_delete'])) {
-    CFile::Delete(intval($_REQUEST["compress_file_delete"]));
+    CFile::Delete((int)$_REQUEST["compress_file_delete"]);
 }
 
 $list = new AdminList($curModuleName);
@@ -124,10 +129,12 @@ $list->SetFilter([
         ],
     ],
 ]);
-if (!isset($by))
+if (!isset($by)) {
     $by = 'ID';
-if (!isset($order))
+}
+if (!isset($order)) {
     $order = 'ASC';
+}
 
 $rsFiles = Compress::getInstance()->getFileList([$by => $order], $list->makeFilter());
 
@@ -152,7 +159,7 @@ $list->SetList(
         {
             $strFilePath = \CFile::GetPath($arRec["ID"]);
             if (file_exists($_SERVER['DOCUMENT_ROOT'] . $strFilePath)) {
-                if (intval($arRec['FILE_ID']) <= 0) {
+                if ((int)$arRec['FILE_ID'] <= 0) {
                     return "<button value='" . $arRec["ID"] . "' name='compress' data-image-id='" . $arRec["ID"] . "'>" . GetMessage("DEV2FUN_IMAGECOMPRESS_COMPRESS") . "</button>";
                 } else {
                     return GetMessage('DEV2FUN_IMAGECOMPRESS_COMRESSED')
@@ -177,10 +184,18 @@ $list->SetList(
             return Compress::getInstance()->getNiceFileSize($arRec["FILE_SIZE"]);
         },
     ],
-    false
+    null
 );
-$list->SetFooter([
+$list->setFooter([
     'compress' => GetMessage('DEV2FUN_IMAGECOMPRESS_COMPRESS'),
 ]);
-$list->Output();
+
+if ($recCompress === false && !empty($GLOBALS['msgError'])) {
+    \CAdminMessage::ShowMessage([
+        "MESSAGE" => $GLOBALS['msgError'],
+        "TYPE" => "ERROR",
+    ]);
+}
+
+$list->output();
 //require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin.php");

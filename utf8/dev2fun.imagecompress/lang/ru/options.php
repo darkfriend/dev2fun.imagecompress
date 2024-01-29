@@ -52,6 +52,10 @@ $MESS["D2F_COMPRESS_OPTIONS_NO_TESTED"] = "Конфигурация сервер
 $MESS["D2F_IMAGECOMPRESS_COMPRESS_IMAGE_PROGRESSBAR"] = "Процесс оптимизации картинок";
 $MESS["D2F_COMPRESS_REFERENCES_JPEG_PROGRESSIVE"] = "Включить progressive jpeg";
 
+$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT"] = "Модули для которых работает оптимизация";
+$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT_MODULE"] = "Модуль \"#MODULE#\"";
+$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT_MODULE_OTHER"] = "Другие модули";
+
 
 $MESS['LABEL_TITLE_HELP_BEGIN'] = 'Вы используете бесплатный модуль разработанный командой <a href="//dev2fun.com" class="c-badge c-badge--rounded c-badge--ghost c-badge--brand" target="_blank">Dev2Fun</a>';
 $MESS['LABEL_TITLE_HELP_BEGIN_TEXT'] = <<<EOT
@@ -129,5 +133,53 @@ $MESS['D2F_COMPRESS_FILE_EXCLUDED_TEXT'] = <<<EO
 		</li>
 	</ul>
 EO;
+$MESS['D2F_COMPRESS_ENABLE_ORIGINAL_PICTURES_MODE'] = 'Включить режим исходных SRC';
+$MESS['D2F_COMPRESS_ORIGINAL_PICTURES_MODE_TEXT'] = <<<EO
+	<p>
+	При включении режима исходных SRC, происходит сбор путей картинок до их конвертации.<br>
+	Чтоб получить исходные пути используйте код ниже:
+	</p>
+	<code lang="php">
+        \Bitrix\Main\Loader::includeModule('dev2fun.imagecompress');<br>
+        \$srcWebp = '/path_to_webp/image.webp';<br>
+        \$originalSrc = \Dev2fun\ImageCompress::getOriginalSrc(\$srcWebp);
+	</code>
+EO;
+
+$MESS['D2F_IMAGECOMPRESS_MODE_CONVERT_TEXT'] = <<<EO
+    <p>
+        Режимы конвертаций:
+    </p>
+    <ul>
+        <li>
+            <b>hitConvert</b> - Конвертация на хитах. При обращении к картинке. Может работать совместно с режимом <b>postConvert</b>. Создает нагрузку при первом обращении к картинке.
+        </li>
+        <li>
+            <b>postConvert</b> - Конвертация в самом конце формирования страницы. Конвертирует все подходящие под условия картинки. Может работать совместно с режимом <b>hitConvert</b>. Создает нагрузку при первом обращении к странице.
+        </li>
+        <li>
+            <b>lazyConvert</b> - Отложенная конвертация картинок. В фоне конвертирует все найденные картинки по посещаемым страницам. <b>Работает отдельно от всех режимов. Не создает нагрузку при заходе на страницу.</b>
+        </li>
+    </ul>
+EO;
 
 $MESS['LABEL_ADD'] = "Добавить";
+
+
+$MESS['D2F_COMPRESS_GLOBAL_SETTINGS'] = "Общие настройки";
+$MESS['D2F_COMPRESS_CRONTAB_TEXT'] = <<<TEXT
+    <b>Сейчас у вас агенты работают на хитах! Крайне рекомендуется перевести агенты на крон!</b><br>
+    Рекомендуется использовать "Обобщённое решение" - <a href="https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=2943" target="_blank">подробнее</a>
+TEXT;
+$MESS['D2F_COMPRESS_LAZY_HEADING_SETTINGS'] = "Настройки Lazy Convert";
+$MESS['D2F_COMPRESS_LAZY_PER_PAGE'] = "Количество картинок за шаг конвертации";
+$MESS['D2F_COMPRESS_LAZY_CACHE_TIME_FIND'] = "Время кэширования на поиск картинок на страницах";
+$MESS['D2F_COMPRESS_LAZY_CACHE_TIME_GET_IMAGES'] = "Время кэширования на подмен картинок на webp-версии";
+$MESS['D2F_COMPRESS_LAZY_USER_GROUPS'] = "В ключе кэширования учитывать группы пользователей";
+$MESS['D2F_COMPRESS_CONVERT_CACHE_INCLUDE_USER_GROUPS_TEXT'] = <<<TEXT
+    Если у вас нет различий в картинках для разных групп пользователей, то рекомендуется снять галку.<br>
+    Так вы <u>значительно</u> снизите количество кэша и нагрузку на сервер.
+TEXT;
+
+$MESS['D2F_COMPRESS_SITE_SETTINGS'] = "Настройки для сайта";
+$MESS['D2F_COMPRESS_SITE_HEADING_TITLE'] = "Развернуть/Свернуть";
