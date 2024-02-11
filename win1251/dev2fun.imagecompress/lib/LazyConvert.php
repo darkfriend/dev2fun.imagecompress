@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.0
+ * @version 0.8.3
  */
 
 namespace Dev2fun\ImageCompress;
@@ -213,7 +213,9 @@ class LazyConvert
     public static function cache(int $ttl, string $cacheId, string $dir, callable $callable, bool $returnValue = true)
     {
         $cache = \Bitrix\Main\Data\Cache::createInstance();
-        $cache->noOutput();
+        if (method_exists($cache, 'noOutput')) {
+            $cache->noOutput();
+        }
         try {
             if ($cache->initCache($ttl, $cacheId, \Dev2funImageCompress::MODULE_ID . $dir)) {
                 return $returnValue ? $cache->getVars() : null;

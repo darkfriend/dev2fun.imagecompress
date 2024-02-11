@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.0
+ * @version 0.8.3
  */
 
 namespace Dev2fun\ImageCompress;
@@ -9,7 +9,6 @@ namespace Dev2fun\ImageCompress;
 use Bitrix\Main;
 use Bitrix\Main\Entity;
 use Bitrix\Main\Localization\Loc;
-use Bitrix\Main\Type\DateTime;
 
 IncludeModuleLangFile(__FILE__);
 
@@ -35,41 +34,34 @@ class ImageCompressImagesTable extends Entity\DataManager
     public static function getMap()
     {
         return [
-            (new Entity\IntegerField('ID'))
-                ->configurePrimary()
-                ->configureAutocomplete(),
+            new Entity\IntegerField('ID', [
+                'primary' => true,
+                'autocomplete' => true,
+            ]),
 
-//            (new Entity\StringField('SITE_ID'))
-//                ->configureRequired(),
+            new Entity\StringField('IMAGE_PATH', [
+                'unique' => true,
+            ]),
 
-            (new Entity\StringField('IMAGE_PATH'))
-                ->configureUnique(),
+            new Entity\StringField('IMAGE_HASH', [
+                'nullable' => true,
+            ]),
 
-            (new Entity\StringField('IMAGE_HASH'))
-                ->configureNullable(),
+            new Entity\BooleanField('IMAGE_IGNORE', [
+                'values' => ['N', 'Y'],
+                'default_value' => 'N',
+            ]),
+//                ->configureValues('N', 'Y')
+//                ->configureDefaultValue('N'),
 
-            (new Entity\BooleanField('IMAGE_IGNORE'))
-                ->configureValues('N', 'Y')
-                ->configureDefaultValue('N'),
+            new Entity\DatetimeField('DATE_CHECK', [
+                'nullable' => true,
+            ]),
+//                ->configureNullable(),
 
-//            (new Entity\EnumField('IMAGE_TYPE'))
-//                ->configureValues([
-//                    'webp',
-//                    'avif',
-//                ])
-//                ->configureRequired(),
-
-//            (new Entity\DatetimeField('DATE_CREATE'))
-//                ->configureDefaultValue(new Main\DB\SqlExpression("NOW()")),
-
-            (new Entity\DatetimeField('DATE_CHECK'))
-                ->configureNullable(),
-//                ->configureDefaultValue(new Main\DB\SqlExpression("NOW()")),
-
-            (new Entity\DatetimeField('DATE_UPDATE'))
-                ->configureNullable(),
-
-//            (new Entity\DatetimeField('DATE_CHECK'))
+            new Entity\DatetimeField('DATE_UPDATE', [
+                'nullable' => true,
+            ]),
 //                ->configureNullable(),
 
             (new Entity\ReferenceField(
