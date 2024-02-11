@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.0
+ * @version 0.8.3
  */
 
 namespace Dev2fun\ImageCompress;
@@ -9,7 +9,6 @@ namespace Dev2fun\ImageCompress;
 use Bitrix\Main;
 use Bitrix\Main\Entity;
 use Bitrix\Main\Localization\Loc;
-use Bitrix\Main\Type\DateTime;
 
 IncludeModuleLangFile(__FILE__);
 
@@ -36,12 +35,18 @@ class ImageCompressImagesToConvertedTable extends Entity\DataManager
     public static function getMap()
     {
         return [
-            (new Entity\IntegerField('ID'))
-                ->configurePrimary()
-                ->configureAutocomplete(),
+            new Entity\IntegerField('ID', [
+                'primary' => true,
+                'autocomplete' => true,
+            ]),
+//                ->configurePrimary()
+//                ->configureAutocomplete(),
 
-            (new Entity\IntegerField('IMAGE_ID'))
-                ->configureRequired(),
+            new Entity\IntegerField('IMAGE_ID', [
+                'required' => true,
+            ]),
+//                ->configureRequired(),
+
             (new Entity\ReferenceField(
                 'IMAGE',
                 ImageCompressImagesTable::class,
@@ -51,8 +56,11 @@ class ImageCompressImagesToConvertedTable extends Entity\DataManager
 //                ['join_type' => 'INNER']
             )),
 
-            (new Entity\IntegerField('CONVERTED_IMAGE_ID'))
-                ->configureRequired(),
+            new Entity\IntegerField('CONVERTED_IMAGE_ID', [
+                'required' => true,
+            ]),
+//                ->configureRequired(),
+
             (new Entity\ReferenceField(
                 'CONVERTED_IMAGE',
                 ImageCompressImagesConvertedTable::class,
@@ -63,18 +71,25 @@ class ImageCompressImagesToConvertedTable extends Entity\DataManager
 //                ['join_type' => 'INNER']
             )),
 
-            (new Entity\EnumField('IMAGE_TYPE'))
-                ->configureValues([
+            new Entity\EnumField('IMAGE_TYPE', [
+                'values' => [
+                    Convert::TYPE_WEBP,
+                    Convert::TYPE_AVIF,
+                ],
+                'required' => true,
+            ]),
+//                ->configureValues([
 //                    Convert::TYPE_WEBP,
 //                    Convert::TYPE_AVIF,
-                    'webp',
-                    'avif',
-                ])
-                ->configureRequired(),
+//                ])
+//                ->configureRequired(),
 
-            (new Entity\BooleanField('IMAGE_PROCESSED'))
-                ->configureValues('N', 'Y')
-                ->configureDefaultValue('N'),
+            new Entity\BooleanField('IMAGE_PROCESSED', [
+                'values' => ['N', 'Y'],
+                'default_value' => 'N',
+            ]),
+//                ->configureValues('N', 'Y')
+//                ->configureDefaultValue('N'),
 
         ];
     }
