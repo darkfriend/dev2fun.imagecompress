@@ -32,7 +32,6 @@ use \Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable;
 
 try {
     $connection = \Bitrix\Main\Application::getInstance()->getConnection();
-    $instance = \Dev2fun\ImageCompress\Compress::getInstance();
 
     // add tables
     if (!$connection->isTableExists(ImageCompressImagesTable::getTableName())) {
