@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.0
+ * @version 0.8.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -20,6 +20,8 @@ class AvifConvertPhp
     private $MODULE_ID = 'dev2fun.imagecompress';
     private $enable = false;
     private $quality = 80;
+    private $origPicturesMode = false;
+    private static $origPictures = [];
 
     /**
      * @param string|null $siteId
@@ -30,6 +32,7 @@ class AvifConvertPhp
             $siteId = \Dev2funImageCompress::getSiteId();
         }
         $this->enable = Option::get($this->MODULE_ID, 'convert_enable', 'N', $siteId) === 'Y';
+        $this->origPicturesMode = Option::get($this->MODULE_ID, 'orig_pictures_mode', 'N', $siteId) === 'Y';
         $this->quality = Option::get($this->MODULE_ID, 'convert_quality', 80, $siteId);
         if (!$this->quality) {
             $this->quality = 80;
@@ -93,12 +96,23 @@ class AvifConvertPhp
         $arFile["SUBDIR"] = \str_replace("/{$uploadDir}",'', $arFile["SUBDIR"]);
 //        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
         $arFile["SUBDIR"] = \ltrim($arFile["SUBDIR"], '/');
-        $srcWebp = "/{$uploadDir}/resize_cache/avif/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.avif";
+//        $srcWebp = "/{$uploadDir}/resize_cache/avif/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.avif";
+        $origPicture = "/{$uploadDir}";
+        $srcWebp = "/{$uploadDir}/resize_cache/avif";
+        if (!empty($arFile["SUBDIR"])) {
+            $srcWebp .= "/{$arFile["SUBDIR"]}";
+            $origPicture .= "/{$arFile["SUBDIR"]}";
+        }
+        $origPicture .= "/{$arFile['FILE_NAME']}";
+        $srcWebp .= "/{$fileInfo['filename']}.avif";
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
 
         if(@\is_file($absSrcWebp)) {
             if(\filesize($absSrcWebp)===0) {
                 return false;
+            }
+            if ($this->origPicturesMode) {
+                self::$origPictures[$srcWebp] = $origPicture;
             }
             return $srcWebp;
         }
@@ -136,7 +150,24 @@ class AvifConvertPhp
         );
         $event->send();
 
+        if ($this->origPicturesMode) {
+            self::$origPictures[$srcWebp] = $origPicture;
+        }
+
         return $srcWebp;
+    }
+
+    /**
+     * Get original by src
+     * @param string $src
+     * @return string
+     */
+    public function getOriginalSrc(string $src): string
+    {
+        if (!$this->origPicturesMode) {
+            return '';
+        }
+        return self::$origPictures[$src] ?? '';
     }
 
     public function getOptionsSettings($advanceSettings=[])
