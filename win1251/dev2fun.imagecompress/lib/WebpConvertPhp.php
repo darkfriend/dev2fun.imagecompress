@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.5
+ * @version 0.8.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -106,9 +106,16 @@ class WebpConvertPhp
 
         $fileInfo = \pathinfo($src);
         $arFile["SUBDIR"] = \str_replace("/{$uploadDir}",'', $arFile["SUBDIR"]);
-//        $arFile["SUBDIR"] = \str_replace("/{$uploadDir}/resize_cache",'', $arFile["SUBDIR"]);
         $arFile["SUBDIR"] = \ltrim($arFile["SUBDIR"], '/');
-        $srcWebp = "/{$uploadDir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.webp";
+//        $srcWebp = "/{$uploadDir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.webp";
+        $origPicture = "/{$uploadDir}";
+        $srcWebp = "/{$uploadDir}/resize_cache/webp";
+        if (!empty($arFile["SUBDIR"])) {
+            $srcWebp .= "/{$arFile["SUBDIR"]}";
+            $origPicture .= "/{$arFile["SUBDIR"]}";
+        }
+        $origPicture .= "/{$arFile['FILE_NAME']}";
+        $srcWebp .= "/{$fileInfo['filename']}.webp";
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
 
         if(@\is_file($absSrcWebp)) {
@@ -116,7 +123,8 @@ class WebpConvertPhp
                 return false;
             }
             if ($this->origPicturesMode) {
-                self::$origPictures[$srcWebp] = "/{$uploadDir}/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}";
+                self::$origPictures[$srcWebp] = $origPicture;
+
             }
             return $srcWebp;
         }
@@ -157,7 +165,7 @@ class WebpConvertPhp
         $event->send();
 
         if ($this->origPicturesMode) {
-            self::$origPictures[$srcWebp] = "/{$uploadDir}/{$arFile["SUBDIR"]}/{$arFile['FILE_NAME']}";
+            self::$origPictures[$srcWebp] = $origPicture;
         }
 
         return $srcWebp;

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.0
+ * @version 0.8.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -1061,6 +1061,7 @@ class Convert
             return false;
         }
 
+        $curBrowserAgent = $_SERVER["HTTP_USER_AGENT"] ?? '';
         $supportBrowsers = [
             'chrome',
             'opera',
@@ -1068,11 +1069,15 @@ class Convert
         $event = new \Bitrix\Main\Event(
             self::getInstance()->MODULE_ID,
             'OnBeforeCheckWebpBrowserSupport',
-            [&$supportBrowsers]
+            [&$supportBrowsers, &$curBrowserAgent]
         );
         $event->send();
 
-        $result = \in_array(self::getBrowserAgentName($_SERVER["HTTP_USER_AGENT"]), $supportBrowsers)
+        if (!$curBrowserAgent) {
+            return true;
+        }
+
+        $result = \in_array(self::getBrowserAgentName($curBrowserAgent), $supportBrowsers)
             || self::checkSupportWebpAccept();
 
         $event = new \Bitrix\Main\Event(self::getInstance()->MODULE_ID, "OnAfterCheckWebpSupport", [$result]);

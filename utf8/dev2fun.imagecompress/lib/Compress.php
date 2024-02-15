@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.0
+ * @version 0.8.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -472,7 +472,7 @@ class Compress
     {
         if(!static::$enable) return;
         $instance = self::getInstance();
-        if ($instance->enableSection && !empty($arFields['PICTURE'])) {
+        if ($instance->enableSection && !empty($arFields['PICTURE']) && is_numeric($arFields['PICTURE'])) {
             $rsSection = \CIBlockSection::GetByID($arFields["ID"]);
             $arSection = $rsSection->GetNext();
             $instance->compressImageByID($arSection['PICTURE']);

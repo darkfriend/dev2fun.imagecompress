@@ -1,143 +1,144 @@
 <?php
-$MESS["MAIN_TAB_RIGHTS"] = "Доступ";
-$MESS["MAIN_TAB_TITLE_RIGHTS"] = "Уровень доступа к модулю";
-$MESS["MAIN_SAVE"] = "Сохранить";
-$MESS["MAIN_OPT_SAVE_TITLE"] = "Сохранить";
-$MESS["D2F_COMPRESS_REFERENCES_OPTIONS_SAVED"] = "Настройки успешно сохранены";
+$MESS["MAIN_TAB_RIGHTS"] = "Р”РѕСЃС‚СѓРї";
+$MESS["MAIN_TAB_TITLE_RIGHTS"] = "РЈСЂРѕРІРµРЅСЊ РґРѕСЃС‚СѓРїР° Рє РјРѕРґСѓР»СЋ";
+$MESS["MAIN_SAVE"] = "РЎРѕС…СЂР°РЅРёС‚СЊ";
+$MESS["MAIN_OPT_SAVE_TITLE"] = "РЎРѕС…СЂР°РЅРёС‚СЊ";
+$MESS["D2F_COMPRESS_REFERENCES_OPTIONS_SAVED"] = "РќР°СЃС‚СЂРѕР№РєРё СѓСЃРїРµС€РЅРѕ СЃРѕС…СЂР°РЅРµРЅС‹";
 
-$MESS["D2F_COMPRESS_REFERENCES_PATH_JPEGOPTI"] = "Путь до jpegoptim";
-$MESS["D2F_COMPRESS_REFERENCES_PATH_PNGOPTI"] = "Путь до optipng";
-$MESS["D2F_COMPRESS_REFERENCES_PATH_TO"] = "Путь до #MODULE#";
-$MESS["D2F_COMPRESS_REFERENCES_ENABLE_OPTIMIZE_TO"] = "Включить оптимизацию #MODULE#";
-$MESS["D2F_COMPRESS_REFERENCES_ENABLE_ELEMENT"] = "Включить сжатие у элементов";
-$MESS["D2F_COMPRESS_REFERENCES_ENABLE_SECTION"] = "Включить сжатие у разделов";
-$MESS["D2F_COMPRESS_REFERENCES_ENABLE_RESIZE"] = "Включить сжатие при ресайзе";
-$MESS["D2F_COMPRESS_REFERENCES_ENABLE_SAVE"] = "Включить сжатие при сохранении";
-$MESS["D2F_COMPRESS_REFERENCES_CNT_STEP"] = "Количество картинок за шаг оптимизации";
-$MESS["D2F_COMPRESS_REFERENCES_CHMOD"] = "Права для файла после оптимизации (в десятеричной системе (777,775,755,644), по умол. 777)";
-$MESS["D2F_COMPRESS_REFERENCES_JPEG_COMPRESS"] = "Качество jpeg-файлов при сжатии";
-$MESS["D2F_COMPRESS_REFERENCES_PNG_COMPRESS"] = "Степень сжатия у png-файлов";
-$MESS["D2F_COMPRESS_REFERENCES_TEST_BTN"] = "Тестировать конфигурацию сервера";
-$MESS["D2F_COMPRESS_REFERENCES_PAGE_EXCLUDED"] = "Страницы исключения";
-$MESS["D2F_COMPRESS_REFERENCES_FILE_EXCLUDED"] = "Исключаемые файлы (картинки)";
+$MESS["D2F_COMPRESS_REFERENCES_PATH_JPEGOPTI"] = "РџСѓС‚СЊ РґРѕ jpegoptim";
+$MESS["D2F_COMPRESS_REFERENCES_PATH_PNGOPTI"] = "РџСѓС‚СЊ РґРѕ optipng";
+$MESS["D2F_COMPRESS_REFERENCES_PATH_TO"] = "РџСѓС‚СЊ РґРѕ #MODULE#";
+$MESS["D2F_COMPRESS_REFERENCES_ENABLE_OPTIMIZE_TO"] = "Р’РєР»СЋС‡РёС‚СЊ РѕРїС‚РёРјРёР·Р°С†РёСЋ #MODULE#";
+$MESS["D2F_COMPRESS_REFERENCES_ENABLE_ELEMENT"] = "Р’РєР»СЋС‡РёС‚СЊ СЃР¶Р°С‚РёРµ Сѓ СЌР»РµРјРµРЅС‚РѕРІ";
+$MESS["D2F_COMPRESS_REFERENCES_ENABLE_SECTION"] = "Р’РєР»СЋС‡РёС‚СЊ СЃР¶Р°С‚РёРµ Сѓ СЂР°Р·РґРµР»РѕРІ";
+$MESS["D2F_COMPRESS_REFERENCES_ENABLE_RESIZE"] = "Р’РєР»СЋС‡РёС‚СЊ СЃР¶Р°С‚РёРµ РїСЂРё СЂРµСЃР°Р№Р·Рµ";
+$MESS["D2F_COMPRESS_REFERENCES_ENABLE_SAVE"] = "Р’РєР»СЋС‡РёС‚СЊ СЃР¶Р°С‚РёРµ РїСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё";
+$MESS["D2F_COMPRESS_REFERENCES_CNT_STEP"] = "РљРѕР»РёС‡РµСЃС‚РІРѕ РєР°СЂС‚РёРЅРѕРє Р·Р° С€Р°Рі РѕРїС‚РёРјРёР·Р°С†РёРё";
+$MESS["D2F_COMPRESS_REFERENCES_CHMOD"] = "РџСЂР°РІР° РґР»СЏ С„Р°Р№Р»Р° РїРѕСЃР»Рµ РѕРїС‚РёРјРёР·Р°С†РёРё (РІ РґРµСЃСЏС‚РµСЂРёС‡РЅРѕР№ СЃРёСЃС‚РµРјРµ (777,775,755,644), РїРѕ СѓРјРѕР». 777)";
+$MESS["D2F_COMPRESS_REFERENCES_JPEG_COMPRESS"] = "РљР°С‡РµСЃС‚РІРѕ jpeg-С„Р°Р№Р»РѕРІ РїСЂРё СЃР¶Р°С‚РёРё";
+$MESS["D2F_COMPRESS_REFERENCES_PNG_COMPRESS"] = "РЎС‚РµРїРµРЅСЊ СЃР¶Р°С‚РёСЏ Сѓ png-С„Р°Р№Р»РѕРІ";
+$MESS["D2F_COMPRESS_REFERENCES_TEST_BTN"] = "РўРµСЃС‚РёСЂРѕРІР°С‚СЊ РєРѕРЅС„РёРіСѓСЂР°С†РёСЋ СЃРµСЂРІРµСЂР°";
+$MESS["D2F_COMPRESS_REFERENCES_PAGE_EXCLUDED"] = "РЎС‚СЂР°РЅРёС†С‹ РёСЃРєР»СЋС‡РµРЅРёСЏ";
+$MESS["D2F_COMPRESS_REFERENCES_FILE_EXCLUDED"] = "РСЃРєР»СЋС‡Р°РµРјС‹Рµ С„Р°Р№Р»С‹ (РєР°СЂС‚РёРЅРєРё)";
 
-$MESS["D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND"] = "Не найден #MODULE#. Установите на сервере #MODULE#";
-$MESS["D2F_IMAGECOMPRESS_ERROR_NOT_FOUND_ALGORITHM"] = "Не известная проблема с алгоритмом для #MODULE#";
-$MESS["D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE"] = "Алгоритм для #MODULE# не выбран!";
-$MESS["D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO"] = "Не указан путь до оптимизации #MODULE#";
+$MESS["D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND"] = "РќРµ РЅР°Р№РґРµРЅ #MODULE#. РЈСЃС‚Р°РЅРѕРІРёС‚Рµ РЅР° СЃРµСЂРІРµСЂРµ #MODULE#";
+$MESS["D2F_IMAGECOMPRESS_ERROR_CHECK_EXEC"] = "РћР±СЏР·Р°С‚РµР»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ EXEC РЅРµ РґРѕСЃС‚СѓРїРЅР°. РџРѕР¶Р°Р»СѓР№СЃС‚Р°, СЂР°Р·СЂРµС€РёС‚Рµ СЌС‚Сѓ С„СѓРЅРєС†РёСЋ.";
+$MESS["D2F_IMAGECOMPRESS_ERROR_NOT_FOUND_ALGORITHM"] = "РќРµ РёР·РІРµСЃС‚РЅР°СЏ РїСЂРѕР±Р»РµРјР° СЃ Р°Р»РіРѕСЂРёС‚РјРѕРј РґР»СЏ #MODULE#";
+$MESS["D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE"] = "РђР»РіРѕСЂРёС‚Рј РґР»СЏ #MODULE# РЅРµ РІС‹Р±СЂР°РЅ!";
+$MESS["D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO"] = "РќРµ СѓРєР°Р·Р°РЅ РїСѓС‚СЊ РґРѕ РѕРїС‚РёРјРёР·Р°С†РёРё #MODULE#";
 
 
-$MESS["D2F_IMAGECOMPRESS_HEADING_TEXT_SETTINGS"] = "Настройки оптимизации для #MODULE#";
-$MESS["D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_SELECT"] = "Алгоритм оптимизации";
-$MESS["D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_SETTING"] = "Настройка для #MODULE#";
-$MESS["D2F_IMAGECOMPRESS_HEADING_TEXT_BASE_SETTINGS"] = "Общие настройки";
+$MESS["D2F_IMAGECOMPRESS_HEADING_TEXT_SETTINGS"] = "РќР°СЃС‚СЂРѕР№РєРё РѕРїС‚РёРјРёР·Р°С†РёРё РґР»СЏ #MODULE#";
+$MESS["D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_SELECT"] = "РђР»РіРѕСЂРёС‚Рј РѕРїС‚РёРјРёР·Р°С†РёРё";
+$MESS["D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_SETTING"] = "РќР°СЃС‚СЂРѕР№РєР° РґР»СЏ #MODULE#";
+$MESS["D2F_IMAGECOMPRESS_HEADING_TEXT_BASE_SETTINGS"] = "РћР±С‰РёРµ РЅР°СЃС‚СЂРѕР№РєРё";
 
-$MESS["D2F_IMAGECOMPRESS_JPEGOPTIM_NOTE_TEXT"] = "Путь до jpegoptim обязательно нужно указывать, если выбран алгоритм jpegoptim для jpeg-картинок.<br>В ином случае оставьте поле пустым.";
-$MESS["D2F_IMAGECOMPRESS_OPTIPNG_NOTE_TEXT"] = "Путь до optipng обязательно нужно указывать, если выбран алгоритм optipng для png-картинок.<br>В ином случае оставьте поле пустым.";
+$MESS["D2F_IMAGECOMPRESS_JPEGOPTIM_NOTE_TEXT"] = "РџСѓС‚СЊ РґРѕ jpegoptim РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РЅСѓР¶РЅРѕ СѓРєР°Р·С‹РІР°С‚СЊ, РµСЃР»Рё РІС‹Р±СЂР°РЅ Р°Р»РіРѕСЂРёС‚Рј jpegoptim РґР»СЏ jpeg-РєР°СЂС‚РёРЅРѕРє.<br>Р’ РёРЅРѕРј СЃР»СѓС‡Р°Рµ РѕСЃС‚Р°РІСЊС‚Рµ РїРѕР»Рµ РїСѓСЃС‚С‹Рј.";
+$MESS["D2F_IMAGECOMPRESS_OPTIPNG_NOTE_TEXT"] = "РџСѓС‚СЊ РґРѕ optipng РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РЅСѓР¶РЅРѕ СѓРєР°Р·С‹РІР°С‚СЊ, РµСЃР»Рё РІС‹Р±СЂР°РЅ Р°Р»РіРѕСЂРёС‚Рј optipng РґР»СЏ png-РєР°СЂС‚РёРЅРѕРє.<br>Р’ РёРЅРѕРј СЃР»СѓС‡Р°Рµ РѕСЃС‚Р°РІСЊС‚Рµ РїРѕР»Рµ РїСѓСЃС‚С‹Рј.";
 
 // webp settings
-$MESS["D2F_COMPRESS_REFERENCES_WEBP_QUALITY"] = "Качество картинки (%)";
-$MESS["D2F_COMPRESS_REFERENCES_WEBP_COMPRESS"] = "Степень сжатия (рекомендуется 4)";
-$MESS["D2F_COMPRESS_REFERENCES_WEBP_MULTITHREADING"] = "Многотопочность";
+$MESS["D2F_COMPRESS_REFERENCES_WEBP_QUALITY"] = "РљР°С‡РµСЃС‚РІРѕ РєР°СЂС‚РёРЅРєРё (%)";
+$MESS["D2F_COMPRESS_REFERENCES_WEBP_COMPRESS"] = "РЎС‚РµРїРµРЅСЊ СЃР¶Р°С‚РёСЏ (СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ 4)";
+$MESS["D2F_COMPRESS_REFERENCES_WEBP_MULTITHREADING"] = "РњРЅРѕРіРѕС‚РѕРїРѕС‡РЅРѕСЃС‚СЊ";
 
 // gif settings
-$MESS["D2F_COMPRESS_REFERENCES_GIF_COMPRESS"] = "Оптимизация gif";
+$MESS["D2F_COMPRESS_REFERENCES_GIF_COMPRESS"] = "РћРїС‚РёРјРёР·Р°С†РёСЏ gif";
 
 // pdf settings
-$MESS["D2F_COMPRESS_REFERENCES_PDF_SETTING_HEADING"] = "Вид оптимизации pdf";
+$MESS["D2F_COMPRESS_REFERENCES_PDF_SETTING_HEADING"] = "Р’РёРґ РѕРїС‚РёРјРёР·Р°С†РёРё pdf";
 
 
-$MESS["D2F_COMPRESS_OPTIONS_TESTED"] = "Конфигурация сервера успешно протестировна";
-$MESS["D2F_COMPRESS_OPTIONS_NO_TESTED"] = "Конфигурация сервера не соответствует!";
-$MESS["D2F_IMAGECOMPRESS_COMPRESS_IMAGE_PROGRESSBAR"] = "Процесс оптимизации картинок";
-$MESS["D2F_COMPRESS_REFERENCES_JPEG_PROGRESSIVE"] = "Включить progressive jpeg";
+$MESS["D2F_COMPRESS_OPTIONS_TESTED"] = "РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ СЃРµСЂРІРµСЂР° СѓСЃРїРµС€РЅРѕ РїСЂРѕС‚РµСЃС‚РёСЂРѕРІРЅР°";
+$MESS["D2F_COMPRESS_OPTIONS_NO_TESTED"] = "РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ СЃРµСЂРІРµСЂР° РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚!";
+$MESS["D2F_IMAGECOMPRESS_COMPRESS_IMAGE_PROGRESSBAR"] = "РџСЂРѕС†РµСЃСЃ РѕРїС‚РёРјРёР·Р°С†РёРё РєР°СЂС‚РёРЅРѕРє";
+$MESS["D2F_COMPRESS_REFERENCES_JPEG_PROGRESSIVE"] = "Р’РєР»СЋС‡РёС‚СЊ progressive jpeg";
 
-$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT"] = "Модули для которых работает оптимизация";
-$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT_MODULE"] = "Модуль \"#MODULE#\"";
-$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT_MODULE_OTHER"] = "Другие модули";
+$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT"] = "РњРѕРґСѓР»Рё РґР»СЏ РєРѕС‚РѕСЂС‹С… СЂР°Р±РѕС‚Р°РµС‚ РѕРїС‚РёРјРёР·Р°С†РёСЏ";
+$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT_MODULE"] = "РњРѕРґСѓР»СЊ \"#MODULE#\"";
+$MESS["D2F_IMAGECOMPRESS_LABEL_MODULES_SELECT_MODULE_OTHER"] = "Р”СЂСѓРіРёРµ РјРѕРґСѓР»Рё";
 
 
-$MESS['LABEL_TITLE_HELP_BEGIN'] = 'Вы используете бесплатный модуль разработанный командой <a href="//dev2fun.com" class="c-badge c-badge--rounded c-badge--ghost c-badge--brand" target="_blank">Dev2Fun</a>';
+$MESS['LABEL_TITLE_HELP_BEGIN'] = 'Р’С‹ РёСЃРїРѕР»СЊР·СѓРµС‚Рµ Р±РµСЃРїР»Р°С‚РЅС‹Р№ РјРѕРґСѓР»СЊ СЂР°Р·СЂР°Р±РѕС‚Р°РЅРЅС‹Р№ РєРѕРјР°РЅРґРѕР№ <a href="//dev2fun.com" class="c-badge c-badge--rounded c-badge--ghost c-badge--brand" target="_blank">Dev2Fun</a>';
 $MESS['LABEL_TITLE_HELP_BEGIN_TEXT'] = <<<EOT
-	<p class="c-paragraph">На этой странице вы можете:</p>
+	<p class="c-paragraph">РќР° СЌС‚РѕР№ СЃС‚СЂР°РЅРёС†Рµ РІС‹ РјРѕР¶РµС‚Рµ:</p>
 	<ul class="c-list">
-		<li class="c-list__item">поддержать выпуск обновлений модуля</li>
-		<li class="c-list__item">поддержать выпуск новых <b>бесплатных</b> модулей</li>
-		<li class="c-list__item">поддержать команду <b>Dev2fun</b></li>
+		<li class="c-list__item">РїРѕРґРґРµСЂР¶Р°С‚СЊ РІС‹РїСѓСЃРє РѕР±РЅРѕРІР»РµРЅРёР№ РјРѕРґСѓР»СЏ</li>
+		<li class="c-list__item">РїРѕРґРґРµСЂР¶Р°С‚СЊ РІС‹РїСѓСЃРє РЅРѕРІС‹С… <b>Р±РµСЃРїР»Р°С‚РЅС‹С…</b> РјРѕРґСѓР»РµР№</li>
+		<li class="c-list__item">РїРѕРґРґРµСЂР¶Р°С‚СЊ РєРѕРјР°РЅРґСѓ <b>Dev2fun</b></li>
 	</ul>
-	<p class="c-paragraph"><b>Ваша поддержка нам крайне важна. Спасибо вам!</b></p>
+	<p class="c-paragraph"><b>Р’Р°С€Р° РїРѕРґРґРµСЂР¶РєР° РЅР°Рј РєСЂР°Р№РЅРµ РІР°Р¶РЅР°. РЎРїР°СЃРёР±Рѕ РІР°Рј!</b></p>
 EOT;
-$MESS['LABEL_TITLE_HELP_DONATE_TEXT'] = 'Поддержать разработчиков';
-$MESS['LABEL_TITLE_HELP_DONATE_ALL_TEXT'] = 'Все способы поддержки';
-$MESS['LABEL_TITLE_HELP_DONATE_OTHER_TEXT'] = 'Другие способы поддержки';
+$MESS['LABEL_TITLE_HELP_DONATE_TEXT'] = 'РџРѕРґРґРµСЂР¶Р°С‚СЊ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєРѕРІ';
+$MESS['LABEL_TITLE_HELP_DONATE_ALL_TEXT'] = 'Р’СЃРµ СЃРїРѕСЃРѕР±С‹ РїРѕРґРґРµСЂР¶РєРё';
+$MESS['LABEL_TITLE_HELP_DONATE_OTHER_TEXT'] = 'Р”СЂСѓРіРёРµ СЃРїРѕСЃРѕР±С‹ РїРѕРґРґРµСЂР¶РєРё';
 $MESS['LABEL_TITLE_HELP_DONATE_OTHER_TEXT_S'] = <<<EOT
-	<p class="c-paragraph"><b>Хорошие отзывы</b> - нас также мотивируют ваши хорошие отзывы. Спасибо за них!</p>
-	<p class="c-paragraph"><b>Ваши идеи и предложения</b> - нам всегда интересны любые идеи по улучшнию модуля. Не стесняйтесь ими делиться!</p>
-	<p class="c-paragraph">Мы стараемся радовать вас удобными и полезными решениями. Приятной работы!</p>
+	<p class="c-paragraph"><b>РҐРѕСЂРѕС€РёРµ РѕС‚Р·С‹РІС‹</b> - РЅР°СЃ С‚Р°РєР¶Рµ РјРѕС‚РёРІРёСЂСѓСЋС‚ РІР°С€Рё С…РѕСЂРѕС€РёРµ РѕС‚Р·С‹РІС‹. РЎРїР°СЃРёР±Рѕ Р·Р° РЅРёС…!</p>
+	<p class="c-paragraph"><b>Р’Р°С€Рё РёРґРµРё Рё РїСЂРµРґР»РѕР¶РµРЅРёСЏ</b> - РЅР°Рј РІСЃРµРіРґР° РёРЅС‚РµСЂРµСЃРЅС‹ Р»СЋР±С‹Рµ РёРґРµРё РїРѕ СѓР»СѓС‡С€РЅРёСЋ РјРѕРґСѓР»СЏ. РќРµ СЃС‚РµСЃРЅСЏР№С‚РµСЃСЊ РёРјРё РґРµР»РёС‚СЊСЃСЏ!</p>
+	<p class="c-paragraph">РњС‹ СЃС‚Р°СЂР°РµРјСЃСЏ СЂР°РґРѕРІР°С‚СЊ РІР°СЃ СѓРґРѕР±РЅС‹РјРё Рё РїРѕР»РµР·РЅС‹РјРё СЂРµС€РµРЅРёСЏРјРё. РџСЂРёСЏС‚РЅРѕР№ СЂР°Р±РѕС‚С‹!</p>
 EOT;
-$MESS['LABEL_TITLE_HELP_DONATE_FOLLOW'] = 'Следите за новостями';
-$MESS['SEC_DONATE_TAB'] = 'Поблагодарить';
-$MESS['SEC_DONATE_TAB_TITLE'] = 'Поблагодарить за модуль';
+$MESS['LABEL_TITLE_HELP_DONATE_FOLLOW'] = 'РЎР»РµРґРёС‚Рµ Р·Р° РЅРѕРІРѕСЃС‚СЏРјРё';
+$MESS['SEC_DONATE_TAB'] = 'РџРѕР±Р»Р°РіРѕРґР°СЂРёС‚СЊ';
+$MESS['SEC_DONATE_TAB_TITLE'] = 'РџРѕР±Р»Р°РіРѕРґР°СЂРёС‚СЊ Р·Р° РјРѕРґСѓР»СЊ';
 
 
-$MESS['LABEL_SETTING_OG_BX_RESIZE_IMAGE_EXACT'] = "масштабирует в прямоугольник указаной шириной и высотой c сохранением пропорций, обрезая лишнее";
-$MESS['LABEL_SETTING_OG_BX_RESIZE_IMAGE_PROPORTIONAL'] = "масштабирует с сохранением пропорций, размер ограничивается указаной шириной и высотой";
-$MESS['LABEL_SETTING_OG_BX_RESIZE_IMAGE_PROPORTIONAL_ALT'] = "масштабирует с сохранением пропорций за ширину при этом принимается максимальное значение из высоты/ширины, размер ограничивается указаной шириной и высотой, улучшенная обработка вертикальных картинок";
+$MESS['LABEL_SETTING_OG_BX_RESIZE_IMAGE_EXACT'] = "РјР°СЃС€С‚Р°Р±РёСЂСѓРµС‚ РІ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє СѓРєР°Р·Р°РЅРѕР№ С€РёСЂРёРЅРѕР№ Рё РІС‹СЃРѕС‚РѕР№ c СЃРѕС…СЂР°РЅРµРЅРёРµРј РїСЂРѕРїРѕСЂС†РёР№, РѕР±СЂРµР·Р°СЏ Р»РёС€РЅРµРµ";
+$MESS['LABEL_SETTING_OG_BX_RESIZE_IMAGE_PROPORTIONAL'] = "РјР°СЃС€С‚Р°Р±РёСЂСѓРµС‚ СЃ СЃРѕС…СЂР°РЅРµРЅРёРµРј РїСЂРѕРїРѕСЂС†РёР№, СЂР°Р·РјРµСЂ РѕРіСЂР°РЅРёС‡РёРІР°РµС‚СЃСЏ СѓРєР°Р·Р°РЅРѕР№ С€РёСЂРёРЅРѕР№ Рё РІС‹СЃРѕС‚РѕР№";
+$MESS['LABEL_SETTING_OG_BX_RESIZE_IMAGE_PROPORTIONAL_ALT'] = "РјР°СЃС€С‚Р°Р±РёСЂСѓРµС‚ СЃ СЃРѕС…СЂР°РЅРµРЅРёРµРј РїСЂРѕРїРѕСЂС†РёР№ Р·Р° С€РёСЂРёРЅСѓ РїСЂРё СЌС‚РѕРј РїСЂРёРЅРёРјР°РµС‚СЃСЏ РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ РёР· РІС‹СЃРѕС‚С‹/С€РёСЂРёРЅС‹, СЂР°Р·РјРµСЂ РѕРіСЂР°РЅРёС‡РёРІР°РµС‚СЃСЏ СѓРєР°Р·Р°РЅРѕР№ С€РёСЂРёРЅРѕР№ Рё РІС‹СЃРѕС‚РѕР№, СѓР»СѓС‡С€РµРЅРЅР°СЏ РѕР±СЂР°Р±РѕС‚РєР° РІРµСЂС‚РёРєР°Р»СЊРЅС‹С… РєР°СЂС‚РёРЅРѕРє";
 
 
-$MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_HEADING'] = "Авторесайз картинок перед оптимизацией";
-$MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_ENABLE'] = "Включить авторесайз";
-$MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_WIDTH'] = "Максимальная ширина";
-$MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_HEIGHT'] = "Максимальная высота";
-$MESS['D2F_IMAGECOMPRESS_OPTIONS_RESIZE_IMAGE_ALGORITHM_SELECT'] = "Алгоритм ресайза";
+$MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_HEADING'] = "РђРІС‚РѕСЂРµСЃР°Р№Р· РєР°СЂС‚РёРЅРѕРє РїРµСЂРµРґ РѕРїС‚РёРјРёР·Р°С†РёРµР№";
+$MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_ENABLE'] = "Р’РєР»СЋС‡РёС‚СЊ Р°РІС‚РѕСЂРµСЃР°Р№Р·";
+$MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_WIDTH'] = "РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ С€РёСЂРёРЅР°";
+$MESS['D2F_COMPRESS_OPTIONS_RESIZE_IMAGE_HEIGHT'] = "РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РІС‹СЃРѕС‚Р°";
+$MESS['D2F_IMAGECOMPRESS_OPTIONS_RESIZE_IMAGE_ALGORITHM_SELECT'] = "РђР»РіРѕСЂРёС‚Рј СЂРµСЃР°Р№Р·Р°";
 
 
-$MESS['MAIN_TAB_SET_OPTI'] = "Оптимизация";
-$MESS['MAIN_TAB_CONVERT'] = "Конвертация";
-$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_BASE_CONVERT'] = "Настройки конвертации webp/avif";
-$MESS['D2F_COMPRESS_REFERENCES_ENABLE_CONVERT'] = "Активность конвертации";
-$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_MODE_CONVERT'] = "Режим конвертации";
-$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_POST_CONVERT_ATTR'] = "Список поддерживаемых атрибутов (для postConvert)";
-$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_CONVERT'] = "Алгоритм конвертации";
-$MESS['D2F_COMPRESS_REFERENCES_WEBP_QUALITY'] = "Качество конечной картинки";
-$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_POST_CONVERT_CACHE_TIME'] = "Время жизни кэща";
+$MESS['MAIN_TAB_SET_OPTI'] = "РћРїС‚РёРјРёР·Р°С†РёСЏ";
+$MESS['MAIN_TAB_CONVERT'] = "РљРѕРЅРІРµСЂС‚Р°С†РёСЏ";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_BASE_CONVERT'] = "РќР°СЃС‚СЂРѕР№РєРё РєРѕРЅРІРµСЂС‚Р°С†РёРё webp/avif";
+$MESS['D2F_COMPRESS_REFERENCES_ENABLE_CONVERT'] = "РђРєС‚РёРІРЅРѕСЃС‚СЊ РєРѕРЅРІРµСЂС‚Р°С†РёРё";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_MODE_CONVERT'] = "Р РµР¶РёРј РєРѕРЅРІРµСЂС‚Р°С†РёРё";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_POST_CONVERT_ATTR'] = "РЎРїРёСЃРѕРє РїРѕРґРґРµСЂР¶РёРІР°РµРјС‹С… Р°С‚СЂРёР±СѓС‚РѕРІ (РґР»СЏ postConvert)";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_CONVERT'] = "РђР»РіРѕСЂРёС‚Рј РєРѕРЅРІРµСЂС‚Р°С†РёРё";
+$MESS['D2F_COMPRESS_REFERENCES_WEBP_QUALITY'] = "РљР°С‡РµСЃС‚РІРѕ РєРѕРЅРµС‡РЅРѕР№ РєР°СЂС‚РёРЅРєРё";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_POST_CONVERT_CACHE_TIME'] = "Р’СЂРµРјСЏ Р¶РёР·РЅРё РєСЌС‰Р°";
 
-$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_CWEBP'] = "Настройки для алгоритма cwebp";
-$MESS['D2F_COMPRESS_REFERENCES_PATH_CWEBP'] = "Путь до cwebp";
-$MESS['D2F_COMPRESS_REFERENCES_CWEBP_COMPRESS'] = "Степень оптимизации cwebp (рекомендуется 4)";
-$MESS['D2F_COMPRESS_REFERENCES_CWEBP_MULTITHREADING'] = "Активность мультипоточности при конвертации (рекомендуется)";
+$MESS['D2F_IMAGECOMPRESS_HEADING_TEXT_CWEBP'] = "РќР°СЃС‚СЂРѕР№РєРё РґР»СЏ Р°Р»РіРѕСЂРёС‚РјР° cwebp";
+$MESS['D2F_COMPRESS_REFERENCES_PATH_CWEBP'] = "РџСѓС‚СЊ РґРѕ cwebp";
+$MESS['D2F_COMPRESS_REFERENCES_CWEBP_COMPRESS'] = "РЎС‚РµРїРµРЅСЊ РѕРїС‚РёРјРёР·Р°С†РёРё cwebp (СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ 4)";
+$MESS['D2F_COMPRESS_REFERENCES_CWEBP_MULTITHREADING'] = "РђРєС‚РёРІРЅРѕСЃС‚СЊ РјСѓР»СЊС‚РёРїРѕС‚РѕС‡РЅРѕСЃС‚Рё РїСЂРё РєРѕРЅРІРµСЂС‚Р°С†РёРё (СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ)";
 
 $MESS['D2F_COMPRESS_PAGE_EXCLUDED_TEXT'] = <<<EO
-	<i>Вы можете указывать как точный путь, так и регулярное выражение.</i>
+	<i>Р’С‹ РјРѕР¶РµС‚Рµ СѓРєР°Р·С‹РІР°С‚СЊ РєР°Рє С‚РѕС‡РЅС‹Р№ РїСѓС‚СЊ, С‚Р°Рє Рё СЂРµРіСѓР»СЏСЂРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ.</i>
 	<ul>
 		<li>
-			Пример точного пути: <code>catalog/</code><br>
-			В этом случае модуль не конвертирует на странице <code>catalog/index.php</code>
+			РџСЂРёРјРµСЂ С‚РѕС‡РЅРѕРіРѕ РїСѓС‚Рё: <code>catalog/</code><br>
+			Р’ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РјРѕРґСѓР»СЊ РЅРµ РєРѕРЅРІРµСЂС‚РёСЂСѓРµС‚ РЅР° СЃС‚СЂР°РЅРёС†Рµ <code>catalog/index.php</code>
 		</li>
 		<li>
-			Пример регулярного выражения: <code>#(\/catalog\/.*)#i</code><br>
-			В этом случае модуль не конвертирует на странице и всех подстраницах раздела /catalog.
+			РџСЂРёРјРµСЂ СЂРµРіСѓР»СЏСЂРЅРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ: <code>#(\/catalog\/.*)#i</code><br>
+			Р’ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РјРѕРґСѓР»СЊ РЅРµ РєРѕРЅРІРµСЂС‚РёСЂСѓРµС‚ РЅР° СЃС‚СЂР°РЅРёС†Рµ Рё РІСЃРµС… РїРѕРґСЃС‚СЂР°РЅРёС†Р°С… СЂР°Р·РґРµР»Р° /catalog.
 		</li>
 	</ul>
 EO;
 $MESS['D2F_COMPRESS_FILE_EXCLUDED_TEXT'] = <<<EO
-	<i>Вы можете указывать как точный путь, так и регулярное выражение.</i>
+	<i>Р’С‹ РјРѕР¶РµС‚Рµ СѓРєР°Р·С‹РІР°С‚СЊ РєР°Рє С‚РѕС‡РЅС‹Р№ РїСѓС‚СЊ, С‚Р°Рє Рё СЂРµРіСѓР»СЏСЂРЅРѕРµ РІС‹СЂР°Р¶РµРЅРёРµ.</i>
 	<ul>
 		<li>
-			Пример точного пути: <code>catalog/image.jpeg</code><br>
-			В этом случае модуль не конвертирует картинку <code>/catalog/image.jpeg</code>
+			РџСЂРёРјРµСЂ С‚РѕС‡РЅРѕРіРѕ РїСѓС‚Рё: <code>catalog/image.jpeg</code><br>
+			Р’ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РјРѕРґСѓР»СЊ РЅРµ РєРѕРЅРІРµСЂС‚РёСЂСѓРµС‚ РєР°СЂС‚РёРЅРєСѓ <code>/catalog/image.jpeg</code>
 		</li>
 		<li>
-			Пример регулярного выражения: <code>#(\/catalog\/.*)#i</code><br>
-			В этом случае модуль не конвертирует все картинки которые в папке /catalog.
+			РџСЂРёРјРµСЂ СЂРµРіСѓР»СЏСЂРЅРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ: <code>#(\/catalog\/.*)#i</code><br>
+			Р’ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РјРѕРґСѓР»СЊ РЅРµ РєРѕРЅРІРµСЂС‚РёСЂСѓРµС‚ РІСЃРµ РєР°СЂС‚РёРЅРєРё РєРѕС‚РѕСЂС‹Рµ РІ РїР°РїРєРµ /catalog.
 		</li>
 	</ul>
 EO;
-$MESS['D2F_COMPRESS_ENABLE_ORIGINAL_PICTURES_MODE'] = 'Включить режим исходных SRC';
+$MESS['D2F_COMPRESS_ENABLE_ORIGINAL_PICTURES_MODE'] = 'Р’РєР»СЋС‡РёС‚СЊ СЂРµР¶РёРј РёСЃС…РѕРґРЅС‹С… SRC';
 $MESS['D2F_COMPRESS_ORIGINAL_PICTURES_MODE_TEXT'] = <<<EO
 	<p>
-	При включении режима исходных SRC, происходит сбор путей картинок до их конвертации.<br>
-	Чтоб получить исходные пути используйте код ниже:
+	РџСЂРё РІРєР»СЋС‡РµРЅРёРё СЂРµР¶РёРјР° РёСЃС…РѕРґРЅС‹С… SRC, РїСЂРѕРёСЃС…РѕРґРёС‚ СЃР±РѕСЂ РїСѓС‚РµР№ РєР°СЂС‚РёРЅРѕРє РґРѕ РёС… РєРѕРЅРІРµСЂС‚Р°С†РёРё.<br>
+	Р§С‚РѕР± РїРѕР»СѓС‡РёС‚СЊ РёСЃС…РѕРґРЅС‹Рµ РїСѓС‚Рё РёСЃРїРѕР»СЊР·СѓР№С‚Рµ РєРѕРґ РЅРёР¶Рµ:
 	</p>
 	<code lang="php">
         \Bitrix\Main\Loader::includeModule('dev2fun.imagecompress');<br>
@@ -148,38 +149,38 @@ EO;
 
 $MESS['D2F_IMAGECOMPRESS_MODE_CONVERT_TEXT'] = <<<EO
     <p>
-        Режимы конвертаций:
+        Р РµР¶РёРјС‹ РєРѕРЅРІРµСЂС‚Р°С†РёР№:
     </p>
     <ul>
         <li>
-            <b>hitConvert</b> - Конвертация на хитах. При обращении к картинке. Может работать совместно с режимом <b>postConvert</b>. Создает нагрузку при первом обращении к картинке.
+            <b>hitConvert</b> - РљРѕРЅРІРµСЂС‚Р°С†РёСЏ РЅР° С…РёС‚Р°С…. РџСЂРё РѕР±СЂР°С‰РµРЅРёРё Рє РєР°СЂС‚РёРЅРєРµ. РњРѕР¶РµС‚ СЂР°Р±РѕС‚Р°С‚СЊ СЃРѕРІРјРµСЃС‚РЅРѕ СЃ СЂРµР¶РёРјРѕРј <b>postConvert</b>. РЎРѕР·РґР°РµС‚ РЅР°РіСЂСѓР·РєСѓ РїСЂРё РїРµСЂРІРѕРј РѕР±СЂР°С‰РµРЅРёРё Рє РєР°СЂС‚РёРЅРєРµ.
         </li>
         <li>
-            <b>postConvert</b> - Конвертация в самом конце формирования страницы. Конвертирует все подходящие под условия картинки. Может работать совместно с режимом <b>hitConvert</b>. Создает нагрузку при первом обращении к странице.
+            <b>postConvert</b> - РљРѕРЅРІРµСЂС‚Р°С†РёСЏ РІ СЃР°РјРѕРј РєРѕРЅС†Рµ С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ СЃС‚СЂР°РЅРёС†С‹. РљРѕРЅРІРµСЂС‚РёСЂСѓРµС‚ РІСЃРµ РїРѕРґС…РѕРґСЏС‰РёРµ РїРѕРґ СѓСЃР»РѕРІРёСЏ РєР°СЂС‚РёРЅРєРё. РњРѕР¶РµС‚ СЂР°Р±РѕС‚Р°С‚СЊ СЃРѕРІРјРµСЃС‚РЅРѕ СЃ СЂРµР¶РёРјРѕРј <b>hitConvert</b>. РЎРѕР·РґР°РµС‚ РЅР°РіСЂСѓР·РєСѓ РїСЂРё РїРµСЂРІРѕРј РѕР±СЂР°С‰РµРЅРёРё Рє СЃС‚СЂР°РЅРёС†Рµ.
         </li>
         <li>
-            <b>lazyConvert</b> - Отложенная конвертация картинок. В фоне конвертирует все найденные картинки по посещаемым страницам. <b>Работает отдельно от всех режимов. Не создает нагрузку при заходе на страницу.</b>
+            <b>lazyConvert</b> - РћС‚Р»РѕР¶РµРЅРЅР°СЏ РєРѕРЅРІРµСЂС‚Р°С†РёСЏ РєР°СЂС‚РёРЅРѕРє. Р’ С„РѕРЅРµ РєРѕРЅРІРµСЂС‚РёСЂСѓРµС‚ РІСЃРµ РЅР°Р№РґРµРЅРЅС‹Рµ РєР°СЂС‚РёРЅРєРё РїРѕ РїРѕСЃРµС‰Р°РµРјС‹Рј СЃС‚СЂР°РЅРёС†Р°Рј. <b>Р Р°Р±РѕС‚Р°РµС‚ РѕС‚РґРµР»СЊРЅРѕ РѕС‚ РІСЃРµС… СЂРµР¶РёРјРѕРІ. РќРµ СЃРѕР·РґР°РµС‚ РЅР°РіСЂСѓР·РєСѓ РїСЂРё Р·Р°С…РѕРґРµ РЅР° СЃС‚СЂР°РЅРёС†Сѓ.</b>
         </li>
     </ul>
 EO;
 
-$MESS['LABEL_ADD'] = "Добавить";
+$MESS['LABEL_ADD'] = "Р”РѕР±Р°РІРёС‚СЊ";
 
 
-$MESS['D2F_COMPRESS_GLOBAL_SETTINGS'] = "Общие настройки";
+$MESS['D2F_COMPRESS_GLOBAL_SETTINGS'] = "РћР±С‰РёРµ РЅР°СЃС‚СЂРѕР№РєРё";
 $MESS['D2F_COMPRESS_CRONTAB_TEXT'] = <<<TEXT
-    <b>Сейчас у вас агенты работают на хитах! Крайне рекомендуется перевести агенты на крон!</b><br>
-    Рекомендуется использовать "Обобщённое решение" - <a href="https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=2943" target="_blank">подробнее</a>
+    <b>РЎРµР№С‡Р°СЃ Сѓ РІР°СЃ Р°РіРµРЅС‚С‹ СЂР°Р±РѕС‚Р°СЋС‚ РЅР° С…РёС‚Р°С…! РљСЂР°Р№РЅРµ СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ РїРµСЂРµРІРµСЃС‚Рё Р°РіРµРЅС‚С‹ РЅР° РєСЂРѕРЅ!</b><br>
+    Р РµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ "РћР±РѕР±С‰С‘РЅРЅРѕРµ СЂРµС€РµРЅРёРµ" - <a href="https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=2943" target="_blank">РїРѕРґСЂРѕР±РЅРµРµ</a>
 TEXT;
-$MESS['D2F_COMPRESS_LAZY_HEADING_SETTINGS'] = "Настройки Lazy Convert";
-$MESS['D2F_COMPRESS_LAZY_PER_PAGE'] = "Количество картинок за шаг конвертации";
-$MESS['D2F_COMPRESS_LAZY_CACHE_TIME_FIND'] = "Время кэширования на поиск картинок на страницах";
-$MESS['D2F_COMPRESS_LAZY_CACHE_TIME_GET_IMAGES'] = "Время кэширования на подмен картинок на webp-версии";
-$MESS['D2F_COMPRESS_LAZY_USER_GROUPS'] = "В ключе кэширования учитывать группы пользователей";
+$MESS['D2F_COMPRESS_LAZY_HEADING_SETTINGS'] = "РќР°СЃС‚СЂРѕР№РєРё Lazy Convert";
+$MESS['D2F_COMPRESS_LAZY_PER_PAGE'] = "РљРѕР»РёС‡РµСЃС‚РІРѕ РєР°СЂС‚РёРЅРѕРє Р·Р° С€Р°Рі РєРѕРЅРІРµСЂС‚Р°С†РёРё";
+$MESS['D2F_COMPRESS_LAZY_CACHE_TIME_FIND'] = "Р’СЂРµРјСЏ РєСЌС€РёСЂРѕРІР°РЅРёСЏ РЅР° РїРѕРёСЃРє РєР°СЂС‚РёРЅРѕРє РЅР° СЃС‚СЂР°РЅРёС†Р°С…";
+$MESS['D2F_COMPRESS_LAZY_CACHE_TIME_GET_IMAGES'] = "Р’СЂРµРјСЏ РєСЌС€РёСЂРѕРІР°РЅРёСЏ РЅР° РїРѕРґРјРµРЅ РєР°СЂС‚РёРЅРѕРє РЅР° webp-РІРµСЂСЃРёРё";
+$MESS['D2F_COMPRESS_LAZY_USER_GROUPS'] = "Р’ РєР»СЋС‡Рµ РєСЌС€РёСЂРѕРІР°РЅРёСЏ СѓС‡РёС‚С‹РІР°С‚СЊ РіСЂСѓРїРїС‹ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№";
 $MESS['D2F_COMPRESS_CONVERT_CACHE_INCLUDE_USER_GROUPS_TEXT'] = <<<TEXT
-    Если у вас нет различий в картинках для разных групп пользователей, то рекомендуется снять галку.<br>
-    Так вы <u>значительно</u> снизите количество кэша и нагрузку на сервер.
+    Р•СЃР»Рё Сѓ РІР°СЃ РЅРµС‚ СЂР°Р·Р»РёС‡РёР№ РІ РєР°СЂС‚РёРЅРєР°С… РґР»СЏ СЂР°Р·РЅС‹С… РіСЂСѓРїРї РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№, С‚Рѕ СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ СЃРЅСЏС‚СЊ РіР°Р»РєСѓ.<br>
+    РўР°Рє РІС‹ <u>Р·РЅР°С‡РёС‚РµР»СЊРЅРѕ</u> СЃРЅРёР·РёС‚Рµ РєРѕР»РёС‡РµСЃС‚РІРѕ РєСЌС€Р° Рё РЅР°РіСЂСѓР·РєСѓ РЅР° СЃРµСЂРІРµСЂ.
 TEXT;
 
-$MESS['D2F_COMPRESS_SITE_SETTINGS'] = "Настройки для сайта";
-$MESS['D2F_COMPRESS_SITE_HEADING_TITLE'] = "Развернуть/Свернуть";
+$MESS['D2F_COMPRESS_SITE_SETTINGS'] = "РќР°СЃС‚СЂРѕР№РєРё РґР»СЏ СЃР°Р№С‚Р°";
+$MESS['D2F_COMPRESS_SITE_HEADING_TITLE'] = "Р Р°Р·РІРµСЂРЅСѓС‚СЊ/РЎРІРµСЂРЅСѓС‚СЊ";

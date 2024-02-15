@@ -22,6 +22,7 @@ $MESS["D2F_COMPRESS_REFERENCES_PAGE_EXCLUDED"] = "Страницы исключ�
 $MESS["D2F_COMPRESS_REFERENCES_FILE_EXCLUDED"] = "Исключаемые файлы (картинки)";
 
 $MESS["D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND"] = "Не найден #MODULE#. Установите на сервере #MODULE#";
+$MESS["D2F_IMAGECOMPRESS_ERROR_CHECK_EXEC"] = "Обязательная функция EXEC не доступна. Пожалуйста, разрешите эту функцию.";
 $MESS["D2F_IMAGECOMPRESS_ERROR_NOT_FOUND_ALGORITHM"] = "Не известная проблема с алгоритмом для #MODULE#";
 $MESS["D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE"] = "Алгоритм для #MODULE# не выбран!";
 $MESS["D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO"] = "Не указан путь до оптимизации #MODULE#";
