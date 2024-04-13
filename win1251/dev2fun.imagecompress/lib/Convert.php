@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.4
+ * @version 0.8.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -773,7 +773,7 @@ class Convert
 
                         if (empty($currentFiles[$md5])) {
                             $rows[] = [
-                                'SITE_ID' => \Dev2funImageCompress::getSiteId(),
+//                                'SITE_ID' => \Dev2funImageCompress::getSiteId(),
                                 'IMAGE_PATH' => $file,
                                 'IMAGE_HASH' => $md5,
                                 'DATE_CREATE' => new SqlExpression("NOW()"),

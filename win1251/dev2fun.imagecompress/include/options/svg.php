@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.5.0
+ * @version 0.8.5
  */
 
 /**
@@ -36,6 +36,7 @@ use \Bitrix\Main\Config\Option;
         />
     </td>
 </tr>
+
 <tr>
     <td width="40%">
         <label><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_ALGORITHM_SELECT') ?>:</label>
@@ -52,6 +53,22 @@ use \Bitrix\Main\Config\Option;
         </select>
     </td>
 </tr>
+
+<tr>
+    <td width="40%">
+        <label for="path_to_node">
+            <?= Loc::getMessage("D2F_COMPRESS_REFERENCES_PATH_TO",['#MODULE#'=>'node']) ?>:
+        </label>
+    </td>
+    <td width="60%">
+        <input type="text"
+               size="50"
+               name="common_options[path_to_node]"
+               value="<?= Option::get($curModuleName, "path_to_node", '/usr/bin'); ?>"
+        /> /node
+    </td>
+</tr>
+
 <tr>
     <td width="40%">
         <label for="path_to_<?=$optType?>">

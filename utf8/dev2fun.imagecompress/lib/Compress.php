@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.4
+ * @version 0.8.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -412,7 +412,9 @@ class Compress
         if ($res) {
             \chmod($destinationFile, 0777);
             \copy($destinationFile, $strFilePath);
-            $this->saveWidthHeight($fileId, $strFilePath);
+            if ($fileId) {
+                $this->saveWidthHeight($fileId, $strFilePath);
+            }
             \unlink($destinationFile);
         }
         return $res;
@@ -547,6 +549,7 @@ class Compress
 
     /**
      * Сжатие картинок на событии в сохранения в таблице
+     * CFile::SaveFile()
      */
     public static function CompressImageOnFileEvent(&$arFile, $strFileName, $strSavePath, $bForceMD5, $bSkipExt)
     {
@@ -566,6 +569,9 @@ class Compress
         if(!Check::isActiveByMimeType($arFile["type"])) {
             return null;
         }
+
+        // resize
+        $instance->resize(0, $arFile["tmp_name"]);
 
         switch ($arFile["type"]) {
             case 'image/jpeg':

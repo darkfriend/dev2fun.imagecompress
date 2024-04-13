@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.4
+ * @version 0.8.5
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -239,7 +239,17 @@ if ($request->isPost() && check_bitrix_sessid()) {
                     if(!$algorithm) {
                         throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => $saveType]));
                     }
-                    if (!Check::isOptim($algorithm, $pth)) {
+                    if ($saveType === 'svg') {
+                        $pathNodejs = $_POST['common_options']["path_to_node"] ?? '/usr/bin';
+                        if (!$pathNodejs) {
+                            throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'nodejs']));
+                        }
+                        $pathNodejs = \rtrim($pathNodejs, '/');
+                        if (!\Dev2fun\ImageCompress\Svg::getInstance()->isOptim($pth, $pathNodejs)) {
+                            throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => "{$saveType}|nodejs"]));
+                        }
+                        $updString['path_to_node'] = $pathNodejs;
+                    } else if (!Check::isOptim($algorithm, $pth)) {
                         throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => $saveType]));
                     }
                 }

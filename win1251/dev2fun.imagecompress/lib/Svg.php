@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.4.0
+ * @version 0.8.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -19,7 +19,10 @@ class Svg
     public $lastError;
     public $binaryName = 'svgo';
     private $MODULE_ID = 'dev2fun.imagecompress';
+    /** @var string путь до svgo */
     private $path = '';
+    /** @var string путь до nodejs */
+    public $pathNodejs;
     private $active = false;
 
     /**
@@ -28,6 +31,7 @@ class Svg
     public function __construct()
     {
         $this->path = Option::get($this->MODULE_ID, 'path_to_svg', '/usr/bin');
+        $this->pathNodejs = Option::get($this->MODULE_ID, 'path_to_node', '/usr/bin');
         $this->active = Option::get($this->MODULE_ID, 'enable_svg', 'N') === 'Y';
     }
 
@@ -56,15 +60,19 @@ class Svg
     /**
      * Check available optimization svg
      * @param string|null $path
+     * @param string|null $pathNodejs
      * @return bool
      */
-    public function isOptim(?string $path = null)
+    public function isOptim(?string $path = null, ?string $pathNodejs = null): bool
     {
         if (!$path) {
             $path = $this->path;
         }
-        if (self::$isOptim === null || $path !== $this->path) {
-            exec($path . "/{$this->binaryName} -v", $s);
+        if (!$pathNodejs) {
+            $pathNodejs = $this->pathNodejs;
+        }
+        if (self::$isOptim === null || $path !== $this->path || $pathNodejs !== $this->pathNodejs) {
+            exec("{$pathNodejs}/node {$path}/{$this->binaryName} -v", $s);
             self::$isOptim = (bool)$s;
         }
         return self::$isOptim;
@@ -104,7 +112,7 @@ class Svg
         $strCommand = '';
 
         exec(
-            "{$this->path}/{$this->binaryName} $strCommand --input=$strFilePath --output=$strFilePath 2>&1",
+            "{$this->pathNodejs}/node {$this->path}/{$this->binaryName} $strCommand --input=$strFilePath --output=$strFilePath 2>&1",
             $res
         );
 
