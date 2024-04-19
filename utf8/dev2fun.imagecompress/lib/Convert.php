@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.5
+ * @version 0.8.6
  */
 
 namespace Dev2fun\ImageCompress;
@@ -22,6 +22,7 @@ class Convert
     const TYPE_WEBP = 'webp';
     const TYPE_AVIF = 'avif';
 
+    /** @var string */
     private $MODULE_ID = 'dev2fun.imagecompress';
     /** @var string */
     public $LAST_ERROR;
@@ -275,7 +276,7 @@ class Convert
         $arExcluded = self::getSettingsExcludeFiles();
 
         $arExcludedRegExp = array_filter($arExcluded, function($item) {
-            return strpos($item, '#');
+            return strpos($item, '#') === 0;
         });
 
         foreach ($arExcludedRegExp as $item) {
