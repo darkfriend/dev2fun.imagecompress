@@ -2,7 +2,7 @@
 /**
  * Created by PhpStorm.
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.0
+ * @version 0.9.0
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 
@@ -116,11 +116,11 @@ $tabControl->BeginNextTab();
                                     <a href="https://vk.com/dev2fun" target="_blank">vk.com/dev2fun</a>
                                 </td>
                             </tr>
-                            <tr class="c-table__row">
-                                <td class="c-table__cell">
-                                    <a href="https://facebook.com/dev2fun" target="_blank">facebook.com/dev2fun</a>
-                                </td>
-                            </tr>
+<!--                            <tr class="c-table__row">-->
+<!--                                <td class="c-table__cell">-->
+<!--                                    <a href="https://facebook.com/dev2fun" target="_blank">facebook.com/dev2fun</a>-->
+<!--                                </td>-->
+<!--                            </tr>-->
                             <tr class="c-table__row">
                                 <td class="c-table__cell">
                                     <a href="https://twitter.com/dev2fun" target="_blank">twitter.com/dev2fun</a>

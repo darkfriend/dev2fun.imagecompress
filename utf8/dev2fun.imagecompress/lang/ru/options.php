@@ -184,3 +184,11 @@ TEXT;
 
 $MESS['D2F_COMPRESS_SITE_SETTINGS'] = "Настройки для сайта";
 $MESS['D2F_COMPRESS_SITE_HEADING_TITLE'] = "Развернуть/Свернуть";
+
+$MESS['D2F_COMPRESS_CACHE_DELETE_HEADING'] = "Удаление истекшего кэша";
+$MESS['D2F_COMPRESS_CACHE_DELETE_ACTIVE'] = "Активность агента удаления истекшего кэша";
+$MESS['D2F_COMPRESS_CACHE_DELETE_AGENT_ACTIVATED'] = "Агент активен";
+$MESS['D2F_COMPRESS_CACHE_DELETE_AGENT_NOT_ACTIVATED'] = "Агент не активен";
+$MESS['D2F_COMPRESS_CACHE_DELETE_LENGTH'] = "Количество удаляемого кэша";
+$MESS['D2F_COMPRESS_CACHE_DELETE_BTN_DEACTIVATE'] = "Дизактивировать";
+$MESS['D2F_COMPRESS_CACHE_DELETE_BTN_ACTIVATE'] = "Активировать";

@@ -104,6 +104,18 @@ if ($request->isPost() && check_bitrix_sessid()) {
             "MESSAGE" => $text,
             "TYPE" => (!$error ? 'OK' : 'ERROR'),
         ]);
+    } else if (isset($_POST['action']) && $_POST['action'] === 'cache-deleted-agent') {
+        $cacheDeletedAgentActive = ($_POST['active'] ?? 'N') === 'Y';
+        if ($cacheDeletedAgentActive) {
+            $res = \Dev2fun\ImageCompress\Cache::activateAgent();
+        } else {
+            $res = \Dev2fun\ImageCompress\Cache::deactivateAgent();
+        }
+        $APPLICATION->RestartBuffer();
+        echo json_encode([
+            'success' => $res,
+        ]);
+        die();
     } else {
         try {
             $success = false;
@@ -490,6 +502,8 @@ if ($request->isPost() && check_bitrix_sessid()) {
                     $_POST['convert_cache_include_user_groups'] ?? 'N'
                 );
             }
+
+            Option::set($curModuleName, 'cache_delete_length', $_POST['cache_delete_length'] ?? 1000);
 
             $msg = Loc::getMessage("D2F_COMPRESS_REFERENCES_OPTIONS_SAVED");
             $success = true;

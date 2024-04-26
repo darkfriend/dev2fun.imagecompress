@@ -1096,10 +1096,10 @@ class Convert
 
     /**
      * Get browser name
-     * @param string $userAgent
+     * @param string|null $userAgent
      * @return string
      */
-    public static function getBrowserAgentName(string $userAgent): string
+    public static function getBrowserAgentName(?string $userAgent): string
     {
         $result = 'Other';
         if(!$userAgent) {

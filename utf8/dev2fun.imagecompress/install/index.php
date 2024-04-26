@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.0
+ * @version 0.9.0
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 \Bitrix\Main\Localization\Loc::loadMessages(__FILE__);
@@ -39,6 +39,7 @@ Loader::registerAutoLoadClasses(
 
         "Dev2fun\ImageCompress\Jpegoptim" => 'lib/Jpegoptim.php',
         "Dev2fun\ImageCompress\Optipng" => 'lib/Optipng.php',
+        "Dev2fun\ImageCompress\Cache" => 'lib/Cache.php',
     ]
 );
 
@@ -90,6 +91,7 @@ class dev2fun_imagecompress extends CModule
             $this->installFiles();
             $this->installDB();
             $this->registerEvents();
+
             ModuleManager::registerModule($this->MODULE_ID);
 
             $startTime = ConvertTimeStamp(time() + \CTimeZone::GetOffset() + 60, 'FULL');
@@ -106,9 +108,29 @@ class dev2fun_imagecompress extends CModule
                 false
             );
             if (!$agentId) {
-                throw new Exception('Error when add agent');
+                throw new Exception('Error when add agent for lazyConvert');
             }
             Option::set($this->MODULE_ID, 'convert_agent', $agentId);
+
+
+            $startTime = ConvertTimeStamp(time() + \CTimeZone::GetOffset() + 120, 'FULL');
+            $agentId = CAgent::AddAgent(
+                \Dev2fun\ImageCompress\Cache::class . '::agentRun();',
+                $this->MODULE_ID,
+                'Y',
+                120,
+                '',
+                'N',
+                $startTime,
+                100,
+                false,
+                false
+            );
+            if (!$agentId) {
+                throw new Exception('Error when add agent for cache-delete');
+            }
+            Option::set($this->MODULE_ID, 'cache_delete_agent', $agentId);
+
         } catch (Exception $e) {
             $GLOBALS['D2F_COMPRESSIMAGE_ERROR'] = $e->getMessage();
             $GLOBALS['D2F_COMPRESSIMAGE_ERROR_NOTES'] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND_NOTES');

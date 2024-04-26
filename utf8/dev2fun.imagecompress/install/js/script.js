@@ -91,6 +91,64 @@ if(typeof addNewRow === "undefined") {
     }
 }
 
+if(typeof cacheDeleteActive === "undefined") {
+    function cacheDeleteActive() {
+        let objRequest = {
+            AJAX_MODE : 'Y',
+            AJAX_IC : 'Y',
+            active : 'Y',
+            action : 'cache-deleted-agent',
+            sessid: BX.bitrix_sessid()
+        };
+        BX.showWait();
+        BX.ajax({
+            url: window.location.href,
+            data : objRequest,
+            method : 'POST',
+            timeout : 600,
+            dataType: 'json',
+            cache: false,
+            onsuccess: function(data) {
+                BX.closeWait();
+                window.location.reload();
+            },
+            onfailure: function(){
+                BX.closeWait();
+                alert('Error!');
+            }
+        });
+    }
+}
+
+if(typeof cacheDeleteDeactivate === "undefined") {
+    function cacheDeleteDeactivate() {
+        let objRequest = {
+            AJAX_MODE : 'Y',
+            AJAX_IC : 'Y',
+            active : 'N',
+            action : 'cache-deleted-agent',
+            sessid: BX.bitrix_sessid()
+        };
+        BX.showWait();
+        BX.ajax({
+            url: window.location.href,
+            data : objRequest,
+            method : 'POST',
+            timeout : 600,
+            dataType: 'json',
+            cache: false,
+            onsuccess: function(data) {
+                BX.closeWait();
+                window.location.reload();
+            },
+            onfailure: function(){
+                BX.closeWait();
+                alert('Error!');
+            }
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function(){
     const convertModeSelect = document.querySelectorAll('.select__convert_mode');
     if (convertModeSelect.length) {

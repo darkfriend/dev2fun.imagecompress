@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.0
+ * @version 0.9.0
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -29,6 +29,7 @@ Loader::registerAutoLoadClasses(
         'Dev2fun\ImageCompress\Convert' => 'lib/Convert.php',
         "Dev2fun\ImageCompress\LazyConvert" => 'lib/LazyConvert.php',
         'Dev2fun\ImageCompress\Process' => 'lib/Process.php',
+        'Dev2fun\ImageCompress\Cache' => 'lib/Cache.php',
         "Dev2funImageCompress" => __FILE__,
 
         "Dev2fun\ImageCompress\Jpegoptim" => 'lib/Jpegoptim.php',

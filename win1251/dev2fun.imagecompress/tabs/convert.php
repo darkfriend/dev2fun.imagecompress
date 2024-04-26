@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.0
+ * @version 0.9.0
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 
@@ -125,6 +125,51 @@ $convertInstance = \Dev2fun\ImageCompress\Convert::getInstance();
         ?>
     </td>
 </tr>
+
+
+<tr class="convert__lazy_settings heading">
+    <td colspan="2">
+        <b><?=Loc::getMessage('D2F_COMPRESS_CACHE_DELETE_HEADING') ?></b>
+    </td>
+</tr>
+<tr class="convert__cache_delete_active">
+    <td width="40%">
+        <label for="cache_delete_active">
+            <?= Loc::getMessage("D2F_COMPRESS_CACHE_DELETE_ACTIVE") ?>:
+        </label>
+    </td>
+    <td width="60%">
+        <?php
+        $cacheDeleteActive = \Dev2fun\ImageCompress\Cache::getAgentActiveValue() === 'Y';
+        ?>
+        <?php if ($cacheDeleteActive) { ?>
+            <p><?= Loc::getMessage("D2F_COMPRESS_CACHE_DELETE_AGENT_ACTIVATED") ?></p>
+            <p>
+                <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_CACHE_DELETE_BTN_DEACTIVATE") ?>" onclick="cacheDeleteDeactivate();"/>
+            </p>
+        <?php } else { ?>
+            <p><?= Loc::getMessage("D2F_COMPRESS_CACHE_DELETE_AGENT_NOT_ACTIVATED") ?></p>
+            <p>
+                <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_CACHE_DELETE_BTN_ACTIVATE") ?>" onclick="cacheDeleteActive();"/>
+            </p>
+        <?php } ?>
+    </td>
+</tr>
+<tr class="convert__cache_delete_length">
+    <td width="40%">
+        <label for="cache_delete_length">
+            <?= Loc::getMessage("D2F_COMPRESS_CACHE_DELETE_LENGTH") ?>:
+        </label>
+    </td>
+    <td width="60%">
+        <input
+            type="text"
+            name="cache_delete_length"
+            value="<?=Option::get($curModuleName, 'cache_delete_length', 1000)?>"
+        />
+    </td>
+</tr>
+
 
 <?php foreach ($arSites as $arSite) { ?>
     <?php
