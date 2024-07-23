@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.6
+ * @version 0.10.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -60,6 +60,8 @@ class Convert
     public static $globalEnable = true;
     /** @var null|array */
     public static $domains = null;
+    /** @var null|array */
+    public static $excludeFiles = null;
     /** @var bool */
     public $enable = false;
     /** @var int */
@@ -186,10 +188,26 @@ class Convert
         } else {
             $pages = [];
         }
-        if (!in_array('#(\/bitrix\/.*)#', $pages)) {
-            array_unshift($pages, '#(\/bitrix\/.*)#');
+
+        if (!in_array('#(\/bitrix\/(?!services\/main\/ajax\.php).*)#', $pages)) {
+            array_unshift(
+                $pages,
+//                '#(\/bitrix\/.*)#',
+                '#(\/bitrix\/(?!services\/main\/ajax\.php).*)#'
+            );
         }
+
         return $pages;
+    }
+
+    /**
+     * Get normalize exclude pages
+     * @param string|null $siteId
+     * @return array
+     */
+    public static function getSettingsExcludePageNormalize(?string $siteId = null)
+    {
+        return self::getSettingsExcludePage($siteId);
     }
 
     /**
@@ -199,16 +217,25 @@ class Convert
      */
     public static function getSettingsExcludeFiles(?string $siteId = null)
     {
-        if (!$siteId) {
-            $siteId = Dev2funImageCompress::getSiteId();
+        static::$excludeFiles = null;
+        if (static::$excludeFiles === null) {
+            if (!$siteId) {
+                $siteId = Dev2funImageCompress::getSiteId();
+            }
+            $files = Option::get(\Dev2funImageCompress::MODULE_ID, 'exclude_files', '', $siteId);
+            if ($files) {
+                $files = \json_decode($files, true);
+                $files = array_map(function($file) {
+                    return ltrim($file, '/');
+                }, $files);
+            } else {
+                $files = [];
+            }
+
+            static::$excludeFiles = $files;
         }
-        $files = Option::get(\Dev2funImageCompress::MODULE_ID, 'exclude_files', '', $siteId);
-        if ($files) {
-            $files = \json_decode($files, true);
-        } else {
-            $files = [];
-        }
-        return $files;
+
+        return static::$excludeFiles;
     }
 
     /**
@@ -246,7 +273,7 @@ class Convert
     public static function isExcludePage(): bool
     {
         global $APPLICATION;
-        $arExcluded = self::getSettingsExcludePage();
+        $arExcluded = self::getSettingsExcludePageNormalize();
         if($arExcluded) {
             $curPage = $APPLICATION->GetCurPage();
             if ($curPage === '/') {
@@ -347,8 +374,12 @@ class Convert
             return $res;
         }
 
-        $upload_dir = Option::get('main', 'upload_dir', 'upload');
-        $res = "/$upload_dir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        if (empty($options['hasFullPath'])) {
+            $upload_dir = Option::get('main', 'upload_dir', 'upload');
+            $res = "/$upload_dir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        } else {
+            $res = "{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
+        }
 
         // исключение файла из списка исключений
         if (static::isExcludeFile($res)) {
@@ -825,10 +856,14 @@ class Convert
                     $imagesHash = [];
                     foreach ($arFiles as $file) {
                         $isUrl = !empty(parse_url($file, PHP_URL_HOST));
+                        $hash = null;
                         if ($isUrl) {
-                            $imagesHash[] = md5_file($file);
-                        } else {
-                            $imagesHash[] = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
+                            $hash = md5_file($file);
+                        } elseif (is_file($_SERVER['DOCUMENT_ROOT'].$file)) {
+                            $hash = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
+                        }
+                        if ($hash) {
+                            $imagesHash[] = $hash;
                         }
 //                        $imagesHash[] = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
 //                        $rows[] = [
@@ -841,7 +876,7 @@ class Convert
                         return [];
                     }
                     $filter[] = [
-                        'IMAGE_HASH', 'in', $imagesHash,
+                        'IMAGE_HASH', 'in', array_unique($imagesHash),
 //                            'logic' => Filter::LOGIC_OR,
 //                            ['IMAGE_HASH', 'in', ''],
                     ];
@@ -862,6 +897,9 @@ class Convert
 
                     $result = [];
                     foreach ($images as $image) {
+                        if (self::isExcludeFile($image['IMAGE_PATH'])) {
+                            continue;
+                        }
                         $result[$image['IMAGE_PATH']] = $image['CONVERTED_IMAGE_PATH'];
                     }
 
@@ -1040,7 +1078,8 @@ class Convert
     public static function checkSupportWebpCurrentPath(): bool
     {
         global $APPLICATION;
-        return !\preg_match('#\/bitrix\/admin\/#', $APPLICATION->GetCurPage());
+//        return !\preg_match('#\/bitrix\/admin\/#', $APPLICATION->GetCurPage());
+        return !\preg_match('#(\/bitrix\/(?!services\/main\/ajax\.php).*)#', $APPLICATION->GetCurPage());
     }
 
     /**
@@ -1179,6 +1218,8 @@ class Convert
             'FILE_NAME' => $fileInfo['basename'],
             'ABS_PATH' => $absFile,
         ];
+
+        $options['hasFullPath'] = true;
 
         return $this->process($arFile, $options);
     }
