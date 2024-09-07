@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.10.1
+ * @version 0.10.2
  */
 
 namespace Dev2fun\ImageCompress;
@@ -645,6 +645,7 @@ class AdminList
                         ],
                     ]);
 
+                    $currentPage = 1;
                     $pageSize = Option::get('dev2fun.imagecompress', "cnt_step", 30);
                     $rsRes = new \CDBResult($rsRes);
                     $rsRes->NavStart($pageSize, false, $_REQUEST['PAGEN_1'] ?? 1);
