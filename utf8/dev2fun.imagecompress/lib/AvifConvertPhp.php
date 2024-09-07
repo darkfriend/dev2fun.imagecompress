@@ -104,7 +104,14 @@ class AvifConvertPhp
             $origPicture .= "/{$arFile["SUBDIR"]}";
         }
         $origPicture .= "/{$arFile['FILE_NAME']}";
-        $srcWebp .= "/{$fileInfo['filename']}.avif";
+//        $srcWebp .= "/{$fileInfo['filename']}.avif";
+
+        $newFileName = $fileInfo['filename'];
+        if (!preg_match('#^[\w\-. ]+$#', $newFileName)) {
+            $newFileName = md5($newFileName);
+        }
+        $srcWebp .= "/{$newFileName}.avif";
+
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
 
         if(@\is_file($absSrcWebp)) {

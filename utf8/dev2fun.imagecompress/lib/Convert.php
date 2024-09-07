@@ -469,7 +469,13 @@ class Convert
             return null;
         }
 
+//        if (!preg_match('#^[\w\-. ]+$#', $file)) {
+//            $file = urldecode($file);
+//        }
+        $file = urldecode($file);
+
         $absFile = "{$_SERVER["DOCUMENT_ROOT"]}{$file}";
+
         if(!\is_file($absFile)) {
             return null;
         }

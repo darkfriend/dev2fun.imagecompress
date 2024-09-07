@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.4
+ * @version 0.10.1
  */
 
 namespace Dev2fun\ImageCompress;
@@ -115,7 +115,14 @@ class WebpConvertPhp
             $origPicture .= "/{$arFile["SUBDIR"]}";
         }
         $origPicture .= "/{$arFile['FILE_NAME']}";
-        $srcWebp .= "/{$fileInfo['filename']}.webp";
+//        $srcWebp .= "/{$fileInfo['filename']}.webp";
+
+        $newFileName = $fileInfo['filename'];
+        if (!preg_match('#^[\w\-. ]+$#', $newFileName)) {
+            $newFileName = md5($newFileName);
+        }
+        $srcWebp .= "/{$newFileName}.webp";
+
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
 
         if(@\is_file($absSrcWebp)) {

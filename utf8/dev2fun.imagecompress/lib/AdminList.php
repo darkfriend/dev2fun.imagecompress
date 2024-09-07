@@ -617,15 +617,18 @@ class AdminList
     public function convertAll()
     {
         global $APPLICATION, $recCompress, $msgError;
-        $navPageCount = 0;
+        $processConvert = 0;
+        $startConvert = false;
         $msgError = '';
         $instance = Convert::getInstance();
         $algImageType = $instance->getImageTypeByAlgorithm($instance->algorithm);
-        if (!empty($_REQUEST['convert_all'])) {
+        if (!empty($_REQUEST['convert_all']) && $_REQUEST['convert_all'] === 'Y') {
             \CJSCore::Init(['ajax']);
             echo '<div id="convertAllStatus">';
             if ($_REQUEST['AJAX_IC']) {
                 try {
+                    $processConvert = true;
+                    $sessionHash = filter_var($_GET['timehash'] ?? '', FILTER_SANITIZE_STRING);
                     $rsRes = ImageCompressImagesTable::getList([
                         'select' => [
                             '*',
@@ -646,23 +649,29 @@ class AdminList
                     $rsRes = new \CDBResult($rsRes);
                     $rsRes->NavStart($pageSize, false, $_REQUEST['PAGEN_1'] ?? 1);
 
-                    if (empty($_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT'])) {
-                        $_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT'] = $rsRes->NavPageCount;
+                    // if (empty($_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT'])) {
+                    if (empty($_SESSION['DEV2FUN_CONVERT'][$sessionHash])) {
+                        $_SESSION['DEV2FUN_CONVERT'][$sessionHash]['PAGE_COUNT'] = $rsRes->NavPageCount;
+                        $_SESSION['DEV2FUN_CONVERT'][$sessionHash]['PAGE'] = 1;
                         $navPageCount = $rsRes->NavPageCount;
-                        if (!$navPageCount) $navPageCount = 0;
+                        if (!$navPageCount) {
+                            $navPageCount = 0;
+                        }
                         //                    $recCompress = true;
                     } else {
-                        $navPageCount = $_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT'];
+                        $navPageCount = $_SESSION['DEV2FUN_CONVERT'][$sessionHash]['PAGE_COUNT'];
+                        $_SESSION['DEV2FUN_CONVERT'][$sessionHash]['PAGE'] = ($_SESSION['DEV2FUN_CONVERT'][$sessionHash]['PAGE'] ?? 1) + 1;
+                        $currentPage = $_SESSION['DEV2FUN_CONVERT'][$sessionHash]['PAGE'];
                     }
 
                     if ((int)$rsRes->NavPageCount === 0) {
-                        unset($_SESSION['DEV2FUN_CONVERT_NAVPAGECOUNT']);
+                        unset($_SESSION['DEV2FUN_CONVERT'][$sessionHash]);
                         $recCompress = true;
                         $navPageCount = 0;
                     }
 
                     if ($navPageCount) {
-                        $progressValue = (100 / $navPageCount) * $rsRes->NavPageNomer;
+                        $progressValue = (100 / $navPageCount) * $currentPage;
                     } else {
                         $progressValue = 100;
                     }
@@ -671,6 +680,9 @@ class AdminList
                     $images = [];
                     while ($arFile = $rsRes->NavNext(true)) {
                         $pathFile = Convert::getNormalizePathFile($arFile['IMAGE_PATH']);
+                        if (!empty($arFile['IMAGE_PATH'])) {
+                            $arFile['IMAGE_PATH'] = urldecode($arFile['IMAGE_PATH']);
+                        }
                         if ($pathFile === null) {
                             ImageCompressImagesTable::update($arFile['ID'], [
                                 'IMAGE_IGNORE' => 'Y',
@@ -685,7 +697,7 @@ class AdminList
                         }
 
                         if (empty($arFile['IMAGE_HASH'])) {
-                            $absPath = $_SERVER['DOCUMENT_ROOT'] . $arFile['IMAGE_PATH'];
+                            $absPath = $_SERVER['DOCUMENT_ROOT'] . '/' . trim($arFile['IMAGE_PATH'],'/');
                             if (is_file($absPath)) {
                                 $imageHash = md5_file($absPath);
                                 ImageCompressImagesTable::update($arFile['ID'], [
@@ -730,16 +742,21 @@ class AdminList
                     "TYPE" => "PROGRESS",
                     "PROGRESS_TOTAL" => $navPageCount,
 //                    "PROGRESS_TOTAL" => $rsRes->NavPageCount,
-                    "PROGRESS_VALUE" => $rsRes->NavPageNomer,
+                    "PROGRESS_VALUE" => $currentPage,
                 ];
                 if ($rsRes->NavPageCount) {
                     $admFields['PROGRESS_TEMPLATE'] = '<span>' . Loc::getMessage('D2F_IMAGECOMPRESS_PROGRESS_TEMPLATE') . '</span>';
                 }
                 \CAdminMessage::ShowMessage($admFields);
-            } else {
+            } elseif ($processConvert) {
                 \CAdminMessage::ShowMessage([
                     "MESSAGE" => Loc::getMessage('D2F_IMAGECOMPRESS_COMPRESS_IMAGE_STATUS_SUCCESS'),
                     "TYPE" => "OK",
+                ]);
+            } else {
+                \CAdminMessage::ShowMessage([
+                    'MESSAGE' => 'Processing convert',
+                    "TYPE" => "PROGRESS",
                 ]);
             }
 //            if ($rsRes->NavPageNomer >= $navPageCount) {
@@ -751,13 +768,13 @@ class AdminList
                 echo \CUtil::PhpToJSObject([
                     'html' => $html,
                     'error' => $recCompress === false ? true : false,
-                    'step' => $rsRes->NavPageNomer,
+                    'step' => $currentPage,
 //                    'step' => ($rsRes->NavPageNomer + 1),
                     'allStep' => $navPageCount,
 //                    'allStep' => $rsRes->NavPageCount,
 //                    'pageCount' => $stepOnPage,
                     'count' => $rsRes->SelectedRowsCount(),
-                    'progressValue' => $progressValue,
+                    'progressValue' => round($progressValue, 0),
                 ]);
                 die();
             }

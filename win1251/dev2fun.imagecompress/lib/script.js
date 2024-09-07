@@ -1,6 +1,6 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.0
+ * @version 0.10.1
  */
 function SendPropcess(step, type) {
     let objRequest = {
@@ -15,7 +15,7 @@ function SendPropcess(step, type) {
         objRequest.compress_all = 'Y';
     }
     BX.ajax({
-        url: window.location.pathname,
+        url: window.location.pathname + window.location.search,
         data : objRequest,
         method : 'POST',
         timeout : 600,

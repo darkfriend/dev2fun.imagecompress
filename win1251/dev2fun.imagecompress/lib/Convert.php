@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.10.0
+ * @version 0.10.1
  */
 
 namespace Dev2fun\ImageCompress;
@@ -469,7 +469,13 @@ class Convert
             return null;
         }
 
+//        if (!preg_match('#^[\w\-. ]+$#', $file)) {
+//            $file = urldecode($file);
+//        }
+        $file = urldecode($file);
+
         $absFile = "{$_SERVER["DOCUMENT_ROOT"]}{$file}";
+
         if(!\is_file($absFile)) {
             return null;
         }

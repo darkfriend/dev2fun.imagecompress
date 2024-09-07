@@ -15,7 +15,7 @@ function SendPropcess(step, type) {
         objRequest.compress_all = 'Y';
     }
     BX.ajax({
-        url: window.location.pathname,
+        url: window.location.pathname + window.location.search,
         data : objRequest,
         method : 'POST',
         timeout : 600,

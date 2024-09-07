@@ -115,7 +115,14 @@ class WebpConvertPhp
             $origPicture .= "/{$arFile["SUBDIR"]}";
         }
         $origPicture .= "/{$arFile['FILE_NAME']}";
-        $srcWebp .= "/{$fileInfo['filename']}.webp";
+//        $srcWebp .= "/{$fileInfo['filename']}.webp";
+
+        $newFileName = $fileInfo['filename'];
+        if (!preg_match('#^[\w\-. ]+$#', $newFileName)) {
+            $newFileName = md5($newFileName);
+        }
+        $srcWebp .= "/{$newFileName}.webp";
+
         $absSrcWebp = $_SERVER["DOCUMENT_ROOT"].$srcWebp;
 
         if(@\is_file($absSrcWebp)) {

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.0
+ * @version 0.10.1
  */
 require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -74,6 +74,10 @@ if (!empty($_REQUEST["convert"]) || ($_REQUEST["action"] ?? '') === "convert") {
 
         if ($arImages) {
             foreach ($arImages as $k => &$arFile) {
+                if (empty($arFile['IMAGE_PATH'])) {
+                    continue;
+                }
+                $arFile['IMAGE_PATH'] = urldecode($arFile['IMAGE_PATH']);
                 $pathFile = Convert::getNormalizePathFile($arFile['IMAGE_PATH']);
                 if ($pathFile === null) {
                     ImageCompressImagesTable::update($arFile['ID'], [
@@ -121,6 +125,7 @@ $list->generalKey = 'ID';
 $list->setRights();
 $list->setTitle(Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_TITLE'));
 
+$convertSessionHash = md5('convert_all_session' . time());
 //$list->setContextMenu(false);
 $list->getlAdmin()->AddAdminContextMenu([
     'convert_all' => [
@@ -130,7 +135,7 @@ $list->getlAdmin()->AddAdminContextMenu([
                 '#IMAGE_TYPE#' => Convert::getInstance()->getImageTypeByAlgorithm(Convert::getInstance()->algorithm)
             ]
         ),
-        'LINK' => $APPLICATION->GetCurPage() . '?convert_all=Y',
+        'LINK' => "{$APPLICATION->GetCurPage()}?convert_all=Y&timehash={$convertSessionHash}",
     ],
 ]);
 $list->setHeaders([
@@ -207,7 +212,7 @@ if ($rsFiles->getSelectedRowsCount()>0) {
         [
             'IMAGE' => function ($val, $arRec)
             {
-                $path = $_SERVER['DOCUMENT_ROOT'] . $arRec['IMAGE_PATH'];
+                $path = $_SERVER['DOCUMENT_ROOT'] . urldecode($arRec['IMAGE_PATH']);
                 if (file_exists($path)) {
                     $name = basename($path);
                     $mimeType = mime_content_type($path);
