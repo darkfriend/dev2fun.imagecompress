@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.10.1
+ * @version 0.10.3
  */
 
 namespace Dev2fun\ImageCompress;
@@ -81,7 +81,7 @@ class Convert
     public function __construct(?string $siteId = null)
     {
         if (!$siteId) {
-            $siteId = \Dev2funImageCompress::getSiteId();
+            $siteId = Dev2funImageCompress::getSiteId();
         }
         $this->siteId = $siteId;
 
@@ -182,7 +182,7 @@ class Convert
         if (!$siteId) {
             $siteId = Dev2funImageCompress::getSiteId();
         }
-        $pages = Option::get(\Dev2funImageCompress::MODULE_ID, 'exclude_pages', '', $siteId);
+        $pages = Option::get(Dev2funImageCompress::MODULE_ID, 'exclude_pages', '', $siteId);
         if ($pages) {
             $pages = \json_decode($pages, true);
         } else {
@@ -222,7 +222,7 @@ class Convert
             if (!$siteId) {
                 $siteId = Dev2funImageCompress::getSiteId();
             }
-            $files = Option::get(\Dev2funImageCompress::MODULE_ID, 'exclude_files', '', $siteId);
+            $files = Option::get(Dev2funImageCompress::MODULE_ID, 'exclude_files', '', $siteId);
             if ($files) {
                 $files = \json_decode($files, true);
                 $files = array_map(function($file) {
@@ -258,7 +258,7 @@ class Convert
             $sFields = [];
         }
         Option::set(
-            \Dev2funImageCompress::MODULE_ID,
+            Dev2funImageCompress::MODULE_ID,
             'exclude_pages',
             \json_encode(\array_values($sFields)),
             $siteId
@@ -333,7 +333,7 @@ class Convert
             }
         }
         Option::set(
-            \Dev2funImageCompress::MODULE_ID,
+            Dev2funImageCompress::MODULE_ID,
             'exclude_files',
             json_encode(array_values($sFields)),
             $siteId
@@ -564,7 +564,7 @@ class Convert
             return false;
         }
 
-        $alg = Option::get(self::getInstance()->MODULE_ID, 'convert_algorithm', 'phpWebp', \Dev2funImageCompress::getSiteId());
+        $alg = Option::get(self::getInstance()->MODULE_ID, 'convert_algorithm', 'phpWebp', Dev2funImageCompress::getSiteId());
         $algInstance = static::getAlgInstance($alg);
         if (!$algInstance->isOptim()) {
             return false;
@@ -732,11 +732,11 @@ class Convert
             'v0.1.0',
             'scanImages',
             self::getInstance()->convertMode,
-            \Dev2funImageCompress::getSiteId(),
-            $userGroups,
+            Dev2funImageCompress::getSiteId(),
+            implode('|', $userGroups),
             $curUri,
         ];
-        $cacheId = implode('|',$cacheId);
+        $cacheId = implode('|', $cacheId);
         $arFiles = LazyConvert::cache(
         //                3600*1,
             self::getInstance()->cacheTimeGetImages,
@@ -802,16 +802,18 @@ class Convert
                     $connection = \Bitrix\Main\Application::getInstance()->getConnection();
                     $rows = [];
                     foreach ($arFiles as $file) {
+                        $file = str_replace('\/', '/', $file);
                         $isUrl = !empty(parse_url($file, PHP_URL_HOST));
                         if ($isUrl) {
                             $md5 = md5_file($file);
                         } else {
-                            $md5 = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
+                            $absFile = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($file, '/');
+                            $md5 = md5_file($absFile);
                         }
 
                         if (empty($currentFiles[$md5])) {
                             $rows[] = [
-//                                'SITE_ID' => \Dev2funImageCompress::getSiteId(),
+//                                'SITE_ID' => Dev2funImageCompress::getSiteId(),
                                 'IMAGE_PATH' => $file,
                                 'IMAGE_HASH' => $md5,
                                 'DATE_CREATE' => new SqlExpression("NOW()"),
@@ -861,19 +863,23 @@ class Convert
                     ];
                     $imagesHash = [];
                     foreach ($arFiles as $file) {
+                        $file = str_replace('\/', '/', $file);
                         $isUrl = !empty(parse_url($file, PHP_URL_HOST));
                         $hash = null;
                         if ($isUrl) {
                             $hash = md5_file($file);
-                        } elseif (is_file($_SERVER['DOCUMENT_ROOT'].$file)) {
-                            $hash = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
+                        } else {
+                            $absFile = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($file, '/');
+                            if (is_file($absFile)) {
+                                $hash = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
+                            }
                         }
                         if ($hash) {
                             $imagesHash[] = $hash;
                         }
 //                        $imagesHash[] = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
 //                        $rows[] = [
-//                            'SITE_ID' => \Dev2funImageCompress::getSiteId(),
+//                            'SITE_ID' => Dev2funImageCompress::getSiteId(),
 //                            'IMAGE_PATH' => $file,
 //                            'IMAGE_HASH' => md5_file($_SERVER['DOCUMENT_ROOT'].$file),
 //                        ];
@@ -946,7 +952,7 @@ class Convert
     public static function getDomains(): array
     {
         if (self::$domains === null) {
-            $sites = \Dev2funImageCompress::getSites();
+            $sites = Dev2funImageCompress::getSites();
             $domains = [];
             foreach ($sites as $site) {
                 $domains[] = $site['SERVER_NAME'];
