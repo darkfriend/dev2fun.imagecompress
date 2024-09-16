@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.10.3
+ * @version 0.10.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -731,9 +731,9 @@ class Convert
         $cacheId = [
             'v0.1.0',
             'scanImages',
-            self::getInstance()->convertMode,
+            implode('|', (array)self::getInstance()->convertMode),
             Dev2funImageCompress::getSiteId(),
-            implode('|', $userGroups),
+            $userGroups,
             $curUri,
         ];
         $cacheId = implode('|', $cacheId);
