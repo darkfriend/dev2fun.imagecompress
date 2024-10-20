@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.10.2
+ * @version 0.10.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -534,7 +534,9 @@ class AdminList
                 if (empty($_SESSION['DEV2FUN_COMPRESS_NAVPAGECOUNT'])) {
                     $_SESSION['DEV2FUN_COMPRESS_NAVPAGECOUNT'] = $rsRes->NavPageCount;
                     $navPageCount = $rsRes->NavPageCount;
-                    if (!$navPageCount) $navPageCount = 0;
+                    if (!$navPageCount) {
+                        $navPageCount = 0;
+                    }
                     $recCompress = true;
                 } else {
                     $navPageCount = $_SESSION['DEV2FUN_COMPRESS_NAVPAGECOUNT'];
@@ -553,7 +555,11 @@ class AdminList
                     }
                     $recCompress = Compress::getInstance()->compressImageByID($arFile['ID']);
                 }
-                $progressValue = (100 / $navPageCount) * $rsRes->NavPageNomer;
+                if ($navPageCount && $rsRes->NavPageNomer) {
+                    $progressValue = (100 / $navPageCount) * $rsRes->NavPageNomer;
+                } else {
+                    $progressValue = 100;
+                }
             }
             if ($recCompress === false) {
                 $msgError = Compress::getInstance()->LAST_ERROR;
@@ -591,7 +597,7 @@ class AdminList
                 $html = ob_get_clean();
                 echo \CUtil::PhpToJSObject([
                     'html' => $html,
-                    'error' => (($recCompress === false) ? true : false),
+                    'error' => ($recCompress === false) ? true : false,
                     'step' => ($rsRes->NavPageNomer + 1),
                     'allStep' => $navPageCount,
                     //                    'allStep' => $rsRes->NavPageCount,
@@ -671,7 +677,7 @@ class AdminList
                         $navPageCount = 0;
                     }
 
-                    if ($navPageCount) {
+                    if ($navPageCount && $currentPage) {
                         $progressValue = (100 / $navPageCount) * $currentPage;
                     } else {
                         $progressValue = 100;
