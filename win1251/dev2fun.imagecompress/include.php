@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.9.0
+ * @version 0.11.0
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -41,6 +41,9 @@ Loader::registerAutoLoadClasses(
         "Dev2fun\ImageCompress\WebpConvertPhp" => 'lib/WebpConvertPhp.php',
         "Dev2fun\ImageCompress\AvifConvertPhp" => 'lib/AvifConvertPhp.php',
         "Dev2fun\ImageCompress\AvifConvertImagick" => 'lib/AvifConvertImagick.php',
+
+        "Dev2fun\ImageCompress\CacheCleaner" => 'lib/CacheCleaner.php',
+        "Dev2fun\ImageCompress\IO" => 'lib/IO.php',
     ]
 );
 

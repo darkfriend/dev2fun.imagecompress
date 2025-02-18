@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.0
+ * @version 0.11.0
  */
 
 IncludeModuleLangFile(__FILE__);
@@ -39,6 +39,15 @@ $items[] = [
         'dev2fun_imagecompress_convert.php',
     ],
 ];
+$items[] = [
+    'text' => Loc::getMessage('DEV2FUN_IMAGECOMPRESS_MENU_ITEM_CONVERT_MOVE'),
+    'url' => "dev2fun_imagecompress_convert_move.php?lang=".LANGUAGE_ID,
+    'module_id' => $moduleId,
+    'items_id' => 'menu_dev2fun_imagecompress_convert_move',
+    'more_url' => [
+        'dev2fun_imagecompress_convert_move.php',
+    ],
+];
 
 $arMenu = [
     "parent_menu" => "global_menu_settings",
@@ -52,6 +61,7 @@ $arMenu = [
     "more_url" => [
         "dev2fun_imagecompress_files.php",
         "dev2fun_imagecompress_convert.php",
+        "dev2fun_imagecompress_convert_move.php",
     ],
     "icon" => "dev2fun_compressimage_menu_icon",
     "page_icon" => "dev2fun_compressimage_page_icon",

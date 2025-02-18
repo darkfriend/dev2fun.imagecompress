@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.9.0
+ * @version 0.11.0
  * @since 0.9.0
  */
 
@@ -10,7 +10,6 @@ namespace Dev2fun\ImageCompress;
 
 use Bitrix\Main\Config\Option;
 use CAgent;
-use Guzzle\Tests\Mock\ErrorResponseMock;
 
 IncludeModuleLangFile(__FILE__);
 

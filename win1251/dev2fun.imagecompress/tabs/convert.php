@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.9.0
+ * @version 0.11.0
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 
@@ -167,6 +167,39 @@ $convertInstance = \Dev2fun\ImageCompress\Convert::getInstance();
             name="cache_delete_length"
             value="<?=Option::get($curModuleName, 'cache_delete_length', 1000)?>"
         />
+    </td>
+</tr>
+<tr class="convert__cache_clear_all">
+    <td width="40%">
+        <label for="cache_clear_all">
+            <?= Loc::getMessage("D2F_COMPRESS_CACHE_CLEAR_ALL_LABEL") ?>:
+        </label>
+    </td>
+    <td width="60%">
+        <p>
+            <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_CACHE_CLEAR_ALL_BTN") ?>" onclick="cacheClearAll();"/>
+        </p>
+    </td>
+</tr>
+<tr class="convert__enable_clear_cache">
+    <td width="40%">
+        <label for="enable_clear_cache">
+            <?= Loc::getMessage("D2F_COMPRESS_ENABLE_CLEAR_CACHE_LABEL") ?>:
+        </label>
+    </td>
+    <td width="60%">
+        <p>
+            <input
+                type="checkbox"
+                name="convert_enable_clear_cache"
+                value="N"
+                <?php
+                if (Option::get($curModuleName, 'convert_enable_clear_cache', 'N') === 'Y') {
+                    echo 'checked';
+                }
+                ?>
+            />
+        </p>
     </td>
 </tr>
 

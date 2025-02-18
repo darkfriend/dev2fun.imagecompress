@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.10.4
+ * @version 0.11.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -72,6 +72,8 @@ class Convert
     public $cacheTimeGetImages = -1;
     /** @var bool */
     public $cacheIncludeUserGroups = true;
+    /** @var bool */
+    public $enableClearCache = false;
 
     public $siteId;
 
@@ -110,6 +112,8 @@ class Convert
             $this->cacheTimeGetImages = Option::get($this->MODULE_ID, 'convert_cache_time_get_images', 3600);
             $this->cacheIncludeUserGroups = Option::get($this->MODULE_ID, 'convert_cache_include_user_groups', 'Y') === 'Y';
         }
+
+        $this->enableClearCache = Option::get($this->MODULE_ID, 'convert_enable_clear_cache', 'N') === 'Y';
     }
 
     /**
@@ -816,7 +820,7 @@ class Convert
 //                                'SITE_ID' => Dev2funImageCompress::getSiteId(),
                                 'IMAGE_PATH' => $file,
                                 'IMAGE_HASH' => $md5,
-                                'DATE_CREATE' => new SqlExpression("NOW()"),
+//                                'DATE_CREATE' => new SqlExpression("NOW()"),
                                 'IMAGE_IGNORE' => 'N',
                                 //                            'IMAGE_PROCESSED' => 'N',
                             ];
@@ -1236,6 +1240,121 @@ class Convert
         return $this->process($arFile, $options);
     }
 
+    /**
+     * Delete picture
+     * @param array $arFile
+     * @return void
+     * @throws \Exception
+     */
+    public static function ConvertImageOnFileDeleteEvent(array $arFile)
+    {
+        if (!self::$globalEnable || !self::getInstance()->enable) {
+            return;
+        }
+
+        $items = ImageCompressImagesConvertedTable::getList([
+            'filter' => [
+                'IMAGE_ID' => $arFile['ID'],
+            ],
+        ])->fetchAll();
+
+        foreach ($items as $item) {
+            ImageCompressImagesConvertedTable::delete($item['ID']);
+            if (!empty($item['CONVERTED_IMAGE_ID'])) {
+                ImageCompressImagesToConvertedTable::delete($item['CONVERTED_IMAGE_ID']);
+            }
+            if (!empty($item['IMAGE_PATH'])) {
+                \Bitrix\Main\IO\File::deleteFile(self::getAbsolutePath($item['IMAGE_PATH']));
+            }
+        }
+    }
+
+    /**
+     * Get absolute path
+     * @param string $path
+     * @return string
+     */
+    public static function getAbsolutePath(string $path): string
+    {
+        return "{$_SERVER["DOCUMENT_ROOT"]}$path";
+    }
+
+    /**
+     * Return webp/avif path
+     * @param string $path
+     * @param string $type
+     * @return string
+     */
+    public static function getConvertedPath(string $path = '', string $type = 'webp'): string
+    {
+//        $moduleName = Dev2funImageCompress::MODULE_ID;
+//        $uploadDir = Option::get('main', 'upload_dir', 'upload');
+//        $srcWebp = "/{$uploadDir}/{$moduleName}";
+        $srcWebp = static::getPath();
+        if ($type) {
+            $srcWebp .= "/{$type}";
+        }
+        if ($path) {
+            $srcWebp .= "/{$path}";
+        }
+        return $srcWebp;
+    }
+
+    /**
+     * Return current common convert path
+     * @return string
+     */
+    public static function getPath(): string
+    {
+        $moduleName = Dev2funImageCompress::MODULE_ID;
+        $uploadDir = Option::get('main', 'upload_dir', 'upload');
+        return "/{$uploadDir}/{$moduleName}";
+    }
+
+    /**
+     * Обработчик на событие очистки всего кэша
+     * @return void
+     */
+    public static function CleanCacheEvent(): void
+    {
+        global $APPLICATION;
+
+        $condition = $APPLICATION->GetCurPage() === '/bitrix/admin/cache.php'
+            && isset($_REQUEST["cachetype"])
+            && isset($_REQUEST["clearcache"])
+            && $_REQUEST["cachetype"] === "all"
+            && $_REQUEST["clearcache"] === "Y";
+        if (!$condition) {
+            return;
+        }
+
+        if(
+            !self::$globalEnable
+            || !static::getInstance()->enable
+            || (
+                !\in_array('postConvert', self::getInstance()->convertMode)
+                && !\in_array('lazyConvert', self::getInstance()->convertMode)
+            )
+        ) {
+            return;
+        }
+
+
+        if (static::getInstance()->enableClearCache) {
+            CacheCleaner::cleanOnEvent();
+        } else {
+            \CAdminNotify::Add([
+                'MESSAGE' => \Bitrix\Main\Localization\Loc::getMessage(
+                    'D2F_IMAGECOMPRESS_CACHE_DELAYED',
+                    ['#URL#' => '/bitrix/admin/settings.php?lang=ru&mid=' . Dev2funImageCompress::MODULE_ID . '&mid_menu=1&tabControl_active_tab=edit2']
+                ),
+                'TAG' => Dev2funImageCompress::MODULE_ID . '_clear_cache',
+                'MODULE_ID' => Dev2funImageCompress::MODULE_ID,
+                'NOTIFY_TYPE' => \CAdminNotify::TYPE_ERROR,
+            ]);
+        }
+
+    }
 //    public function getList(
 //        array $arOrder = [],
 //        array $arFilter = [],

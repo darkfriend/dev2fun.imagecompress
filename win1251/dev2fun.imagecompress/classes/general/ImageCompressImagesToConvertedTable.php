@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.3
+ * @version 0.11.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -15,6 +15,10 @@ IncludeModuleLangFile(__FILE__);
 class ImageCompressImagesToConvertedTable extends Entity\DataManager
 {
     static $module_id = "dev2fun.imagecompress";
+    /**
+     * @var null|string
+     */
+    protected static $engine = null;
 
     public static function getFilePath()
     {
@@ -51,7 +55,7 @@ class ImageCompressImagesToConvertedTable extends Entity\DataManager
                 'IMAGE',
                 ImageCompressImagesTable::class,
                 [
-                    '=this.IMAGE_ID' => 'ref.ID'
+                    '=this.IMAGE_ID' => 'ref.ID',
                 ],
 //                ['join_type' => 'INNER']
             )),
@@ -101,7 +105,7 @@ class ImageCompressImagesToConvertedTable extends Entity\DataManager
      * @throws Main\DB\SqlQueryException
      * @throws Main\SystemException
      */
-    public static function createTable()
+    public static function createTable(): void
     {
         static::getEntity()->createDbTable();
         /** @var Main\DB\MysqlCommonConnection $connection */
@@ -125,6 +129,32 @@ class ImageCompressImagesToConvertedTable extends Entity\DataManager
             'indx_image_processed',
             ['IMAGE_PROCESSED']
         );
+
+        static::addForeignKey();
+    }
+
+    /**
+     * @return void
+     * @throws Main\ArgumentException
+     * @throws Main\DB\SqlQueryException
+     * @throws Main\SystemException
+     */
+    public static function addForeignKey(): void
+    {
+        $connection = static::getEntity()->getConnection();
+
+        if (
+            $connection->getType() !== 'mysql'
+            || ($connection->getType() === 'mysql' &&  static::getEngine() === 'InnoDB')
+        ) {
+            $table = static::getTableName();
+            $tableSourceImages = ImageCompressImagesTable::getTableName();
+            $tableConvertedImages = ImageCompressImagesConvertedTable::getTableName();
+
+
+            $connection->queryExecute("ALTER TABLE {$table} ADD CONSTRAINT FK_IMAGE_ID FOREIGN KEY (IMAGE_ID) REFERENCES {$tableSourceImages}(id) ON DELETE CASCADE");
+            $connection->queryExecute("ALTER TABLE {$table} ADD CONSTRAINT FK_CONVERTED_IMAGE_ID FOREIGN KEY (CONVERTED_IMAGE_ID) REFERENCES {$tableConvertedImages}(id) ON DELETE CASCADE");
+        }
     }
 
     /**
@@ -134,8 +164,123 @@ class ImageCompressImagesToConvertedTable extends Entity\DataManager
      * @throws Main\DB\SqlQueryException
      * @throws Main\SystemException
      */
-    public static function dropTable()
+    public static function dropTable(): void
     {
+        if (static::getEntity()->getConnection()->getType() !== 'mysql') {
+            static::dropForeignKey();
+        }
         static::getEntity()->getConnection()->dropTable(static::getTableName());
+    }
+
+    /**
+     * @return void
+     * @throws Main\ArgumentException
+     * @throws Main\DB\SqlQueryException
+     * @throws Main\SystemException
+     */
+    public static function dropForeignKey(): void
+    {
+        $table = static::getTableName();
+
+        static::getEntity()
+            ->getConnection()
+            ->queryExecute("ALTER TABLE {$table} DROP CONSTRAINT FK_IMAGE_ID");
+
+        static::getEntity()
+            ->getConnection()
+            ->queryExecute("ALTER TABLE {$table} DROP CONSTRAINT FK_CONVERTED_IMAGE_ID");
+    }
+
+    /**
+     * Возвращает движок для таблицы (например InnoDB)
+     * @return string|null
+     * @throws Main\ArgumentException
+     * @throws Main\DB\SqlQueryException
+     * @throws Main\SystemException
+     */
+    public static function getEngine(): ?string
+    {
+        if (static::$engine === null) {
+            $table = static::getTableName();
+            static::$engine = static::getEntity()
+                ->getConnection()
+                ->query("SHOW TABLE STATUS WHERE Name = '{$table}'")
+                ->fetch()['Engine'] ?? '';
+        }
+
+        return static::$engine;
+    }
+
+    /**
+     * Удаляет битые связи
+     * @param int|null $limit
+     * @return void
+     * @throws Main\ArgumentException
+     * @throws Main\DB\SqlQueryException
+     * @throws Main\SystemException
+     */
+    public static function removeWrongRelations(?int $limit = null): void
+    {
+        $table = static::getTableName();
+        $tableSourceImages = ImageCompressImagesTable::getTableName();
+        $tableConvertedImages = ImageCompressImagesConvertedTable::getTableName();
+
+        $limitStr = '';
+        if ($limit) {
+            $limitStr = "LIMIT {$limit}";
+        }
+
+        $rows = static::getEntity()
+            ->getConnection()
+            ->query(<<<SQL
+                SELECT {$table}.ID
+                FROM {$table}
+                    LEFT JOIN {$tableSourceImages} ON {$tableSourceImages}.ID = {$table}.IMAGE_ID
+                    LEFT JOIN {$tableConvertedImages} ON {$tableConvertedImages}.ID = {$table}.CONVERTED_IMAGE_ID
+                WHERE {$tableConvertedImages}.ID IS NULL OR {$tableSourceImages}.ID IS NULL
+                {$limitStr}
+SQL
+            )
+            ->fetchAll();
+
+        if (!$rows) {
+            return;
+        }
+
+        $ids = implode(
+            ',',
+            array_column($rows, 'ID')
+        );
+
+        static::getEntity()->getConnection()
+            ->queryExecute(
+                "DELETE FROM {$table} WHERE ID IN ({$ids})"
+            );
+    }
+
+    /**
+     * Возвращает количество битых связей
+     * @return int
+     * @throws Main\ArgumentException
+     * @throws Main\DB\SqlQueryException
+     * @throws Main\SystemException
+     */
+    public static function getCountWrongRelations(): int
+    {
+        $table = static::getTableName();
+        $tableSourceImages = ImageCompressImagesTable::getTableName();
+        $tableConvertedImages = ImageCompressImagesConvertedTable::getTableName();
+
+        return static::getEntity()
+            ->getConnection()
+            ->query(<<<SQL
+                SELECT COUNT(*) as cnt
+                FROM {$table}
+                    LEFT JOIN {$tableSourceImages} ON {$tableSourceImages}.ID = {$table}.IMAGE_ID
+                    LEFT JOIN {$tableConvertedImages} ON {$tableConvertedImages}.ID = {$table}.CONVERTED_IMAGE_ID
+                WHERE {$tableConvertedImages}.ID IS NULL OR {$tableSourceImages}.ID IS NULL
+SQL
+            )
+            ->fetch()['cnt'] ?? 0;
     }
 }

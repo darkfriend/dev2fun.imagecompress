@@ -192,3 +192,8 @@ $MESS['D2F_COMPRESS_CACHE_DELETE_AGENT_NOT_ACTIVATED'] = "Агент не акт
 $MESS['D2F_COMPRESS_CACHE_DELETE_LENGTH'] = "Количество удаляемого кэша";
 $MESS['D2F_COMPRESS_CACHE_DELETE_BTN_DEACTIVATE'] = "Дизактивировать";
 $MESS['D2F_COMPRESS_CACHE_DELETE_BTN_ACTIVATE'] = "Активировать";
+
+$MESS['D2F_COMPRESS_OPTIONS_CACHE_CLEAR_ALL_SUCCESS'] = "Кэш сконвертированных картинок resize_cache успешно очищен";
+$MESS['D2F_COMPRESS_CACHE_CLEAR_ALL_LABEL'] = "Очистка resize_cache";
+$MESS['D2F_COMPRESS_CACHE_CLEAR_ALL_BTN'] = "Запустить очистку resize_cache";
+$MESS['D2F_COMPRESS_ENABLE_CLEAR_CACHE_LABEL'] = "Включить автоочистку resize_cache при полном сбросе кэша";

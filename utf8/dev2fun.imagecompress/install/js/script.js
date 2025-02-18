@@ -149,6 +149,34 @@ if(typeof cacheDeleteDeactivate === "undefined") {
     }
 }
 
+if(typeof cacheClearAll === "undefined") {
+    function cacheClearAll() {
+        let objRequest = {
+            AJAX_MODE : 'Y',
+            AJAX_IC : 'Y',
+            action : 'cache-clear-all',
+            sessid: BX.bitrix_sessid()
+        };
+        BX.showWait();
+        BX.ajax({
+            url: window.location.href,
+            data : objRequest,
+            method : 'POST',
+            timeout : 600,
+            dataType: 'json',
+            cache: false,
+            onsuccess: function(data) {
+                BX.closeWait();
+                alert(data.message);
+            },
+            onfailure: function(){
+                BX.closeWait();
+                alert('Error!');
+            }
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function(){
     const convertModeSelect = document.querySelectorAll('.select__convert_mode');
     if (convertModeSelect.length) {

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.10.1
+ * @version 0.11.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -93,7 +93,8 @@ class AvifConvertImagick
         $arFile["SUBDIR"] = \ltrim($arFile["SUBDIR"], '/');
 //        $srcWebp = "/{$uploadDir}/resize_cache/avif/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.avif";
         $origPicture = "/{$uploadDir}";
-        $srcWebp = "/{$uploadDir}/resize_cache/avif";
+//        $srcWebp = "/{$uploadDir}/resize_cache/avif";
+        $srcWebp = Convert::getConvertedPath('', 'avif');
         if (!empty($arFile["SUBDIR"])) {
             $srcWebp .= "/{$arFile["SUBDIR"]}";
             $origPicture .= "/{$arFile["SUBDIR"]}";

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.3
+ * @version 0.11.0
  */
 
 namespace Dev2fun\ImageCompress;

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.10.1
+ * @version 0.11.0
  */
 
 namespace Dev2fun\ImageCompress;
@@ -109,7 +109,8 @@ class WebpConvertPhp
         $arFile["SUBDIR"] = \ltrim($arFile["SUBDIR"], '/');
 //        $srcWebp = "/{$uploadDir}/resize_cache/webp/{$arFile["SUBDIR"]}/{$fileInfo['filename']}.webp";
         $origPicture = "/{$uploadDir}";
-        $srcWebp = "/{$uploadDir}/resize_cache/webp";
+//        $srcWebp = "/{$uploadDir}/resize_cache/webp";
+        $srcWebp = Convert::getConvertedPath();
         if (!empty($arFile["SUBDIR"])) {
             $srcWebp .= "/{$arFile["SUBDIR"]}";
             $origPicture .= "/{$arFile["SUBDIR"]}";

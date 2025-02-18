@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.9.0
+ * @version 0.11.0
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 \Bitrix\Main\Localization\Loc::loadMessages(__FILE__);
@@ -279,6 +279,8 @@ class dev2fun_imagecompress extends CModule
 
         $eventManager->registerEventHandler("main", "OnEndBufferContent", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "PostConverterEvent", 999);
 
+        $eventManager->registerEventHandler("main", "OnPageStart", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "CleanCacheEvent", 999);
+
         return true;
     }
 
@@ -286,6 +288,8 @@ class dev2fun_imagecompress extends CModule
     {
         CopyDirFiles(__DIR__ . "/admin", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/admin", true, true);
         CopyDirFiles(__DIR__ . "/themes", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/themes", true, true);
+        CopyDirFiles(__DIR__ . "/js/vue", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/js/{$this->MODULE_ID}/vue", true, true);
+
         return true;
     }
 
@@ -316,8 +320,10 @@ class dev2fun_imagecompress extends CModule
     {
         DeleteDirFilesEx('/bitrix/admin/dev2fun_imagecompress_files.php');
         DeleteDirFilesEx('/bitrix/admin/dev2fun_imagecompress_convert.php');
+        DeleteDirFilesEx('/bitrix/admin/dev2fun_imagecompress_convert_move.php');
         DeleteDirFilesEx('/bitrix/themes/.default/icons/dev2fun.imagecompress');
         DeleteDirFilesEx('/bitrix/themes/.default/dev2fun.imagecompress.css');
+        DeleteDirFilesEx("/bitrix/js/{$this->MODULE_ID}");
         return true;
     }
 
@@ -341,6 +347,8 @@ class dev2fun_imagecompress extends CModule
         $eventManager->unRegisterEventHandler('main', 'OnGetFileSRC', $this->MODULE_ID);
         $eventManager->unRegisterEventHandler('main', 'OnAfterResizeImage', $this->MODULE_ID);
         $eventManager->unRegisterEventHandler('main', 'OnEndBufferContent', $this->MODULE_ID);
+
+        $eventManager->unRegisterEventHandler('main', 'OnPageStart', $this->MODULE_ID);
 
         return true;
     }

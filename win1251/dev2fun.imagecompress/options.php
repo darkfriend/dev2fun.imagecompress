@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.5
+ * @version 0.11.0
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -114,6 +114,14 @@ if ($request->isPost() && check_bitrix_sessid()) {
         $APPLICATION->RestartBuffer();
         echo json_encode([
             'success' => $res,
+        ]);
+        die();
+    } else if (isset($_POST['action']) && $_POST['action'] === 'cache-clear-all') {
+        \Dev2fun\ImageCompress\CacheCleaner::clearingConvertResizeCache();
+        $APPLICATION->RestartBuffer();
+        echo json_encode([
+            'success' => true,
+            'message' => Loc::getMessage("D2F_COMPRESS_OPTIONS_CACHE_CLEAR_ALL_SUCCESS"),
         ]);
         die();
     } else {
@@ -500,6 +508,11 @@ if ($request->isPost() && check_bitrix_sessid()) {
                     $curModuleName,
                     'convert_cache_include_user_groups',
                     $_POST['convert_cache_include_user_groups'] ?? 'N'
+                );
+                Option::set(
+                    $curModuleName,
+                    'convert_enable_clear_cache',
+                    $_POST['convert_enable_clear_cache'] ?? 'N'
                 );
             }
 

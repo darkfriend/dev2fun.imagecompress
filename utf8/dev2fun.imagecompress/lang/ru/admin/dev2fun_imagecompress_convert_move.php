@@ -1,0 +1,37 @@
+<?php
+$MESS["DEV2FUN_IMAGECOMPRESS_CONVERT_TITLE"] = "Перенос сконвертированных файлов";
+$MESS["DEV2FUN_IMAGECOMPRESS_CONVERT_MOVE"] = "Перенести все сконвертированные файлы";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_DEFAULT_TEXT_ERRROR"] = "При конвертации произошла неизвестная ошибка!";
+
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_INFO_TITLE"] = "Информация по переносу";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_INFO_UPDATE_BTN"] = "обновить информацию";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_INFO_TEXT"] = "Необходимо перенести файлы из папок";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_INFO_IN"] = "в";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_INFO_COUNT_FILES"] = "Найдено файлов для переноса (по бд)";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_INFO_DIR_SIZE"] = "Размер папки";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_INFO_DIR_COUNT_FILES"] = "Количество файлов в папке";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_ADMMESSAGE_SUCCESSFUL"] = "Все файлы успешно перенесены";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_PROGRESSBAR_TITLE"] = "Перенос файлов";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_PROGRESSBAR_TEXT"] = "Процесс переноса файлов";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_PROGRESSBAR_STOP_BTN"] = "Остановить";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_COUNT_FILES_PER_STEP"] = "Количество картинок за шаг";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_FILES_BTN"] = "Перенести файлы";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_ERR_COUNT_FILES_PER_STEP"] = "Не указано количество картинок за шаг";
+
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_INFO_TEXT_STEPS"] = "Перенос будет сделан в 2 шага";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_INFO_TEXT_STEP1"] = "Перенос файлов по бд + файлы";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_INFO_TEXT_STEP2"] = "Перенос оставшихся файлов";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_HEADING_STEP1"] = "Информация по файлам в бд";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_HEADING_STEP2"] = "Информация по оставшимся файлам в папках";
+
+
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_HEADING_FILES_DB"] = "Шаг 1: Перенос файлов по БД";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_HEADING_FILES_PHYSICAL"] = "Шаг 2: Перенос физических файлов (оставшихся)";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_STEP2_PROGRESS_TEXT"] = "Поиск файлов для переноса";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_STEP2_PROGRESS_TEXT_REMINDER"] = "Перенос файлов, осталось";
+
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_MSG_SUCCESSFUL"] = "Успешно обработано";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_ERROR_CREATE_DIR"] = "Не смог создать папку #DIR#";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_ERROR_MOVE_FILE"] = "Не смог перенести файл #FILE#";
+$MESS["D2F_IMAGECOMPRESS_CONVERT_MOVE_SUCCESSFUL_ALL"] = "Все файлы успешно перенесены";
+

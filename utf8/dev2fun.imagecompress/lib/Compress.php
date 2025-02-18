@@ -472,11 +472,20 @@ class Compress
      */
     public static function CompressImageOnSectionEvent(&$arFields)
     {
-        if(!static::$enable) return;
+        if(!static::$enable) {
+            return;
+        }
         $instance = self::getInstance();
-        if ($instance->enableSection && !empty($arFields['PICTURE']) && is_numeric($arFields['PICTURE'])) {
+        if (
+            $instance->enableSection
+            && !empty($arFields['PICTURE'])
+            && !empty($arFields['ID'])
+        ) {
             $rsSection = \CIBlockSection::GetByID($arFields["ID"]);
             $arSection = $rsSection->GetNext();
+            if (empty($arSection['PICTURE'])) {
+                return;
+            }
             $instance->compressImageByID($arSection['PICTURE']);
         }
     }
