@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.0
+ * @version 0.11.1
  */
 
 namespace Dev2fun\ImageCompress;
@@ -725,7 +725,8 @@ class Convert
             return $content;
         }
 
-        $curUri = $APPLICATION->GetCurUri();
+//        $curUri = $APPLICATION->GetCurUri();
+        $curUri = $APPLICATION->GetCurPage();
         $userGroups = 'guest';
         $includeUserGroups = self::getInstance()->cacheIncludeUserGroups;
         if ($includeUserGroups && $USER->IsAuthorized()) {
@@ -830,6 +831,9 @@ class Convert
                         ImageCompressImagesTable::getTableName(),
                         $rows
                     );
+
+//                    var_dump($sql);
+//                    die();
 //                    $connection->getSqlHelper()->prepareMerge(
 //                        ImageCompressImagesTable::getTableName(),
 //                        [],
@@ -866,21 +870,29 @@ class Convert
                         'IMAGE_IGNORE' => 'N',
                     ];
                     $imagesHash = [];
+                    $arFilesHash = [];
                     foreach ($arFiles as $file) {
-                        $file = str_replace('\/', '/', $file);
-                        $isUrl = !empty(parse_url($file, PHP_URL_HOST));
+                        $fileNormalize = str_replace('\/', '/', $file);
+                        $isUrl = !empty(parse_url($fileNormalize, PHP_URL_HOST));
                         $hash = null;
                         if ($isUrl) {
-                            $hash = md5_file($file);
+                            $hash = md5_file($fileNormalize);
                         } else {
-                            $absFile = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($file, '/');
+                            $absFile = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($fileNormalize, '/');
                             if (is_file($absFile)) {
-                                $hash = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
+                                $hash = md5_file($_SERVER['DOCUMENT_ROOT'].$fileNormalize);
                             }
                         }
+
                         if ($hash) {
                             $imagesHash[] = $hash;
+                            $arFilesHash[$hash][] = $file;
                         }
+
+
+
+//                        var_dump(empty($currentFiles[$md5]));
+
 //                        $imagesHash[] = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
 //                        $rows[] = [
 //                            'SITE_ID' => Dev2funImageCompress::getSiteId(),
@@ -888,13 +900,12 @@ class Convert
 //                            'IMAGE_HASH' => md5_file($_SERVER['DOCUMENT_ROOT'].$file),
 //                        ];
                     }
+
                     if (!$imagesHash) {
                         return [];
                     }
                     $filter[] = [
                         'IMAGE_HASH', 'in', array_unique($imagesHash),
-//                            'logic' => Filter::LOGIC_OR,
-//                            ['IMAGE_HASH', 'in', ''],
                     ];
                     $images = ImageCompressImagesTable::getList([
                             'select' => [
@@ -911,19 +922,28 @@ class Convert
                         ])
                         ->fetchAll();
 
+
                     $result = [];
                     foreach ($images as $image) {
-                        if (self::isExcludeFile($image['IMAGE_PATH'])) {
+                        if (
+                            empty($arFilesHash[$image['IMAGE_HASH']])
+                            || (!empty($arFilesHash[$image['IMAGE_HASH']]) && !in_array($image['IMAGE_PATH'], $arFilesHash[$image['IMAGE_HASH']]))
+                        ) {
                             continue;
                         }
-                        $result[$image['IMAGE_PATH']] = $image['CONVERTED_IMAGE_PATH'];
+                        foreach ($arFilesHash[$image['IMAGE_HASH']] as $filePath) {
+                            if (self::isExcludeFile($filePath)) {
+                                continue;
+                            }
+                            $result[$filePath] = $image['CONVERTED_IMAGE_PATH'];
+                        }
                     }
 
                     return $result;
                 }
             );
 
-            if($arFileReplace) {
+            if ($arFileReplace) {
                 $content = \strtr($content, $arFileReplace);
             }
 
