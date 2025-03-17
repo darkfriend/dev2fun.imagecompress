@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.11.0
+ * @version 0.11.2
  */
 
 namespace Dev2fun\ImageCompress;
@@ -114,8 +114,8 @@ class LazyConvert
         $duplicateImages = ImageCompressImagesConvertedTable::getList([
             'select' => ['ID', 'ORIGINAL_IMAGE_HASH'],
             'filter' => [
-                'ORIGINAL_IMAGE_HASH' => $imagesHash,
-                'IMAGE_TYPE' => $algImageType,
+                '=ORIGINAL_IMAGE_HASH' => $imagesHash,
+                '=IMAGE_TYPE' => $algImageType,
             ],
         ]);
         $arDuplicateImages = [];
@@ -248,7 +248,7 @@ class LazyConvert
             return $arFiles;
         }
         $filter = [
-            'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE' => Convert::getInstance()->getImageTypeByAlgorithm(
+            '=Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE' => Convert::getInstance()->getImageTypeByAlgorithm(
                 Convert::getInstance()->algorithm
             ),
         ];
@@ -265,7 +265,7 @@ class LazyConvert
             return [];
         }
         $filter[] = [
-            'IMAGE_HASH', 'in', $imagesHash,
+            '=IMAGE_HASH' => $imagesHash,
         ];
         $images = ImageCompressImagesTable::getList([
                 'select' => [

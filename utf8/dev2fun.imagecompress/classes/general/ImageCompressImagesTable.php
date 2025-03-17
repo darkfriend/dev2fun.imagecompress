@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.3
+ * @version 0.11.2
  */
 
 namespace Dev2fun\ImageCompress;
@@ -95,6 +95,14 @@ class ImageCompressImagesTable extends Entity\DataManager
             'indx_date_check',
             ['DATE_CHECK']
         );
+
+        if (!$connection->isIndexExists(static::getTableName(), ['IMAGE_HASH', 'IMAGE_IGNORE'])) {
+            $connection->createIndex(
+                static::getTableName(),
+                'indx_image_hash',
+                ['IMAGE_HASH', 'IMAGE_IGNORE']
+            );
+        }
     }
 
     /**

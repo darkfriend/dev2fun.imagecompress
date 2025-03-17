@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.0
+ * @version 0.11.2
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 
@@ -192,7 +192,7 @@ $convertInstance = \Dev2fun\ImageCompress\Convert::getInstance();
             <input
                 type="checkbox"
                 name="convert_enable_clear_cache"
-                value="N"
+                value="Y"
                 <?php
                 if (Option::get($curModuleName, 'convert_enable_clear_cache', 'N') === 'Y') {
                     echo 'checked';

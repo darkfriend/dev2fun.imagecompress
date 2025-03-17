@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.0
+ * @version 0.11.2
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 \Bitrix\Main\Localization\Loc::loadMessages(__FILE__);
@@ -296,6 +296,15 @@ class dev2fun_imagecompress extends CModule
     public function unInstallDB()
     {
         $connection = Application::getInstance()->getConnection();
+
+        if (ImageCompressImagesToConvertedTable::getEntity()->getConnection()->isTableExists(ImageCompressImagesToConvertedTable::getTableName())) {
+            ImageCompressImagesToConvertedTable::dropTable();
+        }
+
+        if (ImageCompressImagesConvertedTable::getEntity()->getConnection()->isTableExists(ImageCompressImagesConvertedTable::getTableName())) {
+            ImageCompressImagesConvertedTable::dropTable();
+        }
+
 //        $connection->dropTable(ImageCompressTable::getTableName());
         if (ImageCompressTable::getEntity()->getConnection()->isTableExists(ImageCompressTable::getTableName())) {
             $connection->dropTable(ImageCompressTable::getTableName());
@@ -304,12 +313,6 @@ class dev2fun_imagecompress extends CModule
 
         if (ImageCompressImagesTable::getEntity()->getConnection()->isTableExists(ImageCompressImagesTable::getTableName())) {
             ImageCompressImagesTable::dropTable();
-        }
-        if (ImageCompressImagesConvertedTable::getEntity()->getConnection()->isTableExists(ImageCompressImagesConvertedTable::getTableName())) {
-            ImageCompressImagesConvertedTable::dropTable();
-        }
-        if (ImageCompressImagesToConvertedTable::getEntity()->getConnection()->isTableExists(ImageCompressImagesToConvertedTable::getTableName())) {
-            ImageCompressImagesToConvertedTable::dropTable();
         }
 
         Option::delete($this->MODULE_ID);

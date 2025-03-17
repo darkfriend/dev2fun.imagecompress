@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.1
+ * @version 0.11.2
  */
 
 namespace Dev2fun\ImageCompress;
@@ -820,7 +820,7 @@ class Convert
                             $rows[] = [
 //                                'SITE_ID' => Dev2funImageCompress::getSiteId(),
                                 'IMAGE_PATH' => $file,
-                                'IMAGE_HASH' => $md5,
+                                '=IMAGE_HASH' => $md5,
 //                                'DATE_CREATE' => new SqlExpression("NOW()"),
                                 'IMAGE_IGNORE' => 'N',
                                 //                            'IMAGE_PROCESSED' => 'N',
@@ -863,11 +863,11 @@ class Convert
                 function () use ($arFiles) {
                     $filter = [
 //                        'IMAGE_PROCESSED' => 'Y',
-                        'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_PROCESSED' => 'Y',
-                        'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE' => self::getInstance()->getImageTypeByAlgorithm(
+                        '=Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_PROCESSED' => 'Y',
+                        '=Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE' => self::getInstance()->getImageTypeByAlgorithm(
                             self::getInstance()->algorithm
                         ),
-                        'IMAGE_IGNORE' => 'N',
+                        '=IMAGE_IGNORE' => 'N',
                     ];
                     $imagesHash = [];
                     $arFilesHash = [];
@@ -889,8 +889,6 @@ class Convert
                             $arFilesHash[$hash][] = $file;
                         }
 
-
-
 //                        var_dump(empty($currentFiles[$md5]));
 
 //                        $imagesHash[] = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
@@ -905,7 +903,7 @@ class Convert
                         return [];
                     }
                     $filter[] = [
-                        'IMAGE_HASH', 'in', array_unique($imagesHash),
+                        '=IMAGE_HASH' => array_unique($imagesHash),
                     ];
                     $images = ImageCompressImagesTable::getList([
                             'select' => [
@@ -1274,7 +1272,7 @@ class Convert
 
         $items = ImageCompressImagesConvertedTable::getList([
             'filter' => [
-                'IMAGE_ID' => $arFile['ID'],
+                '=IMAGE_ID' => $arFile['ID'],
             ],
         ])->fetchAll();
 
