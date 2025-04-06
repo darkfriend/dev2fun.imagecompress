@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.2
+ * @version 0.11.3
  */
 
 namespace Dev2fun\ImageCompress;
@@ -743,7 +743,6 @@ class Convert
         ];
         $cacheId = implode('|', $cacheId);
         $arFiles = LazyConvert::cache(
-        //                3600*1,
             self::getInstance()->cacheTimeGetImages,
             $cacheId,
             '/scan-images',
@@ -803,7 +802,6 @@ class Convert
                 '/find-images',
                 function () use ($arFiles) {
                     $currentFiles = LazyConvert::findFiles($arFiles);
-//                    DebugHelper::print_pre($currentFiles, 1);
                     $connection = \Bitrix\Main\Application::getInstance()->getConnection();
                     $rows = [];
                     foreach ($arFiles as $file) {
@@ -820,10 +818,10 @@ class Convert
                             $rows[] = [
 //                                'SITE_ID' => Dev2funImageCompress::getSiteId(),
                                 'IMAGE_PATH' => $file,
-                                '=IMAGE_HASH' => $md5,
+                                'IMAGE_HASH' => $md5,
 //                                'DATE_CREATE' => new SqlExpression("NOW()"),
                                 'IMAGE_IGNORE' => 'N',
-                                //                            'IMAGE_PROCESSED' => 'N',
+//                            'IMAGE_PROCESSED' => 'N',
                             ];
                         }
                     }
@@ -832,13 +830,6 @@ class Convert
                         $rows
                     );
 
-//                    var_dump($sql);
-//                    die();
-//                    $connection->getSqlHelper()->prepareMerge(
-//                        ImageCompressImagesTable::getTableName(),
-//                        [],
-//                        $rows,
-//                    );
                     $connection->queryExecute($sql);
                     return true;
                 },
