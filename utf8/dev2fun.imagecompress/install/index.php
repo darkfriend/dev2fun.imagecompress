@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.2
+ * @version 0.11.4
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 \Bitrix\Main\Localization\Loc::loadMessages(__FILE__);
@@ -276,6 +276,7 @@ class dev2fun_imagecompress extends CModule
 
         $eventManager->registerEventHandler("main", "OnGetFileSRC", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "CompressImageOnConvertEvent", 999);
         $eventManager->registerEventHandler("main", "OnAfterResizeImage", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "CompressImageCacheOnConvertEvent", 999);
+        $eventManager->registerEventHandler("main", "OnFileDelete", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "ConvertImageOnFileDeleteEvent");
 
         $eventManager->registerEventHandler("main", "OnEndBufferContent", $this->MODULE_ID, "Dev2fun\\ImageCompress\\Convert", "PostConverterEvent", 999);
 

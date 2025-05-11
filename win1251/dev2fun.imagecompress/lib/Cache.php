@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.0
+ * @version 0.11.4
  * @since 0.9.0
  */
 
@@ -16,7 +16,6 @@ IncludeModuleLangFile(__FILE__);
 class Cache
 {
     const OPTION_NAME_DELETE_AGENT = 'cache_delete_agent';
-    const OPTION_NAME_DELETE_LENGTH = 'cache_delete_length';
 
     /**
      * Return current cache engine
@@ -34,11 +33,8 @@ class Cache
     public static function agentRun()
     {
         if (self::getCacheEngine() === 'cacheenginefiles') {
-            $limit = \Bitrix\Main\Config\Option::get('dev2fun.imagecompress', self::OPTION_NAME_DELETE_LENGTH, 1000);
-            if (empty($limit)) {
-                $limit = 1000;
-            }
-            \Bitrix\Main\Data\CacheEngineFiles::delayedDelete($limit);
+            $cache = \Bitrix\Main\Data\Cache::createCacheEngine();
+            $cache->delayedDelete();
         }
 
         return self::class . '::agentRun();';

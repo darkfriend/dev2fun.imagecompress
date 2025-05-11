@@ -3,7 +3,7 @@
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
  * @version 0.11.4
- * @since 0.9.0
+ * @since 0.11.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -13,18 +13,9 @@ use CAgent;
 
 IncludeModuleLangFile(__FILE__);
 
-class Cache
+class CompressAgent
 {
-    const OPTION_NAME_DELETE_AGENT = 'cache_delete_agent';
-
-    /**
-     * Return current cache engine
-     * @return string
-     */
-    public static function getCacheEngine()
-    {
-        return \Bitrix\Main\Data\Cache::getCacheEngineType();
-    }
+    const OPTION_NAME_AGENT = 'image_compress_agent';
 
     /**
      * Run agent
@@ -32,9 +23,51 @@ class Cache
      */
     public static function agentRun()
     {
-        if (self::getCacheEngine() === 'cacheenginefiles') {
-            $cache = \Bitrix\Main\Data\Cache::createCacheEngine();
-            $cache->delayedDelete();
+        try {
+            $limit = Option::get(\Dev2funImageCompress::MODULE_ID, "cnt_step", 30);
+
+            $filterList = [
+                'COMRESSED' => 'N',
+                '@CONTENT_TYPE' => [
+                    'image/jpeg',
+                    'image/png',
+                    'application/pdf',
+                ],
+            ];
+
+            $rsRes = Compress::getInstance()
+                ->getFileList(
+                    [],
+                    $filterList,
+                    $limit
+                );
+//            $rsRes->NavStart($limit, false);
+
+            while ($arFile = $rsRes->GetNext()) {
+                $strFilePath = \CFile::GetPath($arFile["ID"]);
+                if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $strFilePath)) {
+                    Compress::getInstance()
+                        ->addCompressTable(
+                            $arFile['ID'],
+                            [
+                                'FILE_ID' => $arFile['ID'],
+                                'SIZE_BEFORE' => 0,
+                                'SIZE_AFTER' => 0,
+                            ]
+                        );
+                    continue;
+                }
+
+                Compress::getInstance()
+                    ->compressImageByID($arFile['ID']);
+            }
+
+        } catch (\Throwable $e) {
+            $msg = "Error image optimization: {$e->getMessage()}";
+            AddMessage2Log(
+                $msg,
+                \Dev2funImageCompress::MODULE_ID
+            );
         }
 
         return self::class . '::agentRun();';
@@ -47,12 +80,12 @@ class Cache
      */
     public static function addAgent(): int
     {
-        $startTime = ConvertTimeStamp(time() + \CTimeZone::GetOffset() + 120, 'FULL');
+        $startTime = ConvertTimeStamp(time() + \CTimeZone::GetOffset() + 600, 'FULL');
         $agentId = CAgent::AddAgent(
             self::class . '::agentRun();',
             \Dev2funImageCompress::MODULE_ID,
             'Y',
-            120,
+            600,
             '',
             'N',
             $startTime,
@@ -64,7 +97,7 @@ class Cache
             throw new \Exception('Error when add agent for cache-delete');
         }
 
-        Option::set(\Dev2funImageCompress::MODULE_ID, self::OPTION_NAME_DELETE_AGENT, $agentId);
+        Option::set(\Dev2funImageCompress::MODULE_ID, self::OPTION_NAME_AGENT, $agentId);
 
         return $agentId;
     }
@@ -75,7 +108,7 @@ class Cache
      */
     public static function getAgentIdOption(): ?int
     {
-        return Option::get(\Dev2funImageCompress::MODULE_ID, self::OPTION_NAME_DELETE_AGENT) ?: null;
+        return Option::get(\Dev2funImageCompress::MODULE_ID, self::OPTION_NAME_AGENT) ?: null;
     }
 
     /**
@@ -83,7 +116,7 @@ class Cache
      */
     public static function getAgent()
     {
-        static $agent = null;;
+        static $agent = null;
         if ($agent === null) {
             $rs = CAgent::GetList([], ['NAME' => self::class . '::agentRun();']);
             $agent = $rs ? $rs->Fetch() : [];
@@ -126,8 +159,7 @@ class Cache
      */
     public static function activateAgent(): bool
     {
-        $agentId = self::getAgentId();
-        return (bool)CAgent::Update($agentId, ['ACTIVE' => 'Y']);
+        return (bool)CAgent::Update(self::getAgentId(), ['ACTIVE' => 'Y']);
     }
 
     /**
@@ -136,8 +168,7 @@ class Cache
      */
     public static function deactivateAgent(): bool
     {
-        $agentId = self::getAgentId();
-        return (bool)CAgent::Update($agentId, ['ACTIVE' => 'N']);
+        return (bool)CAgent::Update(self::getAgentId(), ['ACTIVE' => 'N']);
     }
 
     /**

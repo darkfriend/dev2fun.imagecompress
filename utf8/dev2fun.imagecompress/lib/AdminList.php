@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.10.5
+ * @version 0.11.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -355,6 +355,14 @@ class AdminList
                         default:
                             if (strlen($arItem['VALUE'])) {
                                 $arFilter[(isset($arItem['OPER']) ? $arItem['OPER'] : '') . strtoupper($k)] = $arItem['VALUE'];
+                            } else {
+                                $arFilter['@CONTENT_TYPE'] = [
+                                    'image/png',
+                                    'image/jpeg',
+                                    'application/pdf',
+                                    'image/svg',
+                                    'image/gif',
+                                ];
                             }
                     }
 

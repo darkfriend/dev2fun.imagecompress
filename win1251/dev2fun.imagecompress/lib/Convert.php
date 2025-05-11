@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.3
+ * @version 0.11.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -385,7 +385,7 @@ class Convert
             $res = "{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
         }
 
-        // Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð° Ð¸Ð· ÑÐ¿Ð¸ÑÐºÐ° Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ð¹
+        // èñêëþ÷åíèå ôàéëà èç ñïèñêà èñêëþ÷åíèé
         if (static::isExcludeFile($res)) {
             return false;
         }
@@ -468,7 +468,7 @@ class Convert
             return null;
         }
 
-        // Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð° Ð¸Ð· ÑÐ¿Ð¸ÑÐºÐ° Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ð¹
+        // èñêëþ÷åíèå ôàéëà èç ñïèñêà èñêëþ÷åíèé
         if (static::isExcludeFile($file)) {
             return null;
         }
@@ -511,7 +511,7 @@ class Convert
     }
 
     /**
-     * Ð¡Ð¾Ð±Ñ‹Ñ‚Ð¸Ðµ Ð½Ð° Ñ€ÐµÑÐ°Ð¹Ð·Ðµ (OnAfterResizeImage)
+     * Ñîáûòèå íà ðåñàéçå (OnAfterResizeImage)
      * @param array $arFile
      * @param array $arInfo
      * @param array $callbackData
@@ -557,13 +557,13 @@ class Convert
             return false;
         }
 
-        // Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð° Ð¸Ð· ÑÐ¿Ð¸ÑÐºÐ° Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ð¹
+        // èñêëþ÷åíèå ôàéëà èç ñïèñêà èñêëþ÷åíèé
         $resFile = "/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
         if (static::isExcludeFile($resFile)) {
             return false;
         }
 
-        // Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ Ñ„Ð°Ð¹Ð»Ð° Ð¸Ð·-Ð·Ð° Ñ‚Ð¸Ð¿Ð° Ñ„Ð°Ð¹Ð»Ð°
+        // èñêëþ÷åíèå ôàéëà èç-çà òèïà ôàéëà
         if (!\in_array($arFileConvert["CONTENT_TYPE"], static::$supportContentType)) {
             return false;
         }
@@ -615,7 +615,7 @@ class Convert
             return null;
         }
 
-        // Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ðµ ÑÑ‚Ñ€Ð°Ð½Ð¸Ñ†Ñ‹ Ð¸Ð· ÑÐ¿Ð¸ÑÐºÐ° Ð¸ÑÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ð¹
+        // èñêëþ÷åíèå ñòðàíèöû èç ñïèñêà èñêëþ÷åíèé
         if (self::isExcludePage()) {
             return false;
         }
@@ -748,6 +748,14 @@ class Convert
             '/scan-images',
             function() use ($content) {
                 $arFiles = [];
+
+                // íîâàÿ îáðàáîòêà íà áóäóùåå
+//                \preg_match_all('/([^"\']+\.(?:jpe?g|png))/mi', $content, $matchInlineImages);
+//                var_dump($matchInlineImages);
+//                if (!empty($matchInlineImages[1])) {
+//                    $arFiles = $matchInlineImages[1];
+//                }
+
                 \preg_match_all('/([^"\'=\s]+\.(?:jpe?g|png))/mi', $content, $matchInlineImages);
                 if(!empty($matchInlineImages[1])) {
                     $arFiles = $matchInlineImages[1];
@@ -975,6 +983,12 @@ class Convert
                 if ($siteDomains) {
                     foreach ($siteDomains as $siteDomain) {
                         $domains[] = $siteDomain;
+                        if (
+                            function_exists('idn_to_ascii')
+                            && preg_match('#[À-ÿ]#ui', $siteDomain)
+                        ) {
+                            $domains[] = idn_to_ascii($siteDomain);
+                        }
                     }
                 }
             }
@@ -1017,7 +1031,16 @@ class Convert
         if (!empty($url['scheme'])) {
             $replacer[] = $url['scheme'];
         }
-        return str_replace($replacer, '', $file);
+        $file = str_replace($replacer, '', $file);
+
+        if ($file) {
+            $file = str_replace('\\/', '/', $file);
+            if (strpos($file, '/') !== 0) {
+                return null;
+            }
+        }
+
+        return $file;
     }
 
     /**
@@ -1250,32 +1273,44 @@ class Convert
     }
 
     /**
-     * Delete picture
+     * Delete webp picture
      * @param array $arFile
-     * @return void
+     * @return bool
      * @throws \Exception
      */
     public static function ConvertImageOnFileDeleteEvent(array $arFile)
     {
         if (!self::$globalEnable || !self::getInstance()->enable) {
-            return;
+            return true;
         }
 
-        $items = ImageCompressImagesConvertedTable::getList([
+        $item = ImageCompressImagesTable::getList([
             'filter' => [
-                '=IMAGE_ID' => $arFile['ID'],
+                '=IMAGE_PATH' => $arFile['SRC'],
+            ],
+        ])->fetch();
+
+        $itemConverted = ImageCompressImagesConvertedTable::getList([
+            'filter' => [
+                '=ORIGINAL_IMAGE_HASH' => $item['IMAGE_HASH'],
             ],
         ])->fetchAll();
 
-        foreach ($items as $item) {
-            ImageCompressImagesConvertedTable::delete($item['ID']);
-            if (!empty($item['CONVERTED_IMAGE_ID'])) {
-                ImageCompressImagesToConvertedTable::delete($item['CONVERTED_IMAGE_ID']);
-            }
-            if (!empty($item['IMAGE_PATH'])) {
-                \Bitrix\Main\IO\File::deleteFile(self::getAbsolutePath($item['IMAGE_PATH']));
+        if ($itemConverted) {
+            foreach ($itemConverted as $file) {
+                ImageCompressImagesConvertedTable::delete($file['ID']);
+                $convertAbsPath = self::getAbsolutePath($file['IMAGE_PATH']);
+                if (is_file($convertAbsPath)) {
+                    @unlink($convertAbsPath);
+                }
             }
         }
+
+        if (!empty($item['IMAGE_PATH'])) {
+            ImageCompressImagesTable::delete($item['ID']);
+        }
+
+        return true;
     }
 
     /**
@@ -1321,7 +1356,7 @@ class Convert
     }
 
     /**
-     * ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚Ñ‡Ð¸Ðº Ð½Ð° ÑÐ¾Ð±Ñ‹Ñ‚Ð¸Ðµ Ð¾Ñ‡Ð¸ÑÑ‚ÐºÐ¸ Ð²ÑÐµÐ³Ð¾ ÐºÑÑˆÐ°
+     * Îáðàáîò÷èê íà ñîáûòèå î÷èñòêè âñåãî êýøà
      * @return void
      */
     public static function CleanCacheEvent(): void
@@ -1364,21 +1399,17 @@ class Convert
         }
 
     }
-//    public function getList(
-//        array $arOrder = [],
-//        array $arFilter = [],
-//        int $limit = 100,
-//        int $offset = 0
-//    ) {
-//        global $DB;
-//        $strSql = $this->queryBuilder($arOrder, $arFilter);
-//        //        if($limit) {
-//        //            $strSql .= ' LIMIT '.$limit;
-//        //        }
-//        //
-//        //        if($offset) {
-//        //            $strSql .= ' OFFSET '.$offset;
-//        //        }
-//        return $DB->Query($strSql, false, "FILE: " . __FILE__ . "<br> LINE: " . __LINE__);
-//    }
+
+    /**
+     * Return md5 file hash
+     * @param string $absPath
+     * @return string
+     */
+    public static function getMd5Hash(string $absPath): string
+    {
+        if (!is_file($absPath)) {
+            return '';
+        }
+        return md5_file($absPath);
+    }
 }

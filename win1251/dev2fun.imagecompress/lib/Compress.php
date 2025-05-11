@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.5
+ * @version 0.11.4
  */
 
 namespace Dev2fun\ImageCompress;
@@ -472,11 +472,20 @@ class Compress
      */
     public static function CompressImageOnSectionEvent(&$arFields)
     {
-        if(!static::$enable) return;
+        if(!static::$enable) {
+            return;
+        }
         $instance = self::getInstance();
-        if ($instance->enableSection && !empty($arFields['PICTURE']) && is_numeric($arFields['PICTURE'])) {
+        if (
+            $instance->enableSection
+            && !empty($arFields['PICTURE'])
+            && !empty($arFields['ID'])
+        ) {
             $rsSection = \CIBlockSection::GetByID($arFields["ID"]);
             $arSection = $rsSection->GetNext();
+            if (empty($arSection['PICTURE'])) {
+                return;
+            }
             $instance->compressImageByID($arSection['PICTURE']);
         }
     }
@@ -698,6 +707,10 @@ class Compress
                     foreach ($arIn as $v) {
                         $val .= ($val <> '' ? ',' : '') . "'" . $DB->ForSql(\trim($v)) . "'";
                     }
+                } elseif (\substr($val, 0, 1) === "%") {
+                    $val = \substr($val, 1);
+                    $strOperation = "LIKE";
+                    $val = $DB->ForSql($val);
                 } elseif (\substr($val, 0, 1) === ">") {
                     $val = \substr($val, 1);
                     $strOperation = ">";
@@ -731,20 +744,28 @@ class Compress
                     case "FILE_SIZE":
                     case "ORIGINAL_NAME":
                     case "CONTENT_TYPE":
-                        if ($strOperation === "IN")
-                            $arSqlSearch[] = "f." . $key . " IN (" . $val . ")";
-                        elseif ($strOperation === ">")
-                            $arSqlSearch[] = "f." . $key . " > " . $val . "";
-                        elseif ($strOperation === "<")
-                            $arSqlSearch[] = "f." . $key . " < " . $val . "";
-                        else
-                            $arSqlSearch[] = "f." . $key . " = '" . $val . "'";
+                        if ($strOperation === "IN") {
+                            $arSqlSearch[] = "f.{$key} IN ({$val})";
+                        } elseif ($strOperation === "LIKE") {
+                            $arSqlSearch[] = "f.{$key} LIKE {$val}";
+                        } elseif ($strOperation === ">") {
+                            $arSqlSearch[] = "f.{$key} > {$val}";
+                        } elseif ($strOperation === "<") {
+                            $arSqlSearch[] = "f.{$key} < {$val}";
+                        } else {
+                            if (is_numeric($val)) {
+                                $arSqlSearch[] = "f.{$key} = {$val}";
+                            } else {
+                                $arSqlSearch[] = "f.{$key} = '{$val}'";
+                            }
+                        }
                         break;
                     case "COMRESSED":
-                        if ($val === "Y")
+                        if ($val === "Y") {
                             $arSqlSearch[] = "tf.FILE_ID > 0";
-                        else
+                        } else {
                             $arSqlSearch[] = "tf.FILE_ID is NULL";
+                        }
                         break;
                     case "COMPRESSED":
                         $arSqlSearch[] = "tf.COMPRESSED = $val";
@@ -954,4 +975,6 @@ SQL;
 
         return $this->LAST_ERROR;
     }
+
+
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.0
+ * @version 0.11.4
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 
@@ -270,6 +270,31 @@ foreach (Dev2funImageCompress::$supportFormats as $optType) {
     <tr class="heading">
         <td colspan="2">
             <b><?= Loc::getMessage('D2F_IMAGECOMPRESS_HEADING_TEXT_BASE_SETTINGS') ?></b>
+        </td>
+    </tr>
+
+
+    <tr class="convert__cache_delete_active">
+        <td width="40%">
+            <label for="cache_delete_active">
+                <?= Loc::getMessage("D2F_COMPRESS_AGENT_ACTIVE") ?>:
+            </label>
+        </td>
+        <td width="60%">
+            <?php
+            $agentCompressActive = \Dev2fun\ImageCompress\CompressAgent::getAgentActiveValue() === 'Y';
+            ?>
+            <?php if ($agentCompressActive) { ?>
+                <p><?= Loc::getMessage("D2F_COMPRESS_AGENT_ACTIVATED") ?></p>
+                <p>
+                    <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_AGENT_BTN_DEACTIVATE") ?>" onclick="compressAgentDeactivate();"/>
+                </p>
+            <?php } else { ?>
+                <p><?= Loc::getMessage("D2F_COMPRESS_AGENT_NOT_ACTIVATED") ?></p>
+                <p>
+                    <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_AGENT_BTN_ACTIVATE") ?>" onclick="compressAgentActive();"/>
+                </p>
+            <?php } ?>
         </td>
     </tr>
 

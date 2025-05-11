@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.10.1
+ * @version 0.11.4
  */
 require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -201,7 +201,7 @@ $rsFiles = \Dev2fun\ImageCompress\ImageCompressImagesTable::getList([
         'CONVERTED_IMAGE_PROCESSED' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_PROCESSED',
         'CONVERTED_IMAGE_TYPE' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE',
     ],
-    'filter' => $list->makeFilter(),
+    'filter' => $list->makeFilterConvert(),
     'order' => [$by => $order],
 ]);
 
