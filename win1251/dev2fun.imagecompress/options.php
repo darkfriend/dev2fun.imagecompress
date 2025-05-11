@@ -170,7 +170,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
             //            $enableJpeg =  $request->getPost('enable_jpeg');
             $algorithmJpeg = $_POST['common_options']['opti_algorithm_jpeg'] ?? '';
             //            $algorithmJpeg = $request->getPost('opti_algorithm_jpeg');
-            $pthJpeg = $_POST['common_options']['path_to_jpegoptim'] ?? '';
+            $pthJpeg = htmlspecialchars($_POST['common_options']['path_to_jpegoptim'] ?? '');
             //            $pthJpeg = $request->getPost('path_to_jpegoptim');
             if ($pthJpeg) {
                 $pthJpeg = rtrim($pthJpeg, '/');
@@ -181,6 +181,9 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 }
                 if(!$algorithmJpeg) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'jpeg']));
+                }
+                if (!file_exists($pthJpeg)) {
+                    throw new Exception("path to jpegoptim not found");
                 }
                 if (!Check::isOptim($algorithmJpeg, $pthJpeg)) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'jpegoptim']));
@@ -198,7 +201,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
 
             $enablePng = $_POST['common_options']['enable_png'] ?? 'N';
             $algorithmPng = $_POST['common_options']['opti_algorithm_png'] ?? '';
-            $pthPng = $_POST['common_options']['path_to_optipng'] ?? '';
+            $pthPng = htmlspecialchars($_POST['common_options']['path_to_optipng'] ?? '');
             if ($pthPng) {
                 $pthPng = rtrim($pthPng, '/');
             }
@@ -208,6 +211,9 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 }
                 if(!$algorithmPng) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'png']));
+                }
+                if (!file_exists($pthPng)) {
+                    throw new Exception("path to optipng not found");
                 }
                 if (!Check::isOptim($algorithmPng, $pthPng)) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'jpegoptim']));
@@ -224,13 +230,16 @@ if ($request->isPost() && check_bitrix_sessid()) {
             //            $ps2pdf = $request->getPost('path_to_ps2pdf');
 
             $enablePdf = $_POST['common_options']['enable_pdf'] ?? 'N';
-            $ps2pdf = $_POST['common_options']['path_to_ps2pdf'] ?? '';
+            $ps2pdf = htmlspecialchars($_POST['common_options']['path_to_ps2pdf'] ?? '');
             if ($ps2pdf) {
                 $ps2pdf = \rtrim($ps2pdf, '/');
             }
             if($enablePdf==='Y') {
                 if(!$ps2pdf) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'pdf']));
+                }
+                if (!file_exists($ps2pdf)) {
+                    throw new Exception("path to ps2pdf not found");
                 }
                 if (!Check::isOptim('ps2pdf', $ps2pdf)) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'ps2pdf']));
@@ -258,7 +267,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
 
                 $enable = $_POST['common_options']["enable_{$saveType}"] ?? 'N';
                 $algorithm = $_POST['common_options']["opti_algorithm_{$saveType}"] ?? '';
-                $pth = $_POST['common_options']["path_to_{$saveType}"] ?? '/usr/bin';
+                $pth = htmlspecialchars($_POST['common_options']["path_to_{$saveType}"] ?? '/usr/bin');
                 //                $algorithm = $request->getPost('opti_algorithm_'.$saveType);
                 //                $pth = $request->getPost('path_to_'.$saveType, '/usr/bin');
                 if ($pth) {
@@ -272,17 +281,25 @@ if ($request->isPost() && check_bitrix_sessid()) {
                         throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => $saveType]));
                     }
                     if ($saveType === 'svg') {
-                        $pathNodejs = $_POST['common_options']["path_to_node"] ?? '/usr/bin';
+                        $pathNodejs = htmlspecialchars($_POST['common_options']["path_to_node"] ?? '/usr/bin');
                         if (!$pathNodejs) {
                             throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'nodejs']));
                         }
                         $pathNodejs = \rtrim($pathNodejs, '/');
+                        if (!file_exists($pathNodejs)) {
+                            throw new Exception("path to node.js not found");
+                        }
                         if (!\Dev2fun\ImageCompress\Svg::getInstance()->isOptim($pth, $pathNodejs)) {
                             throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => "{$saveType}|nodejs"]));
                         }
                         $updString['path_to_node'] = $pathNodejs;
-                    } else if (!Check::isOptim($algorithm, $pth)) {
-                        throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => $saveType]));
+                    } else {
+                        if (!file_exists($pth)) {
+                            throw new Exception("path to {$saveType} not found");
+                        }
+                        if (!Check::isOptim($algorithm, $pth)) {
+                            throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => $saveType]));
+                        }
                     }
                 }
                 $updCheckbox['enable_'.$saveType] = $enable === 'Y';
@@ -433,7 +450,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
 
                 $updString['convert_algorithm'] = $_POST['options'][$arSite['ID']]['convert_algorithm'] ?? 'phpWebp';
                 $updString['convert_quality'] = $_POST['options'][$arSite['ID']]['convert_quality'] ?? '80';
-                $updString['path_to_cwebp'] = $_POST['options'][$arSite['ID']]['path_to_cwebp'] ?? '/usr/bin';
+                $updString['path_to_cwebp'] = htmlspecialchars($_POST['options'][$arSite['ID']]['path_to_cwebp'] ?? '/usr/bin');
 
                 if ($updString['path_to_cwebp']) {
                     $updString['path_to_cwebp'] = \rtrim($updString['path_to_cwebp'], '/');
@@ -441,6 +458,9 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 if($updString['convert_algorithm'] === 'cwebp') {
                     if(!$updString['path_to_cwebp']) {
                         throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'cwebp']));
+                    }
+                    if (!file_exists($updString['path_to_cwebp'])) {
+                        throw new Exception("path to cwebp not found");
                     }
                     if (!Check::isOptim('cwebp', $updString['path_to_cwebp'])) {
                         throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'cwebp']));
