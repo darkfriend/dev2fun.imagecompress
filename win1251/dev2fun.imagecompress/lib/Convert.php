@@ -446,6 +446,11 @@ class Convert
      */
     public function convertFile(string $file, array $options = [])
     {
+        $file = self::getNormalizePathFile($file);
+        if (!$file) {
+            return null;
+        }
+
         $alg = Option::get($this->MODULE_ID, 'convert_algorithm', 'phpWebp', $this->siteId);
         $algInstance = static::getAlgInstance($alg);
 
@@ -454,12 +459,12 @@ class Convert
             return false;
         }
 
-        if($file) {
-            $fileScheme = \parse_url($file, \PHP_URL_SCHEME);
-            if($fileScheme==='data') {
-                return null;
-            }
-        }
+//        if ($file) {
+//            $fileScheme = \parse_url($file, \PHP_URL_SCHEME);
+//            if($fileScheme==='data') {
+//                return null;
+//            }
+//        }
 
         $event = new \Bitrix\Main\Event($this->MODULE_ID, "OnBeforePostConvertImage", [&$file]);
         $event->send();
@@ -855,7 +860,6 @@ class Convert
             ];
             $cacheId = implode('|',$cacheId);
             $arFileReplace = LazyConvert::cache(
-//                3600*1,
                 self::getInstance()->cacheTimeGetImages,
                 $cacheId,
                 '/get-images',
@@ -888,8 +892,6 @@ class Convert
                             $arFilesHash[$hash][] = $file;
                         }
 
-//                        var_dump(empty($currentFiles[$md5]));
-
 //                        $imagesHash[] = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
 //                        $rows[] = [
 //                            'SITE_ID' => Dev2funImageCompress::getSiteId(),
@@ -919,17 +921,19 @@ class Convert
                         ])
                         ->fetchAll();
 
-
                     $result = [];
                     foreach ($images as $image) {
                         if (
                             empty($arFilesHash[$image['IMAGE_HASH']])
-                            || (!empty($arFilesHash[$image['IMAGE_HASH']]) && !in_array($image['IMAGE_PATH'], $arFilesHash[$image['IMAGE_HASH']]))
+//                            || (
+//                                !empty($arFilesHash[$image['IMAGE_HASH']])
+//                                && !in_array($image['IMAGE_PATH'], $arFilesHash[$image['IMAGE_HASH']])
+//                            )
                         ) {
                             continue;
                         }
                         foreach ($arFilesHash[$image['IMAGE_HASH']] as $filePath) {
-                            if (self::isExcludeFile($filePath)) {
+                            if (self::isExcludeFile($image['IMAGE_PATH'])) {
                                 continue;
                             }
                             $result[$filePath] = $image['CONVERTED_IMAGE_PATH'];

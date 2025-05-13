@@ -11,8 +11,7 @@ namespace Dev2fun\ImageCompress;
 use Bitrix\Main\DB\SqlExpression;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Config\Option;
-use Bitrix\Main\ORM\Query\Filter\Condition;
-use darkfriend\helpers\DebugHelper;
+use Bitrix\Main\ORM\Query\Query;
 
 IncludeModuleLangFile(__FILE__);
 
@@ -372,6 +371,61 @@ class AdminList
         return $arFilter;
     }
 
+    public function makeFilterConvert(): array
+    {
+        $arFilter = [];
+
+        foreach ($this->arFilter as $k => $arItem) {
+            switch ($arItem['TYPE']) {
+                case 'calendar':
+                    if (strlen($arItem['VALUE1'])) {
+                        $arFilter[strtoupper($k) . '1'] = $arItem['VALUE1'];
+                    }
+                    if (strlen($arItem['VALUE2'])) {
+                        $arFilter[strtoupper($k) . '2'] = $arItem['VALUE2'];
+                    }
+                    break;
+                case 'content_type':
+                    if (strlen($arItem["VALUE"]) <= 0) {
+                        $arItem["VALUE"] = array_keys($arItem["VARIANTS"]);
+                    }
+                    $arFilter[(isset($arItem['OPER']) ? $arItem['OPER'] : '') . strtoupper($k)] = $arItem['VALUE'];
+                    break;
+                default:
+                    switch ($k) {
+                        case 'CONVERTED_IMAGE_PROCESSED':
+                            if (strlen($arItem['VALUE'])) {
+                                if ($arItem['VALUE'] === 'Y') {
+                                    $arFilter['=' . strtoupper($k)] = $arItem['VALUE'];
+                                } else {
+                                    $arFilter['!=' . strtoupper($k)] = 'Y';
+                                }
+                            }
+                            break;
+                        default:
+                            if (strlen($arItem['VALUE'])) {
+                                $arFilter[(isset($arItem['OPER']) ? $arItem['OPER'] : '') . strtoupper($k)] = $arItem['VALUE'];
+                            } else {
+                                $arFilter[] = Query::filter()
+                                    ->whereIn(
+                                        'CONVERTED_IMAGE.IMAGE.CONTENT_TYPE',
+                                        [
+                                            'image/png',
+                                            'image/jpeg',
+                                            'application/pdf',
+                                            'image/svg',
+//                                            'image/gif',
+                                        ]
+                                    );
+                            }
+                    }
+
+            }
+        }
+
+        return $arFilter;
+    }
+
     public function setFilter($arFilter)
     {
         $this->arFilter = $arFilter;
@@ -694,10 +748,12 @@ class AdminList
 //                    $stepOnPage = 0;
                     $images = [];
                     while ($arFile = $rsRes->NavNext(true)) {
-                        $pathFile = Convert::getNormalizePathFile($arFile['IMAGE_PATH']);
                         if (!empty($arFile['IMAGE_PATH'])) {
                             $arFile['IMAGE_PATH'] = urldecode($arFile['IMAGE_PATH']);
                         }
+
+                        $pathFile = Convert::getNormalizePathFile($arFile['IMAGE_PATH']);
+
                         if ($pathFile === null) {
                             ImageCompressImagesTable::update($arFile['ID'], [
                                 'IMAGE_IGNORE' => 'Y',
