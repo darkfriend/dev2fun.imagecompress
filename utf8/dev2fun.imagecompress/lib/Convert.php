@@ -385,7 +385,7 @@ class Convert
             $res = "{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
         }
 
-        // исключение файла из списка исключений
+        // РёСЃРєР»СЋС‡РµРЅРёРµ С„Р°Р№Р»Р° РёР· СЃРїРёСЃРєР° РёСЃРєР»СЋС‡РµРЅРёР№
         if (static::isExcludeFile($res)) {
             return false;
         }
@@ -473,7 +473,7 @@ class Convert
             return null;
         }
 
-        // исключение файла из списка исключений
+        // РёСЃРєР»СЋС‡РµРЅРёРµ С„Р°Р№Р»Р° РёР· СЃРїРёСЃРєР° РёСЃРєР»СЋС‡РµРЅРёР№
         if (static::isExcludeFile($file)) {
             return null;
         }
@@ -516,7 +516,7 @@ class Convert
     }
 
     /**
-     * Событие на ресайзе (OnAfterResizeImage)
+     * РЎРѕР±С‹С‚РёРµ РЅР° СЂРµСЃР°Р№Р·Рµ (OnAfterResizeImage)
      * @param array $arFile
      * @param array $arInfo
      * @param array $callbackData
@@ -562,13 +562,13 @@ class Convert
             return false;
         }
 
-        // исключение файла из списка исключений
+        // РёСЃРєР»СЋС‡РµРЅРёРµ С„Р°Р№Р»Р° РёР· СЃРїРёСЃРєР° РёСЃРєР»СЋС‡РµРЅРёР№
         $resFile = "/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
         if (static::isExcludeFile($resFile)) {
             return false;
         }
 
-        // исключение файла из-за типа файла
+        // РёСЃРєР»СЋС‡РµРЅРёРµ С„Р°Р№Р»Р° РёР·-Р·Р° С‚РёРїР° С„Р°Р№Р»Р°
         if (!\in_array($arFileConvert["CONTENT_TYPE"], static::$supportContentType)) {
             return false;
         }
@@ -620,7 +620,7 @@ class Convert
             return null;
         }
 
-        // исключение страницы из списка исключений
+        // РёСЃРєР»СЋС‡РµРЅРёРµ СЃС‚СЂР°РЅРёС†С‹ РёР· СЃРїРёСЃРєР° РёСЃРєР»СЋС‡РµРЅРёР№
         if (self::isExcludePage()) {
             return false;
         }
@@ -754,7 +754,7 @@ class Convert
             function() use ($content) {
                 $arFiles = [];
 
-                // новая обработка на будущее
+                // РЅРѕРІР°СЏ РѕР±СЂР°Р±РѕС‚РєР° РЅР° Р±СѓРґСѓС‰РµРµ
 //                \preg_match_all('/([^"\']+\.(?:jpe?g|png))/mi', $content, $matchInlineImages);
 //                var_dump($matchInlineImages);
 //                if (!empty($matchInlineImages[1])) {
@@ -989,7 +989,7 @@ class Convert
                         $domains[] = $siteDomain;
                         if (
                             function_exists('idn_to_ascii')
-                            && preg_match('#[А-я]#ui', $siteDomain)
+                            && preg_match('#[Рђ-СЏ]#ui', $siteDomain)
                         ) {
                             $domains[] = idn_to_ascii($siteDomain);
                         }
@@ -1360,7 +1360,7 @@ class Convert
     }
 
     /**
-     * Обработчик на событие очистки всего кэша
+     * РћР±СЂР°Р±РѕС‚С‡РёРє РЅР° СЃРѕР±С‹С‚РёРµ РѕС‡РёСЃС‚РєРё РІСЃРµРіРѕ РєСЌС€Р°
      * @return void
      */
     public static function CleanCacheEvent(): void
@@ -1418,7 +1418,7 @@ class Convert
     }
 
     /**
-     * Процесс удаления по переданным идентификаторам из таблицы найденных картинок
+     * РџСЂРѕС†РµСЃСЃ СѓРґР°Р»РµРЅРёСЏ РїРѕ РїРµСЂРµРґР°РЅРЅС‹Рј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂР°Рј РёР· С‚Р°Р±Р»РёС†С‹ РЅР°Р№РґРµРЅРЅС‹С… РєР°СЂС‚РёРЅРѕРє
      * @param int|int[] $id
      * @return void
      * @throws \Bitrix\Main\ArgumentException
@@ -1456,8 +1456,8 @@ class Convert
     }
 
     /**
-     * Удаляет картинку полностью (физически с полностью).
-     * А именно из найденных и сконвертированную, если она есть
+     * РЈРґР°Р»СЏРµС‚ РєР°СЂС‚РёРЅРєСѓ РїРѕР»РЅРѕСЃС‚СЊСЋ (С„РёР·РёС‡РµСЃРєРё СЃ РїРѕР»РЅРѕСЃС‚СЊСЋ).
+     * Рђ РёРјРµРЅРЅРѕ РёР· РЅР°Р№РґРµРЅРЅС‹С… Рё СЃРєРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРЅСѓСЋ, РµСЃР»Рё РѕРЅР° РµСЃС‚СЊ
      * @param int $id
      * @param int|null $convertedImageId
      * @param string|null $absPathConvertedImage
@@ -1466,7 +1466,7 @@ class Convert
      */
     public static function deleteImageById(int $id, ?int $convertedImageId = null, ?string $absPathConvertedImage = null): void
     {
-        // удаляю из бд
+        // СѓРґР°Р»СЏСЋ РёР· Р±Рґ
         ImageCompressImagesTable::delete($id);
         if ($convertedImageId) {
             self::deleteConvertedImageById($convertedImageId, $absPathConvertedImage);
@@ -1474,7 +1474,7 @@ class Convert
     }
 
     /**
-     * Удаляет конвертированную картинку физически и в бд
+     * РЈРґР°Р»СЏРµС‚ РєРѕРЅРІРµСЂС‚РёСЂРѕРІР°РЅРЅСѓСЋ РєР°СЂС‚РёРЅРєСѓ С„РёР·РёС‡РµСЃРєРё Рё РІ Р±Рґ
      * @param int|null $id
      * @param string|null $absPathConvertedImage
      * @return void
@@ -1486,10 +1486,10 @@ class Convert
             ImageCompressImagesConvertedTable::delete($id);
         }
         if ($absPathConvertedImage && is_file($absPathConvertedImage)) {
-            // удаляю файл
+            // СѓРґР°Р»СЏСЋ С„Р°Р№Р»
             @unlink($absPathConvertedImage);
             $dirAbsPath = dirname($absPathConvertedImage);
-            // чекаю папку на пустоту и удаляю
+            // С‡РµРєР°СЋ РїР°РїРєСѓ РЅР° РїСѓСЃС‚РѕС‚Сѓ Рё СѓРґР°Р»СЏСЋ
             if (IO::isEmptyDir($dirAbsPath)) {
                 @rmdir($dirAbsPath);
             }
