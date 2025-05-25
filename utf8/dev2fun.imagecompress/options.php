@@ -128,6 +128,18 @@ if ($request->isPost() && check_bitrix_sessid()) {
             'success' => $res,
         ]);
         die();
+    } else if (isset($_POST['action']) && $_POST['action'] === 'convert-agent') {
+        $cacheDeletedAgentActive = ($_POST['active'] ?? 'N') === 'Y';
+        if ($cacheDeletedAgentActive) {
+            $res = \Dev2fun\ImageCompress\ConvertAgent::activateAgent();
+        } else {
+            $res = \Dev2fun\ImageCompress\ConvertAgent::deactivateAgent();
+        }
+        $APPLICATION->RestartBuffer();
+        echo json_encode([
+            'success' => $res,
+        ]);
+        die();
     } else if (isset($_POST['action']) && $_POST['action'] === 'cache-clear-all') {
         \Dev2fun\ImageCompress\CacheCleaner::clearingConvertResizeCache();
         $APPLICATION->RestartBuffer();

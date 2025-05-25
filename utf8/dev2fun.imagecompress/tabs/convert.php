@@ -20,7 +20,11 @@ $convertInstance = \Dev2fun\ImageCompress\Convert::getInstance();
 
 <?php if (
     \in_array(\Dev2fun\ImageCompress\Convert::LAZY_CONVERT, $convertInstance->convertMode)
-    && (!defined('BX_CRONTAB_SUPPORT') || !BX_CRONTAB_SUPPORT)
+//    && (!defined('BX_CRONTAB_SUPPORT') || !BX_CRONTAB_SUPPORT)
+    && (
+        !\Dev2fun\ImageCompress\ConvertAgent::agentsUseCrontab()
+        || !\Dev2fun\ImageCompress\ConvertAgent::checkAgents()
+    )
 ) { ?>
     <tr>
         <td colspan="2">
@@ -125,6 +129,32 @@ $convertInstance = \Dev2fun\ImageCompress\Convert::getInstance();
         ?>
     </td>
 </tr>
+
+<tr class="convert__cache_delete_active">
+    <td width="40%">
+        <label for="cache_delete_active">
+            <?= Loc::getMessage("D2F_COMPRESS_CONVERT_AGENT_ACTIVE") ?>:
+        </label>
+    </td>
+    <td width="60%">
+        <?php
+        $agentCompressActive = \Dev2fun\ImageCompress\ConvertAgent::getAgentActiveValue() === 'Y';
+        ?>
+        <?php if ($agentCompressActive) { ?>
+            <p><?= Loc::getMessage("D2F_COMPRESS_AGENT_ACTIVATED") ?></p>
+            <p>
+                <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_AGENT_BTN_DEACTIVATE") ?>" onclick="compressAgentDeactivate('convert-agent');"/>
+            </p>
+        <?php } else { ?>
+            <p><?= Loc::getMessage("D2F_COMPRESS_AGENT_NOT_ACTIVATED") ?></p>
+            <p>
+                <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_AGENT_BTN_ACTIVATE") ?>" onclick="compressAgentActive('convert-agent');"/>
+            </p>
+        <?php } ?>
+    </td>
+</tr>
+
+
 
 
 <tr class="convert__lazy_settings heading">

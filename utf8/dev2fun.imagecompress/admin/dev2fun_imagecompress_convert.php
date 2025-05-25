@@ -46,6 +46,7 @@ $tabControl = new CAdminTabControl("tabControl", $aTabs, true, true);
 $bVarsFromForm = false;
 $APPLICATION->SetTitle(Loc::getMessage("DEV2FUN_IMAGECOMPRESS_CONVERT_TITLE"));
 
+
 //require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");
 $recCompress = null;
 if (!empty($_REQUEST["convert"]) || ($_REQUEST["action"] ?? '') === "convert") {
@@ -117,6 +118,10 @@ if (!empty($_REQUEST["convert"]) || ($_REQUEST["action"] ?? '') === "convert") {
         }
         $recCompress = true;
     }
+} elseif (($_REQUEST["action_button"] ?? '') === "delete" && !empty($_REQUEST['ID'])) {
+    Convert::deleteProcessById($_REQUEST['ID']);
+
+    LocalRedirect($APPLICATION->GetCurUri());
 }
 
 $list = new AdminList($curModuleName);
@@ -127,17 +132,24 @@ $list->setTitle(Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_TITLE'));
 
 $convertSessionHash = md5('convert_all_session' . time());
 //$list->setContextMenu(false);
-$list->getlAdmin()->AddAdminContextMenu([
-    'convert_all' => [
-        'TEXT' => Loc::getMessage(
-            'DEV2FUN_IMAGECOMPRESS_CONVERT_ALL',
-            [
-                '#IMAGE_TYPE#' => Convert::getInstance()->getImageTypeByAlgorithm(Convert::getInstance()->algorithm)
-            ]
-        ),
-        'LINK' => "{$APPLICATION->GetCurPage()}?convert_all=Y&timehash={$convertSessionHash}",
-    ],
-]);
+$list->getlAdmin()->AddAdminContextMenu(
+    [
+        'convert_all' => [
+            'TEXT' => Loc::getMessage(
+                'DEV2FUN_IMAGECOMPRESS_CONVERT_ALL',
+                [
+                    '#IMAGE_TYPE#' => Convert::getInstance()->getImageTypeByAlgorithm(Convert::getInstance()->algorithm)
+                ]
+            ),
+            'LINK' => "{$APPLICATION->GetCurPage()}?convert_all=Y&timehash={$convertSessionHash}",
+        ],
+        'search_pictures' => [
+            'TEXT' => Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_SEARCH_PICTURES_BTN'),
+//            'LINK' => "{$APPLICATION->GetCurPage()}?search_pictures=Y",
+            'ONCLICK' => 'SearchPictures();',
+        ],
+    ]
+);
 $list->setHeaders([
     'ID' => "ID",
     'IMAGE_IGNORE' => "Ignore",
@@ -245,6 +257,7 @@ if ($rsFiles->getSelectedRowsCount()>0) {
 }
 $list->setFooter([
     'convert' => Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_BTN_ACTION'),
+    'delete' => Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_BTN_ACTION_DELETE'),
 ]);
 $list->output('convert');
 //require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin.php");

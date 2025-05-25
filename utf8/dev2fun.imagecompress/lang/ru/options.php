@@ -198,6 +198,7 @@ $MESS['D2F_COMPRESS_AGENT_ACTIVATED'] = "Агент активен";
 $MESS['D2F_COMPRESS_AGENT_NOT_ACTIVATED'] = "Агент не активен";
 $MESS['D2F_COMPRESS_AGENT_BTN_DEACTIVATE'] = "Дизактивировать";
 $MESS['D2F_COMPRESS_AGENT_BTN_ACTIVATE'] = "Активировать";
+$MESS['D2F_COMPRESS_CONVERT_AGENT_ACTIVE'] = "Активность агента конвертации";
 
 
 $MESS['D2F_COMPRESS_OPTIONS_CACHE_CLEAR_ALL_SUCCESS'] = "Кэш сконвертированных картинок resize_cache успешно очищен";

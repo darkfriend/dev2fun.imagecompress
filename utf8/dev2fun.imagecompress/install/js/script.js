@@ -149,6 +149,64 @@ if(typeof cacheDeleteDeactivate === "undefined") {
     }
 }
 
+if(typeof compressAgentActive === "undefined") {
+    function compressAgentActive(act) {
+        let objRequest = {
+            AJAX_MODE : 'Y',
+            AJAX_IC : 'Y',
+            active : 'Y',
+            action : act,
+            sessid: BX.bitrix_sessid()
+        };
+        BX.showWait();
+        BX.ajax({
+            url: window.location.href,
+            data : objRequest,
+            method : 'POST',
+            timeout : 600,
+            dataType: 'json',
+            cache: false,
+            onsuccess: function(data) {
+                BX.closeWait();
+                window.location.reload();
+            },
+            onfailure: function(){
+                BX.closeWait();
+                alert('Error!');
+            }
+        });
+    }
+}
+
+if(typeof compressAgentDeactivate === "undefined") {
+    function compressAgentDeactivate(act) {
+        let objRequest = {
+            AJAX_MODE : 'Y',
+            AJAX_IC : 'Y',
+            active : 'N',
+            action : act,
+            sessid: BX.bitrix_sessid()
+        };
+        BX.showWait();
+        BX.ajax({
+            url: window.location.href,
+            data : objRequest,
+            method : 'POST',
+            timeout : 600,
+            dataType: 'json',
+            cache: false,
+            onsuccess: function(data) {
+                BX.closeWait();
+                window.location.reload();
+            },
+            onfailure: function(){
+                BX.closeWait();
+                alert('Error!');
+            }
+        });
+    }
+}
+
 if(typeof cacheClearAll === "undefined") {
     function cacheClearAll() {
         let objRequest = {

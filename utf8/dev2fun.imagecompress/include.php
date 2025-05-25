@@ -45,6 +45,8 @@ Loader::registerAutoLoadClasses(
 
         "Dev2fun\ImageCompress\CacheCleaner" => 'lib/CacheCleaner.php',
         "Dev2fun\ImageCompress\IO" => 'lib/IO.php',
+        "Dev2fun\ImageCompress\ConvertAgent" => 'lib/ConvertAgent.php',
+        "Dev2fun\ImageCompress\ConvertSearchPictures" => 'lib/ConvertSearchPictures.php',
     ]
 );
 

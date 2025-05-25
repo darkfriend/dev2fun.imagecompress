@@ -520,6 +520,7 @@ class AdminList
         switch ($type) {
             case 'convert':
                 $this->convertAll();
+                $this->searchPicturesForConvert();
                 $this->processResult(Loc::getMessage('D2F_IMAGECOMPRESS_CONVERT_IMAGE_STATUS_SUCCESS'));
                 if ($recCompress === false && empty($GLOBALS['msgError'])) {
                     $GLOBALS['msgError'] = Loc::getMessage('D2F_IMAGECOMPRESS_CONVERT_DEFAULT_TEXT_ERRROR');
@@ -550,6 +551,11 @@ class AdminList
             echo $this->bottomNote;
             echo EndNote();
         }
+
+        echo '<script type="text/javascript">';
+            include_once(__DIR__ . '/script.js');
+        echo '</script>';
+
         require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/epilog_admin.php');
     }
 
@@ -671,13 +677,13 @@ class AdminList
             }
             echo '</div>';
             echo '<script type="text/javascript">';
-                include_once(__DIR__ . '/script.js');
-                echo "
-                    BX.ready(function(){
-                        BX.showWait('compressAllStatus');
-                        SendPropcess(1);
-                    });
-                ";
+//            include_once(__DIR__ . '/script.js');
+            echo "
+                BX.ready(function(){
+                    BX.showWait('compressAllStatus');
+                    SendPropcess(1);
+                });
+            ";
             echo '</script>';
         }
     }
@@ -851,14 +857,83 @@ class AdminList
             }
             echo '</div>';
             echo '<script type="text/javascript">';
-                include_once(__DIR__ . '/script.js');
-                echo "
-                    BX.ready(function(){
-                        BX.showWait('convertAllStatus');
-                        SendPropcess(1, 'convert');
-                    });
-                ";
+//            include_once(__DIR__ . '/script.js');
+            echo "
+                BX.ready(function(){
+                    BX.showWait('convertAllStatus');
+                    SendPropcess(1, 'convert');
+                });
+            ";
             echo '</script>';
+        }
+    }
+
+    public function searchPicturesForConvert()
+    {
+        global $APPLICATION;
+//        $processConvert = 0;
+//        $startConvert = false;
+//        $msgError = '';
+//        $instance = Convert::getInstance();
+//        $algImageType = $instance->getImageTypeByAlgorithm($instance->algorithm);
+        if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'searchPicture') {
+            $context = \Bitrix\Main\Context::getCurrent();
+            $requestBody = $context->getRequest()->getJsonList()->toArray();
+
+            $curModuleName = \Dev2funImageCompress::MODULE_ID;
+            $uploadDir = "{$_SERVER['DOCUMENT_ROOT']}/upload";
+            $maxFiles = (int)($_REQUEST['limit'] ?? 500);
+            $excludePaths = [
+                "{$_SERVER['DOCUMENT_ROOT']}/upload/{$curModuleName}",
+                "{$_SERVER['DOCUMENT_ROOT']}/upload/dev2fun.imagepro",
+                "{$_SERVER['DOCUMENT_ROOT']}/upload/resize_cache/webp",
+                "{$_SERVER['DOCUMENT_ROOT']}/upload/resize_cache/avif",
+                "{$_SERVER['DOCUMENT_ROOT']}/upload/tmp",
+            ];
+
+
+
+            $result = [
+                'success' => false,
+                'msg' => '',
+                'body' => null,
+            ];
+
+            $APPLICATION->RestartBuffer();
+
+            if (!is_dir($uploadDir)) {
+                $result['msg'] = 'Directory not found';
+                echo json_encode($result);
+                die();
+            }
+
+            try {
+                $result['body'] = ConvertSearchPictures::scanFiles($uploadDir, $excludePaths, $maxFiles);
+                $result['success'] = true;
+            } catch (Exception $e) {
+                $result['msg'] = $e->getMessage();
+            }
+
+            echo json_encode($result);
+            die();
+
+//            \CAdminMessage::ShowMessage([
+//                "MESSAGE" => $msgError,
+//                "TYPE" => "ERROR",
+//            ]);
+
+//            \CAdminMessage::ShowMessage([
+//                "MESSAGE" => Loc::getMessage('D2F_IMAGECOMPRESS_COMPRESS_IMAGE_STATUS_SUCCESS'),
+//                "TYPE" => "OK",
+//            ]);
+
+        }
+
+        if (!empty($_REQUEST['process_search_result']) && $_REQUEST['status'] === 'success') {
+            \CAdminMessage::ShowMessage([
+                "MESSAGE" => Loc::getMessage('D2F_IMAGECOMPRESS_CONVERT_SEARCH_PICTURES_SUCCESS'),
+                "TYPE" => "OK",
+            ]);
         }
     }
 }
