@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.4
+ * @version 0.11.5
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -122,6 +122,18 @@ if ($request->isPost() && check_bitrix_sessid()) {
             $res = \Dev2fun\ImageCompress\CompressAgent::activateAgent();
         } else {
             $res = \Dev2fun\ImageCompress\CompressAgent::deactivateAgent();
+        }
+        $APPLICATION->RestartBuffer();
+        echo json_encode([
+            'success' => $res,
+        ]);
+        die();
+    } else if (isset($_POST['action']) && $_POST['action'] === 'convert-agent') {
+        $cacheDeletedAgentActive = ($_POST['active'] ?? 'N') === 'Y';
+        if ($cacheDeletedAgentActive) {
+            $res = \Dev2fun\ImageCompress\ConvertAgent::activateAgent();
+        } else {
+            $res = \Dev2fun\ImageCompress\ConvertAgent::deactivateAgent();
         }
         $APPLICATION->RestartBuffer();
         echo json_encode([

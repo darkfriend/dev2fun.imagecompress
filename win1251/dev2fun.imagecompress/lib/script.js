@@ -1,6 +1,6 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.10.1
+ * @version 0.11.5
  */
 function SendPropcess(step, type) {
     let objRequest = {
@@ -8,11 +8,13 @@ function SendPropcess(step, type) {
         PAGEN_1: step,
     };
     let wrapId = 'compressAllStatus';
-    if (type === 'convert') {
-        objRequest.convert_all = 'Y';
-        wrapId = 'convertAllStatus';
-    } else {
-        objRequest.compress_all = 'Y';
+    switch (type) {
+        case 'convert':
+            objRequest.convert_all = 'Y';
+            wrapId = 'convertAllStatus';
+            break;
+        default:
+            objRequest.compress_all = 'Y';
     }
     BX.ajax({
         url: window.location.pathname + window.location.search,
@@ -40,6 +42,37 @@ function SendPropcess(step, type) {
         },
         onfailure: function () {
             BX.closeWait(wrapId);
+            BX(wrapId).innerHTML = 'Error!';
+        }
+    });
+}
+
+function SearchPictures() {
+    let objRequest = {
+        AJAX_IC: 'Y',
+        action: 'searchPicture',
+    };
+    let wrapId = '';
+    BX.showWait();
+    BX.ajax({
+        url: window.location.pathname + window.location.search,
+        data: objRequest,
+        method: 'POST',
+        timeout: 600,
+        dataType: 'json',
+        cache: false,
+        onsuccess: function (data) {
+            BX.closeWait();
+            console.log(data);
+            if (data.success) {
+                // window.location.href = window.location.pathname + '?process_search_result=Y&status=success';
+            } else {
+                let err = data.msg ? data.msg : 'Unknow error!'
+                BX(wrapId).innerHTML = 'Error! ' + err;
+            }
+        },
+        onfailure: function () {
+            BX.closeWait();
             BX(wrapId).innerHTML = 'Error!';
         }
     });

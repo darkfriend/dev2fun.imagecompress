@@ -1,6 +1,6 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.10.1
+ * @version 0.11.5
  */
 function SendPropcess(step, type) {
     let objRequest = {

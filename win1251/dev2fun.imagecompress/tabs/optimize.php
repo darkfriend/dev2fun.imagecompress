@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.11.4
+ * @version 0.11.5
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 
@@ -14,6 +14,21 @@ use Bitrix\Main\Localization\Loc;
 /** @var array $optiAlgorithmPng */
 /** @var array $resizeAlgorithm */
 ?>
+
+<?php if (
+    !\Dev2fun\ImageCompress\ConvertAgent::agentsUseCrontab()
+    || !\Dev2fun\ImageCompress\ConvertAgent::checkAgents()
+) { ?>
+    <tr>
+        <td colspan="2">
+            <?php
+            echo BeginNote();
+            echo Loc::getMessage('D2F_COMPRESS_CRONTAB_TEXT');
+            echo EndNote();
+            ?>
+        </td>
+    </tr>
+<?php } ?>
 
 <!--    <tr class="heading">-->
 <!--        <td colspan="2">-->
@@ -287,12 +302,12 @@ foreach (Dev2funImageCompress::$supportFormats as $optType) {
             <?php if ($agentCompressActive) { ?>
                 <p><?= Loc::getMessage("D2F_COMPRESS_AGENT_ACTIVATED") ?></p>
                 <p>
-                    <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_AGENT_BTN_DEACTIVATE") ?>" onclick="compressAgentDeactivate();"/>
+                    <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_AGENT_BTN_DEACTIVATE") ?>" onclick="compressAgentDeactivate('compress-agent');"/>
                 </p>
             <?php } else { ?>
                 <p><?= Loc::getMessage("D2F_COMPRESS_AGENT_NOT_ACTIVATED") ?></p>
                 <p>
-                    <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_AGENT_BTN_ACTIVATE") ?>" onclick="compressAgentActive();"/>
+                    <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_AGENT_BTN_ACTIVATE") ?>" onclick="compressAgentActive('compress-agent');"/>
                 </p>
             <?php } ?>
         </td>

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.4
+ * @version 0.11.5
  */
 
 namespace Dev2fun\ImageCompress;
@@ -385,7 +385,7 @@ class Convert
             $res = "{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
         }
 
-        // ���������� ����� �� ������ ����������
+        // исключение файла из списка исключений
         if (static::isExcludeFile($res)) {
             return false;
         }
@@ -473,7 +473,7 @@ class Convert
             return null;
         }
 
-        // ���������� ����� �� ������ ����������
+        // исключение файла из списка исключений
         if (static::isExcludeFile($file)) {
             return null;
         }
@@ -516,7 +516,7 @@ class Convert
     }
 
     /**
-     * ������� �� ������� (OnAfterResizeImage)
+     * Событие на ресайзе (OnAfterResizeImage)
      * @param array $arFile
      * @param array $arInfo
      * @param array $callbackData
@@ -562,13 +562,13 @@ class Convert
             return false;
         }
 
-        // ���������� ����� �� ������ ����������
+        // исключение файла из списка исключений
         $resFile = "/$uploadDir/{$arFile["SUBDIR"]}/{$arFile["FILE_NAME"]}";
         if (static::isExcludeFile($resFile)) {
             return false;
         }
 
-        // ���������� ����� ��-�� ���� �����
+        // исключение файла из-за типа файла
         if (!\in_array($arFileConvert["CONTENT_TYPE"], static::$supportContentType)) {
             return false;
         }
@@ -620,7 +620,7 @@ class Convert
             return null;
         }
 
-        // ���������� �������� �� ������ ����������
+        // исключение страницы из списка исключений
         if (self::isExcludePage()) {
             return false;
         }
@@ -754,7 +754,7 @@ class Convert
             function() use ($content) {
                 $arFiles = [];
 
-                // ����� ��������� �� �������
+                // новая обработка на будущее
 //                \preg_match_all('/([^"\']+\.(?:jpe?g|png))/mi', $content, $matchInlineImages);
 //                var_dump($matchInlineImages);
 //                if (!empty($matchInlineImages[1])) {
@@ -989,7 +989,7 @@ class Convert
                         $domains[] = $siteDomain;
                         if (
                             function_exists('idn_to_ascii')
-                            && preg_match('#[�-�]#ui', $siteDomain)
+                            && preg_match('#[А-я]#ui', $siteDomain)
                         ) {
                             $domains[] = idn_to_ascii($siteDomain);
                         }
@@ -1360,7 +1360,7 @@ class Convert
     }
 
     /**
-     * ���������� �� ������� ������� ����� ����
+     * Обработчик на событие очистки всего кэша
      * @return void
      */
     public static function CleanCacheEvent(): void
@@ -1415,5 +1415,84 @@ class Convert
             return '';
         }
         return md5_file($absPath);
+    }
+
+    /**
+     * Процесс удаления по переданным идентификаторам из таблицы найденных картинок
+     * @param int|int[] $id
+     * @return void
+     * @throws \Bitrix\Main\ArgumentException
+     * @throws \Bitrix\Main\ObjectPropertyException
+     * @throws \Bitrix\Main\SystemException
+     */
+    public static function deleteProcessById($id): void
+    {
+        $arImages = ImageCompressImagesTable::getList([
+            'select' => [
+                'ID',
+                'CONVERTED_IMAGE_PATH' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.IMAGE_PATH',
+                'CONVERTED_IMAGE_ID' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.ID',
+                'REF_IMAGE_ID' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.ID',
+            ],
+            'filter' => [
+                'ID' => $id,
+            ],
+        ])->fetchAll();
+
+        foreach ($arImages as $image) {
+            $convertedAbsPath = $image['CONVERTED_IMAGE_PATH'] ?? null;
+            if ($convertedAbsPath) {
+                $convertedAbsPath = "{$_SERVER['DOCUMENT_ROOT']}{$convertedAbsPath}";
+            } else {
+                $convertedAbsPath = null;
+            }
+
+            self::deleteImageById(
+                $image['ID'],
+                $image['CONVERTED_IMAGE_ID'] ?? null,
+                $convertedAbsPath
+            );
+        }
+    }
+
+    /**
+     * Удаляет картинку полностью (физически с полностью).
+     * А именно из найденных и сконвертированную, если она есть
+     * @param int $id
+     * @param int|null $convertedImageId
+     * @param string|null $absPathConvertedImage
+     * @return void
+     * @throws \Exception
+     */
+    public static function deleteImageById(int $id, ?int $convertedImageId = null, ?string $absPathConvertedImage = null): void
+    {
+        // удаляю из бд
+        ImageCompressImagesTable::delete($id);
+        if ($convertedImageId) {
+            self::deleteConvertedImageById($convertedImageId, $absPathConvertedImage);
+        }
+    }
+
+    /**
+     * Удаляет конвертированную картинку физически и в бд
+     * @param int|null $id
+     * @param string|null $absPathConvertedImage
+     * @return void
+     * @throws \Exception
+     */
+    public static function deleteConvertedImageById(?int $id, ?string $absPathConvertedImage = null): void
+    {
+        if ($id) {
+            ImageCompressImagesConvertedTable::delete($id);
+        }
+        if ($absPathConvertedImage && is_file($absPathConvertedImage)) {
+            // удаляю файл
+            @unlink($absPathConvertedImage);
+            $dirAbsPath = dirname($absPathConvertedImage);
+            // чекаю папку на пустоту и удаляю
+            if (IO::isEmptyDir($dirAbsPath)) {
+                @rmdir($dirAbsPath);
+            }
+        }
     }
 }
