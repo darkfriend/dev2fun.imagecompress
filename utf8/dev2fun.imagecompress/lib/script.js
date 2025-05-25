@@ -63,9 +63,8 @@ function SearchPictures() {
         cache: false,
         onsuccess: function (data) {
             BX.closeWait();
-            console.log(data);
             if (data.success) {
-                // window.location.href = window.location.pathname + '?process_search_result=Y&status=success';
+                window.location.href = window.location.pathname + '?process_search_result=Y&status=success';
             } else {
                 let err = data.msg ? data.msg : 'Unknow error!'
                 BX(wrapId).innerHTML = 'Error! ' + err;
