@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.6
+ * @version 0.11.7
  */
 
 namespace Dev2fun\ImageCompress;
@@ -76,7 +76,7 @@ class Ps2Pdf
         if (!$path) {
             $path = $this->path;
         }
-        if (\Dev2funImageCompress::checkAvailable("{$path}/gs")) {
+        if (!\Dev2funImageCompress::checkAvailable("{$path}/gs")) {
             throw new \Exception("{$path}/gs no readable or executable");
         }
         if (self::$isOptim === null || $path !== $this->path) {

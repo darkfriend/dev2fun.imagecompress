@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.6
+ * @version 0.11.7
  */
 
 namespace Dev2fun\ImageCompress;
@@ -73,7 +73,7 @@ class Jpegoptim
             $path = $this->jpegOptimPath;
         }
         if (self::$isOptim === null || $path !== $this->jpegOptimPath) {
-            if (\Dev2funImageCompress::checkAvailable("{$path}/jpegoptim")) {
+            if (!\Dev2funImageCompress::checkAvailable("{$path}/jpegoptim")) {
                 throw new \Exception("jpegoptim no readable or executable");
             }
             exec($path . '/jpegoptim --version', $s);
