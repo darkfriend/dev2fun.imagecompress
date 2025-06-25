@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.0
+ * @version 0.11.6
  */
 
 namespace Dev2fun\ImageCompress;
@@ -69,9 +69,11 @@ class AvifConvertImagick
      * @return bool|null
      * @throws \Exception
      */
-    public function convert($arFile, $params = [])
+    public function convert($arFile, array $params = [])
     {
-        if(!$this->enable) return false;
+        if (!$this->enable) {
+            return false;
+        }
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
@@ -132,7 +134,12 @@ class AvifConvertImagick
         $imagick->setImageFormat('avif');
         $imagick->setCompressionQuality($this->quality);
         $imagick->writeImage($absSrcWebp);
-        $imagick->destroy();
+
+        if (method_exists($imagick, 'destroy')) {
+            $imagick->destroy();
+        } else {
+            $imagick->clear();
+        }
 
 //        switch(\mime_content_type($src)) {
 //            case 'image/png':

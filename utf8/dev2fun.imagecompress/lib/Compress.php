@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.4
+ * @version 0.11.6
  */
 
 namespace Dev2fun\ImageCompress;
@@ -153,6 +153,10 @@ class Compress
 //		return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
     }
 
+    /**
+     * @return bool
+     * @deprecated 0.11.6
+     */
     public function isPNGOptim()
     {
         if (!$this->pngoptim) {
@@ -164,6 +168,10 @@ class Compress
         return $this->pngoptim;
     }
 
+    /**
+     * @return bool
+     * @deprecated 0.11.6
+     */
     public function isJPEGOptim()
     {
         if (!$this->jpegoptim) {
@@ -179,7 +187,7 @@ class Compress
      * @param string|null $strFilePath
      * @return bool|null
      * @throws \Exception
-     * @deprecated
+     * @deprecated 0.11.6
      */
     public function compressJPG(?string $strFilePath)
     {
@@ -211,7 +219,7 @@ class Compress
      * @param string|null $strFilePath
      * @return bool|null
      * @throws \Exception
-     * @deprecated
+     * @deprecated 0.11.6
      */
     public function compressPNG(?string $strFilePath)
     {
@@ -241,7 +249,7 @@ class Compress
      * @param string|null $strFilePath
      * @return bool|null
      * @throws \Exception
-     * @deprecated
+     * @deprecated 0.11.6
      */
     public function compressPdf(?string $strFilePath)
     {

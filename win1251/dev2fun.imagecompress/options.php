@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.5
+ * @version 0.11.6
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -194,7 +194,10 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 if(!$algorithmJpeg) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'jpeg']));
                 }
-                if (!file_exists($pthJpeg)) {
+                if (\Dev2funImageCompress::checkAvailable("{$pthJpeg}/{$algorithmJpeg}")) {
+                    throw new Exception("{$pthJpeg}/{$algorithmJpeg} no readable or executable");
+                }
+                if (!file_exists("{$pthJpeg}/{$algorithmJpeg}")) {
                     throw new Exception("path to jpegoptim not found");
                 }
                 if (!Check::isOptim($algorithmJpeg, $pthJpeg)) {
@@ -223,6 +226,9 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 }
                 if(!$algorithmPng) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'png']));
+                }
+                if (\Dev2funImageCompress::checkAvailable("{$pthPng}/{$algorithmPng}")) {
+                    throw new Exception("{$pthPng}/{$algorithmPng} no readable or executable");
                 }
                 if (!file_exists($pthPng)) {
                     throw new Exception("path to optipng not found");
@@ -298,6 +304,9 @@ if ($request->isPost() && check_bitrix_sessid()) {
                             throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'nodejs']));
                         }
                         $pathNodejs = \rtrim($pathNodejs, '/');
+                        if (\Dev2funImageCompress::checkAvailable($pathNodejs)) {
+                            throw new Exception("{$pathNodejs} no readable or executable");
+                        }
                         if (!file_exists($pathNodejs)) {
                             throw new Exception("path to node.js not found");
                         }

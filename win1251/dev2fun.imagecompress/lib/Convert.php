@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.5
+ * @version 0.11.6
  */
 
 namespace Dev2fun\ImageCompress;
@@ -39,6 +39,8 @@ class Convert
         'image/jpeg',
         'image/png',
         'image/svg',
+        'image/webp',
+        'image/avif',
     ];
 
     public static $convertModes = [
@@ -114,6 +116,10 @@ class Convert
         }
 
         $this->enableClearCache = Option::get($this->MODULE_ID, 'convert_enable_clear_cache', 'N') === 'Y';
+
+        if (\Dev2funImageCompress::isCli()) {
+            $this->enable = true;
+        }
     }
 
     /**

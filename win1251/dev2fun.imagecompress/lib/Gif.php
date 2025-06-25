@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.4.0
+ * @version 0.11.6
  */
 
 namespace Dev2fun\ImageCompress;
@@ -61,6 +61,9 @@ class Gif
             $path = $this->path;
         }
         if (self::$isOptim === null || $path !== $this->path) {
+            if (\Dev2funImageCompress::checkAvailable("{$path}/gifsicle")) {
+                throw new \Exception("gifsicle no readable or executable");
+            }
             exec($path . '/gifsicle --version', $s);
             self::$isOptim = (bool)$s;
         }

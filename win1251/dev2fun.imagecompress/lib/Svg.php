@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.8.5
+ * @version 0.11.6
  */
 
 namespace Dev2fun\ImageCompress;
@@ -70,6 +70,9 @@ class Svg
         }
         if (!$pathNodejs) {
             $pathNodejs = $this->pathNodejs;
+        }
+        if (\Dev2funImageCompress::checkAvailable("{$path}/{$this->binaryName}")) {
+            throw new \Exception("{$path}/{$this->binaryName} no readable or executable");
         }
         if (self::$isOptim === null || $path !== $this->path || $pathNodejs !== $this->pathNodejs) {
             exec("{$pathNodejs}/node {$path}/{$this->binaryName} -v", $s);

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.4
+ * @version 0.11.6
  */
 
 namespace Dev2fun\ImageCompress;
@@ -73,6 +73,9 @@ class Optipng
             $path = $this->pngOptimPath;
         }
         if (self::$isOptim === null || $path !== $this->pngOptimPath) {
+            if (\Dev2funImageCompress::checkAvailable("{$path}/optipng")) {
+                throw new \Exception("{$path}/optipng no readable or executable");
+            }
             exec($path . '/optipng -v', $s);
             self::$isOptim = (bool)$s;
         }

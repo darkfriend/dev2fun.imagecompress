@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.0
+ * @version 0.11.6
  */
 
 namespace Dev2fun\ImageCompress;
@@ -75,10 +75,12 @@ class WebpConvertPhp
      * @return bool|null
      * @throws \Exception
      */
-    public function convert($arFile, $params = [])
+    public function convert($arFile, array $params = [])
     {
-        if(!$this->enable) return false;
-//        \darkfriend\helpers\DebugHelper::print_pre($arFile, 1);
+        if (!$this->enable) {
+            return false;
+        }
+
         //        $strFilePath = strtr(
         //            $strFilePath,
         //            [
@@ -154,10 +156,18 @@ class WebpConvertPhp
             case 'image/jpeg':
                 $img = \imageCreateFromJpeg($src);
                 break;
+            case 'image/webp':
+                $img = \imagecreatefromwebp($src);
+                if ($img && (is_resource($img) || $img instanceof \GdImage)) {
+                    \imagepalettetotruecolor($img);
+                }
+                break;
         }
+
         if (empty($img)) {
             return false;
         }
+
         \imageWebp(
             $img,
             $absSrcWebp,
@@ -224,10 +234,18 @@ class WebpConvertPhp
             case 'image/jpeg':
                 $img = \imageCreateFromJpeg($src);
                 break;
+            case 'image/webp':
+                $img = \imagecreatefromwebp($src);
+                if ($img && (is_resource($img) || $img instanceof \GdImage)) {
+                    \imagepalettetotruecolor($img);
+                }
+                break;
         }
+
         if (empty($img)) {
             return false;
         }
+
         \imageWebp(
             $img,
             $absSrcWebp,

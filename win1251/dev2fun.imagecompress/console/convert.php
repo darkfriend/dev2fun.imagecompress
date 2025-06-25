@@ -2,7 +2,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.0
+ * @version 0.11.6
  * @since 0.7.4
  * @example ./convert.php -l=10
  */
@@ -43,6 +43,7 @@ $cnt = $connection->queryScalar(
 echo "Found {$cnt} files" . PHP_EOL;
 
 $convert = \Dev2fun\ImageCompress\Convert::getInstance();
+$convert->enable = true;
 
 if (!$convert->enable) {
     echo "Converter is not active. Please activate function convert in module settings." . PHP_EOL;
@@ -54,7 +55,6 @@ echo "Start progress" . PHP_EOL;
 $lastId = null;
 $upload_dir = \Bitrix\Main\Config\Option::get('main', 'upload_dir', 'upload');
 
-//$files = [];
 $stepOnPage = 0;
 for ($i=1; $i<=$cnt; $i+=$limit) {
     $sql = "SELECT f.* FROM b_file f WHERE f.CONTENT_TYPE IN ('image/jpeg', 'image/png', 'image/gif')";

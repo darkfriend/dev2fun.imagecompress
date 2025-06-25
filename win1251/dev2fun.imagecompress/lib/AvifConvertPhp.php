@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.0
+ * @version 0.11.6
  */
 
 namespace Dev2fun\ImageCompress;
@@ -74,9 +74,11 @@ class AvifConvertPhp
      * @return bool|null
      * @throws \Exception
      */
-    public function convert($arFile, $params = [])
+    public function convert($arFile, array $params = [])
     {
-        if(!$this->enable) return false;
+        if (!$this->enable) {
+            return false;
+        }
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
@@ -140,10 +142,15 @@ class AvifConvertPhp
             case 'image/jpeg':
                 $img = \imageCreateFromJpeg($src);
                 break;
+            case 'image/avif':
+                $img = \imagecreatefromavif($src);
+                break;
         }
-        if(empty($img)) {
+
+        if (empty($img)) {
             return false;
         }
+
         imageavif(
             $img,
             $absSrcWebp,
