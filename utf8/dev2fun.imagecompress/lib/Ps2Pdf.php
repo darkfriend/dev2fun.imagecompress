@@ -76,7 +76,7 @@ class Ps2Pdf
         if (!$path) {
             $path = $this->path;
         }
-        if (\Dev2funImageCompress::checkAvailable("{$path}/gs")) {
+        if (!\Dev2funImageCompress::checkAvailable("{$path}/gs")) {
             throw new \Exception("{$path}/gs no readable or executable");
         }
         if (self::$isOptim === null || $path !== $this->path) {

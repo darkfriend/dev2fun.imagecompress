@@ -26,6 +26,7 @@ class Webp
     private static $isOptim = null;
     private $origPicturesMode = false;
     private static $origPictures = [];
+    private $convertAlgorithm = '';
 
     /**
      * @param string|null $siteId
@@ -51,6 +52,13 @@ class Webp
         }
 
         $this->multithreading = Option::get($this->MODULE_ID, 'cwebp_multithreading', 'Y', $siteId) === 'Y';
+
+        if (\Dev2funImageCompress::isCli()) {
+            $this->convertAlgorithm = 'phpWebp';
+            $this->enable = true;
+        } else {
+            $this->convertAlgorithm = Option::get($this->MODULE_ID, 'convert_algorithm', 'phpWebp', $siteId);
+        }
     }
 
     /**
@@ -73,11 +81,14 @@ class Webp
      */
     public function isOptim(?string $path = null)
     {
+        if ($this->convertAlgorithm !== 'cwebp') {
+            return true;
+        }
         if (!$path) {
             $path = $this->path;
         }
         if (self::$isOptim === null || $path !== $this->path) {
-            if (\Dev2funImageCompress::checkAvailable("{$path}/cwebp")) {
+            if (!\Dev2funImageCompress::checkAvailable("{$path}/cwebp")) {
                 throw new \Exception("{$path}/cwebp no readable or executable");
             }
             exec($path . '/cwebp -version', $s);

@@ -78,16 +78,21 @@ if ($request->isPost() && check_bitrix_sessid()) {
         $error = false;
         $arSite = current($arSites);
 
-        $disableFunctions = ini_get('disable_functions');
-        if ($disableFunctions && in_array('exec', explode(',', $disableFunctions))) {
-            $text[] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_EXEC');
+        try {
+            $disableFunctions = ini_get('disable_functions');
+            if ($disableFunctions && in_array('exec', explode(',', $disableFunctions))) {
+                $text[] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_EXEC');
+            }
+
+            foreach (Check::$optiClasses as $algKey => $algItem) {
+                if(!Check::isOptim($algKey)) {
+                    $text[] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => $algKey]);
+                }
+            }
+        } catch (Exception $e) {
+            $text[] =  $e->getMessage();
         }
 
-        foreach (Check::$optiClasses as $algKey => $algItem) {
-            if(!Check::isOptim($algKey)) {
-                $text[] = Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => $algKey]);
-            }
-        }
         if (!$text) {
             $text = Loc::getMessage("D2F_COMPRESS_OPTIONS_TESTED");
         } else {
@@ -194,7 +199,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 if(!$algorithmJpeg) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'jpeg']));
                 }
-                if (\Dev2funImageCompress::checkAvailable("{$pthJpeg}/{$algorithmJpeg}")) {
+                if (!\Dev2funImageCompress::checkAvailable("{$pthJpeg}/{$algorithmJpeg}")) {
                     throw new Exception("{$pthJpeg}/{$algorithmJpeg} no readable or executable");
                 }
                 if (!file_exists("{$pthJpeg}/{$algorithmJpeg}")) {
@@ -227,7 +232,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 if(!$algorithmPng) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'png']));
                 }
-                if (\Dev2funImageCompress::checkAvailable("{$pthPng}/{$algorithmPng}")) {
+                if (!\Dev2funImageCompress::checkAvailable("{$pthPng}/{$algorithmPng}")) {
                     throw new Exception("{$pthPng}/{$algorithmPng} no readable or executable");
                 }
                 if (!file_exists($pthPng)) {
@@ -304,7 +309,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
                             throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'nodejs']));
                         }
                         $pathNodejs = \rtrim($pathNodejs, '/');
-                        if (\Dev2funImageCompress::checkAvailable($pathNodejs)) {
+                        if (!\Dev2funImageCompress::checkAvailable($pathNodejs)) {
                             throw new Exception("{$pathNodejs} no readable or executable");
                         }
                         if (!file_exists($pathNodejs)) {
