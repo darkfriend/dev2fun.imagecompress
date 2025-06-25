@@ -175,9 +175,15 @@ class Compress
         return $this->jpegoptim;
     }
 
-    public function compressJPG(string $strFilePath)
+    /**
+     * @param string|null $strFilePath
+     * @return bool|null
+     * @throws \Exception
+     * @deprecated
+     */
+    public function compressJPG(?string $strFilePath)
     {
-        if(!static::$enable || !$this->enableJpeg) {
+        if(!static::$enable || !$this->enableJpeg || !$strFilePath) {
             return null;
         }
         $res = false;
@@ -201,9 +207,15 @@ class Compress
         return $res;
     }
 
-    public function compressPNG(string $strFilePath)
+    /**
+     * @param string|null $strFilePath
+     * @return bool|null
+     * @throws \Exception
+     * @deprecated
+     */
+    public function compressPNG(?string $strFilePath)
     {
-        if(!static::$enable || !$this->enablePng) {
+        if(!static::$enable || !$this->enablePng || !$strFilePath) {
             return null;
         }
         $res = false;
@@ -225,9 +237,15 @@ class Compress
         return $res;
     }
 
-    public function compressPdf(string $strFilePath)
+    /**
+     * @param string|null $strFilePath
+     * @return bool|null
+     * @throws \Exception
+     * @deprecated
+     */
+    public function compressPdf(?string $strFilePath)
     {
-        if(!static::$enable || !$this->enablePdf) {
+        if(!static::$enable || !$this->enablePdf || !$strFilePath) {
             return null;
         }
         $res = false;
@@ -251,18 +269,20 @@ class Compress
 
     /**
      * Запускает процесс
-     * @param string $strFilePath
+     * @param string|null $strFilePath
      * @param string|null $alg
      * @param array $options
      * @return bool|null
      * @throws \Bitrix\Main\ArgumentNullException
      * @throws \Bitrix\Main\ArgumentOutOfRangeException
      */
-    public function process(string $strFilePath, ?string $alg=null, array $options=[])
+    public function process(?string $strFilePath, ?string $alg=null, array $options=[])
     {
-        if(!static::$enable) return null;
+        if (!static::$enable) {
+            return null;
+        }
         $res = false;
-        if(!$alg) {
+        if (!$alg || !$strFilePath) {
             return $res;
         }
         $algInstance = static::getAlgInstance($alg);

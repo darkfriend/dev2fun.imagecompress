@@ -39,6 +39,8 @@ class Convert
         'image/jpeg',
         'image/png',
         'image/svg',
+        'image/webp',
+        'image/avif',
     ];
 
     public static $convertModes = [
@@ -114,6 +116,10 @@ class Convert
         }
 
         $this->enableClearCache = Option::get($this->MODULE_ID, 'convert_enable_clear_cache', 'N') === 'Y';
+
+        if (\Dev2funImageCompress::isCli()) {
+            $this->enable = true;
+        }
     }
 
     /**

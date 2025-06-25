@@ -77,6 +77,9 @@ class Webp
             $path = $this->path;
         }
         if (self::$isOptim === null || $path !== $this->path) {
+            if (\Dev2funImageCompress::checkAvailable("{$path}/cwebp")) {
+                throw new \Exception("{$path}/cwebp no readable or executable");
+            }
             exec($path . '/cwebp -version', $s);
             self::$isOptim = (bool)$s;
         }
@@ -90,9 +93,11 @@ class Webp
      * @return bool
      * @throws \Exception
      */
-    public function convert($arFile, $params = [])
+    public function convert($arFile, array $params = [])
     {
-        if(!$this->enable) return false;
+        if (!$this->enable) {
+            return false;
+        }
 
         //        $strFilePath = strtr(
         //            $strFilePath,

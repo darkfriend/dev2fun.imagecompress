@@ -74,10 +74,10 @@ class Dev2funImageCompress
     public static function getProtocol(): string
     {
         $protocol = 'http';
-        if(\Bitrix\Main\Context::getCurrent()->getRequest()->isHttps()) {
+        if (\Bitrix\Main\Context::getCurrent()->getRequest()->isHttps()) {
             $protocol .= 's';
         }
-        return ($protocol.'://');
+        return ($protocol . '://');
     }
 
     /**
@@ -87,7 +87,7 @@ class Dev2funImageCompress
     public static function getHost(): string
     {
         $host = \SITE_SERVER_NAME;
-        if(!$host) {
+        if (!$host) {
             $host = $_SERVER['HTTP_HOST'];
         }
         return $host;
@@ -98,10 +98,12 @@ class Dev2funImageCompress
      * @param string $path
      * @return string
      */
-    public static function getUrl($path=''): string
+    public static function getUrl($path = ''): string
     {
-        if(!$path) return '';
-        return self::getProtocol().self::getHost().$path;
+        if (!$path) {
+            return '';
+        }
+        return self::getProtocol() . self::getHost() . $path;
     }
 
     /**
@@ -133,7 +135,8 @@ class Dev2funImageCompress
             if (!$siteId) {
                 $site = array_filter(
                     static::getSites(),
-                    function($v) {
+                    static function ($v)
+                    {
                         return $v['DEF'] === 'Y';
                     }
                 );
@@ -145,6 +148,72 @@ class Dev2funImageCompress
         }
 
         return self::$siteId;
+    }
+
+    /**
+     * Check available path
+     * @param string $path
+     * @return bool
+     * @throws Exception
+     */
+    //    public static function checkAvailable(string $path): bool
+    //    {
+    //        if (!is_readable($path)) {
+    //            throw new \Exception("no readable path {$util}");
+    //        }
+    //
+    //        if (!is_executable($path)) {
+    //            throw new \Exception("no executable path {$util}");
+    //        }
+    ////        return is_readable($path) && is_executable($path);
+    //    }
+
+    /**
+     * @param string $path
+     * @return bool
+     * @throws Exception
+     */
+    public static function checkAvailable(string $path): bool
+    {
+        return self::checkReadable($path) && self::checkExecutable($path);
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public static function checkReadable(string $path): bool
+    {
+        return is_readable($path);
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public static function checkExecutable(string $path): bool
+    {
+        return is_executable($path);
+    }
+
+    /**
+     * Checked of cli
+     * @return bool
+     * @since 1.0.6
+     */
+    public static function isCli()
+    {
+        return self::getMode() === 'cli';
+    }
+
+    /**
+     * Get mode script
+     * @return string
+     * @since 1.0.6
+     */
+    public static function getMode()
+    {
+        return \php_sapi_name();
     }
 
     /**

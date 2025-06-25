@@ -150,6 +150,6 @@ class ConvertAgent
      */
     public static function checkAgents(): bool
     {
-        return \Bitrix\Main\Config\Option::get("main", 'agents_use_crontab', 'Y') === 'N';
+        return \Bitrix\Main\Config\Option::get("main", 'check_agents', 'Y') === 'N';
     }
 }

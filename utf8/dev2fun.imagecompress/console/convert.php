@@ -43,6 +43,7 @@ $cnt = $connection->queryScalar(
 echo "Found {$cnt} files" . PHP_EOL;
 
 $convert = \Dev2fun\ImageCompress\Convert::getInstance();
+$convert->enable = true;
 
 if (!$convert->enable) {
     echo "Converter is not active. Please activate function convert in module settings." . PHP_EOL;

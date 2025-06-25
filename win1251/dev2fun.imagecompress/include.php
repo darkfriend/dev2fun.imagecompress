@@ -148,6 +148,24 @@ class Dev2funImageCompress
     }
 
     /**
+     * Check available path
+     * @param string $path
+     * @param string $util
+     * @return void
+     * @throws Exception
+     */
+    public static function checkAvailable(string $path, string $util = ''): void
+    {
+        if (!is_readable($path)) {
+            throw new \Exception("no readable path {$util}");
+        }
+
+        if (!is_executable($path)) {
+            throw new \Exception("no executable path {$util}");
+        }
+    }
+
+    /**
      * @param array $aGlobalMenu
      * @param array $aModuleMenu
      * @return void
