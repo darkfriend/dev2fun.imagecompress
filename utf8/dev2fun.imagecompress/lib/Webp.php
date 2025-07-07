@@ -89,7 +89,7 @@ class Webp
         }
         if (self::$isOptim === null || $path !== $this->path) {
             if (!\Dev2funImageCompress::checkAvailable("{$path}/cwebp")) {
-                throw new \Exception("{$path}/cwebp no readable or executable");
+                return false;
             }
             exec($path . '/cwebp -version', $s);
             self::$isOptim = (bool)$s;

@@ -74,7 +74,7 @@ class Jpegoptim
         }
         if (self::$isOptim === null || $path !== $this->jpegOptimPath) {
             if (!\Dev2funImageCompress::checkAvailable("{$path}/jpegoptim")) {
-                throw new \Exception("jpegoptim no readable or executable");
+                return false;
             }
             exec($path . '/jpegoptim --version', $s);
             self::$isOptim = (bool)$s;

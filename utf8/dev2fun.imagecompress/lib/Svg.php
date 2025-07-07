@@ -75,7 +75,7 @@ class Svg
             $pathNodejs = $this->pathNodejs;
         }
         if (!\Dev2funImageCompress::checkAvailable("{$path}/{$this->binaryName}")) {
-            throw new \Exception("{$path}/{$this->binaryName} no readable or executable");
+            return false;
         }
         if (self::$isOptim === null || $path !== $this->path || $pathNodejs !== $this->pathNodejs) {
             exec("{$pathNodejs}/node {$path}/{$this->binaryName} -v", $s);

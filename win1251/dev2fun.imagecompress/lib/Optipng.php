@@ -74,7 +74,7 @@ class Optipng
         }
         if (self::$isOptim === null || $path !== $this->pngOptimPath) {
             if (!\Dev2funImageCompress::checkAvailable("{$path}/optipng")) {
-                throw new \Exception("{$path}/optipng no readable or executable");
+                return false;
             }
             exec($path . '/optipng -v', $s);
             self::$isOptim = (bool)$s;
