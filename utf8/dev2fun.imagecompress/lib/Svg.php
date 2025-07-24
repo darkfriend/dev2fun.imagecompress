@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.7
+ * @version 0.11.8
  */
 
 namespace Dev2fun\ImageCompress;
@@ -61,9 +61,10 @@ class Svg
      * Check available optimization svg
      * @param string|null $path
      * @param string|null $pathNodejs
+     * @param bool $exception
      * @return bool
      */
-    public function isOptim(?string $path = null, ?string $pathNodejs = null): bool
+    public function isOptim(?string $path = null, ?string $pathNodejs = null, bool $exception = false): bool
     {
         if (!$this->isActive()) {
             return true;
@@ -74,10 +75,23 @@ class Svg
         if (!$pathNodejs) {
             $pathNodejs = $this->pathNodejs;
         }
-        if (!\Dev2funImageCompress::checkAvailable("{$path}/{$this->binaryName}")) {
-            throw new \Exception("{$path}/{$this->binaryName} no readable or executable");
-        }
         if (self::$isOptim === null || $path !== $this->path || $pathNodejs !== $this->pathNodejs) {
+            if (!\Dev2funImageCompress::checkAvailable("{$pathNodejs}/node")) {
+                if ($exception) {
+                    throw new \Exception("{$pathNodejs}/node no readable or executable");
+                }
+                self::$isOptim = false;
+                return self::$isOptim;
+            }
+
+            if (!\Dev2funImageCompress::checkAvailable("{$path}/{$this->binaryName}")) {
+                if ($exception) {
+                    throw new \Exception("{$path}/{$this->binaryName} no readable or executable");
+                }
+                self::$isOptim = false;
+                return self::$isOptim;
+            }
+
             exec("{$pathNodejs}/node {$path}/{$this->binaryName} -v", $s);
             self::$isOptim = (bool)$s;
         }

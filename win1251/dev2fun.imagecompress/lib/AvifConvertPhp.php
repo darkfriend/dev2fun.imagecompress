@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.6
+ * @version 0.11.8
  */
 
 namespace Dev2fun\ImageCompress;
@@ -56,7 +56,7 @@ class AvifConvertPhp
      * Check imageavif and gd
      * @return bool
      */
-    public function isOptim()
+    public function isOptim(): bool
     {
         if(!\function_exists('imageavif')) {
             throw new \ErrorException('Not found "imageavif"');

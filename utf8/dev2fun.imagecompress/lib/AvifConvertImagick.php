@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.6
+ * @version 0.11.8
  */
 
 namespace Dev2fun\ImageCompress;
@@ -54,7 +54,7 @@ class AvifConvertImagick
      * Check
      * @return bool
      */
-    public function isOptim()
+    public function isOptim(): bool
     {
         if(!\class_exists('Imagick')) {
             throw new \ErrorException('Not found "Imagick"');

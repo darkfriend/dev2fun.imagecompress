@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.5
+ * @version 0.11.8
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 
@@ -40,6 +40,67 @@ $convertInstance = \Dev2fun\ImageCompress\Convert::getInstance();
 <tr class="heading">
     <td colspan="2">
         <b><?= Loc::getMessage("D2F_COMPRESS_GLOBAL_SETTINGS") ?></b>
+    </td>
+</tr>
+
+<?php
+$browsers = [
+    'opera',
+    'edge',
+    'chrome',
+    'safari',
+    'firefox',
+    'msie',
+    'other',
+];
+$browsersSupport = Option::get($curModuleName, "browsers_support", '{}');
+if ($browsersSupport) {
+    $browsersSupport = json_decode($browsersSupport, true);
+} else {
+    $browsersSupport = [];
+}
+?>
+<!-- BROWSERS SUPPORT -->
+<tr class="browsers_support_settings">
+    <td width="40%">
+        <label for="browsers_support">
+            <?= Loc::getMessage("D2F_COMPRESS_BROWSERS_SUPPORT") ?>:
+        </label>
+    </td>
+    <td width="60%">
+        <?php foreach ($browsers as $browser) { ?>
+            <label>
+                <input
+                    type="checkbox"
+                    name="browsers[]"
+                    value="<?=$browser?>"
+                    <?= in_array($browser, $browsersSupport) ? 'checked' : '' ?>
+                />
+                <?= $browser ?>
+            </label><br>
+        <?php } ?>
+    </td>
+</tr>
+
+<?php
+$headerAccept = Option::get($curModuleName, "header_accept", 'N');
+?>
+<tr class="browsers_support_settings">
+    <td width="40%">
+        <label for="check_header_accept">
+            <?= Loc::getMessage("D2F_COMPRESS_CHECK_HEADER_ACCEPT") ?>:
+        </label>
+    </td>
+    <td width="60%">
+        <label>
+            <input
+                type="checkbox"
+                id="check_header_accept"
+                name="header_accept"
+                value="Y"
+                <?= $headerAccept === 'Y' ? 'checked' : '' ?>
+            />
+        </label>
     </td>
 </tr>
 

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.6
+ * @version 0.11.8
  */
 
 namespace Dev2fun\ImageCompress;
@@ -76,8 +76,12 @@ class Convert
     public $cacheIncludeUserGroups = true;
     /** @var bool */
     public $enableClearCache = false;
-
+    /** @var string|null */
     public $siteId;
+    /** @var array|null */
+    public $browsersSupport;
+    /** @var bool|null */
+    public $headerAccept;
 
     /**
      * @param string|null $siteId
@@ -116,6 +120,10 @@ class Convert
         }
 
         $this->enableClearCache = Option::get($this->MODULE_ID, 'convert_enable_clear_cache', 'N') === 'Y';
+
+        $browsersSupport = Option::get($this->MODULE_ID, 'browsers_support', '');
+        $this->browsersSupport = $browsersSupport ? json_decode($browsersSupport, true) : [];
+        $this->headerAccept = Option::get($this->MODULE_ID, 'header_accept', 'Y') === 'Y';
 
         if (\Dev2funImageCompress::isCli()) {
             $this->enable = true;
@@ -1150,6 +1158,15 @@ class Convert
     }
 
     /**
+     * Check header accept on support avif
+     * @return bool
+     */
+    public static function checkSupportAvifAccept(): bool
+    {
+        return \strpos($_SERVER['HTTP_ACCEPT'], 'image/avif') !== false;
+    }
+
+    /**
      * Get result check webp support
      * @return bool
      */
@@ -1160,10 +1177,7 @@ class Convert
         }
 
         $curBrowserAgent = $_SERVER["HTTP_USER_AGENT"] ?? '';
-        $supportBrowsers = [
-            'chrome',
-            'opera',
-        ];
+        $supportBrowsers = self::getInstance()->browsersSupport;
         $event = new \Bitrix\Main\Event(
             self::getInstance()->MODULE_ID,
             'OnBeforeCheckWebpBrowserSupport',
@@ -1176,7 +1190,10 @@ class Convert
         }
 
         $result = \in_array(self::getBrowserAgentName($curBrowserAgent), $supportBrowsers)
-            || self::checkSupportWebpAccept();
+            || (
+                self::getInstance()->headerAccept
+                && (self::checkSupportWebpAccept() || self::checkSupportAvifAccept())
+            );
 
         $event = new \Bitrix\Main\Event(self::getInstance()->MODULE_ID, "OnAfterCheckWebpSupport", [$result]);
         $event->send();
@@ -1198,7 +1215,7 @@ class Convert
      */
     public static function getBrowserAgentName(?string $userAgent): string
     {
-        $result = 'Other';
+        $result = 'other';
         if(!$userAgent) {
             return $result;
         }

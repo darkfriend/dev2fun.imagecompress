@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.6
+ * @version 0.11.8
  */
 
 namespace Dev2fun\ImageCompress;
@@ -161,7 +161,9 @@ class Compress
     {
         if (!$this->pngoptim) {
             $this->pngoptim = Check::isPNGOptim($this->algorithmPng);
-            if (!$this->pngoptim) $this->LAST_ERROR = Check::$lastError;
+            if (!$this->pngoptim) {
+                $this->LAST_ERROR = Check::$lastError;
+            }
 //            exec($this->pngOptimPath.'/optipng -v',$s);
 //            if($s) $this->pngoptim = true;
         }
@@ -176,7 +178,9 @@ class Compress
     {
         if (!$this->jpegoptim) {
             $this->jpegoptim = Check::isJPEGOptim($this->algorithmJpeg);
-            if (!$this->jpegoptim) $this->LAST_ERROR = Check::$lastError;
+            if (!$this->jpegoptim) {
+                $this->LAST_ERROR = Check::$lastError;
+            }
 //            exec($this->jpegOptimPath.'/jpegoptim --version',$s);
 //            if($s) $this->jpegoptim = true;
         }
@@ -685,27 +689,38 @@ class Compress
         ) {
             return null;
         }
+
         switch ($arFile["CONTENT_TYPE"]) {
             case 'image/jpeg':
-                $instance->compressJPG($cacheImageFileTmp);
+                if ($instance->enableJpeg) {
+                    $instance->compressJPG($cacheImageFileTmp);
+                }
                 break;
             case 'image/png':
-                $instance->compressPNG($cacheImageFileTmp);
+                if ($instance->enablePng) {
+                    $instance->compressPNG($cacheImageFileTmp);
+                }
                 break;
             case 'application/pdf':
-                $instance->compressPdf($cacheImageFileTmp);
+                if ($instance->enablePdf) {
+                    $instance->compressPdf($cacheImageFileTmp);
+                }
                 break;
             case 'image/svg':
-                $instance->process(
-                    $cacheImageFileTmp,
-                    Option::get($instance->MODULE_ID, 'opti_algorithm_svg', '')
-                );
+                if ($instance->enableSvg) {
+                    $instance->process(
+                        $cacheImageFileTmp,
+                        Option::get($instance->MODULE_ID, 'opti_algorithm_svg', '')
+                    );
+                }
                 break;
             case 'image/gif':
-                $instance->process(
-                    $cacheImageFileTmp,
-                    Option::get($instance->MODULE_ID, 'opti_algorithm_gif', '')
-                );
+                if ($instance->enableGif) {
+                    $instance->process(
+                        $cacheImageFileTmp,
+                        Option::get($instance->MODULE_ID, 'opti_algorithm_gif', '')
+                    );
+                }
                 break;
         }
     }

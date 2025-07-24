@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.7
+ * @version 0.11.8
  */
 
 namespace Dev2fun\ImageCompress;
@@ -77,9 +77,10 @@ class Webp
     /**
      * Check available cwebp
      * @param string|null $path
+     * @param bool $exception
      * @return bool
      */
-    public function isOptim(?string $path = null)
+    public function isOptim(?string $path = null, bool $exception = false): bool
     {
         if ($this->convertAlgorithm !== 'cwebp') {
             return true;
@@ -89,10 +90,14 @@ class Webp
         }
         if (self::$isOptim === null || $path !== $this->path) {
             if (!\Dev2funImageCompress::checkAvailable("{$path}/cwebp")) {
-                throw new \Exception("{$path}/cwebp no readable or executable");
+                self::$isOptim = false;
+                if ($exception) {
+                    throw new \Exception("{$path}/cwebp no readable or executable");
+                }
+            } else {
+                exec("{$path}/cwebp -version", $s);
+                self::$isOptim = (bool)$s;
             }
-            exec($path . '/cwebp -version', $s);
-            self::$isOptim = (bool)$s;
         }
         return self::$isOptim;
     }

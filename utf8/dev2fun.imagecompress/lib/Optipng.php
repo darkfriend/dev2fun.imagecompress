@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.7
+ * @version 0.11.8
  */
 
 namespace Dev2fun\ImageCompress;
@@ -65,19 +65,24 @@ class Optipng
     /**
      * Check available optimization PNG
      * @param string|null $path
+     * @param bool $exception
      * @return bool
      */
-    public function isOptim(?string $path = null)
+    public function isOptim(?string $path = null, bool $exception = false)
     {
         if (!$path) {
             $path = $this->pngOptimPath;
         }
         if (self::$isOptim === null || $path !== $this->pngOptimPath) {
             if (!\Dev2funImageCompress::checkAvailable("{$path}/optipng")) {
-                throw new \Exception("{$path}/optipng no readable or executable");
+                self::$isOptim = false;
+                if ($exception) {
+                    throw new \Exception("{$path}/optipng no readable or executable");
+                }
+            } else {
+                exec("{$path}/optipng -v", $s);
+                self::$isOptim = (bool)$s;
             }
-            exec($path . '/optipng -v', $s);
-            self::$isOptim = (bool)$s;
         }
         return self::$isOptim;
     }
@@ -122,8 +127,6 @@ class Optipng
                 '[' => '\[',
             ]
         );
-//		foreach (GetModuleEvents($this->MODULE_ID, "OnBeforeResizeImageOptipng", true) as $arEvent)
-//			ExecuteModuleEventEx($arEvent, array(&$strFilePath, &$quality));
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,

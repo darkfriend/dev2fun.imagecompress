@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.7
+ * @version 0.11.8
  */
 
 namespace Dev2fun\ImageCompress;
@@ -69,19 +69,24 @@ class Ps2Pdf
     /**
      * Check available optimization pdf
      * @param string|null $path
+     * @param bool $exception
      * @return bool
      */
-    public function isOptim(?string $path = null)
+    public function isOptim(?string $path = null, bool $exception = false): bool
     {
         if (!$path) {
             $path = $this->path;
         }
-        if (!\Dev2funImageCompress::checkAvailable("{$path}/gs")) {
-            throw new \Exception("{$path}/gs no readable or executable");
-        }
         if (self::$isOptim === null || $path !== $this->path) {
-            \exec($path . '/gs -v', $s);
-            self::$isOptim = (bool)$s;;
+            if (!\Dev2funImageCompress::checkAvailable("{$path}/gs")) {
+                self::$isOptim = false;
+                if ($exception) {
+                    throw new \Exception("{$path}/gs no readable or executable");
+                }
+            } else {
+                \exec($path . '/gs -v', $s);
+                self::$isOptim = (bool)$s;
+            }
         }
         return self::$isOptim;
     }
@@ -95,7 +100,7 @@ class Ps2Pdf
      */
     public function compress($strFilePath, $params = [])
     {
-        if(!$this->active) {
+        if (!$this->active) {
             $this->lastError = 'no_active';
             return false;
         }

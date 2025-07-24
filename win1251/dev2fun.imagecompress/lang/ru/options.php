@@ -167,7 +167,7 @@ EO;
 $MESS['LABEL_ADD'] = "Добавить";
 
 
-$MESS['D2F_COMPRESS_GLOBAL_SETTINGS'] = "Общие настройки";
+$MESS['D2F_COMPRESS_GLOBAL_SETTINGS'] = "Общие настройки конвертации";
 $MESS['D2F_COMPRESS_CRONTAB_TEXT'] = <<<TEXT
     <b>Сейчас у вас агенты работают на хитах! Крайне рекомендуется перевести агенты на крон!</b><br>
     Рекомендуется использовать "Обобщённое решение" - <a href="https://dev.1c-bitrix.ru/learning/course/?COURSE_ID=43&LESSON_ID=2943" target="_blank">подробнее</a>
@@ -199,6 +199,8 @@ $MESS['D2F_COMPRESS_AGENT_NOT_ACTIVATED'] = "Агент не активен";
 $MESS['D2F_COMPRESS_AGENT_BTN_DEACTIVATE'] = "Дизактивировать";
 $MESS['D2F_COMPRESS_AGENT_BTN_ACTIVATE'] = "Активировать";
 $MESS['D2F_COMPRESS_CONVERT_AGENT_ACTIVE'] = "Активность агента конвертации";
+$MESS['D2F_COMPRESS_BROWSERS_SUPPORT'] = "Браузеры, в которых выводятся сконвертированные картинки";
+$MESS['D2F_COMPRESS_CHECK_HEADER_ACCEPT'] = "Проверять поддержку webp/avif по заголовку Accept";
 
 
 $MESS['D2F_COMPRESS_OPTIONS_CACHE_CLEAR_ALL_SUCCESS'] = "Кэш сконвертированных картинок resize_cache успешно очищен";

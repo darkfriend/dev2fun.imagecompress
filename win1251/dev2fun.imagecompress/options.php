@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.7
+ * @version 0.11.8
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -427,6 +427,18 @@ if ($request->isPost() && check_bitrix_sessid()) {
             }
 
 
+
+            $browsersSupport = Option::get($curModuleName, "browsers_support", '');
+            $browsersSupport = json_decode($browsersSupport, true);
+            if (isset($_POST['browsers'])) {
+                $browsersSupport = json_encode($_POST['browsers'] ?? []);
+            } elseif (!empty($browsersSupport)) {
+                $browsersSupport = '';
+            }
+            Option::set($curModuleName, 'browsers_support', $browsersSupport);
+
+            $headerAccept = $_POST['header_accept'] ?? 'N';
+            Option::set($curModuleName, 'header_accept', $headerAccept);
 
 
             $updCheckbox = [];
