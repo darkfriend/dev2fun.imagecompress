@@ -19,7 +19,7 @@
         "@tabler/icons-vue": "^3.21.0",
         "@types/aos": "3.0.7",
         "aos": "2.3.4",
-        "axios": "^1.7.7",
+        "axios": "^1.8.2",
         "cross-env": "^7.0.3",
         "empty-lite": "^2.0.0",
         "lodash": "4.17.21",
