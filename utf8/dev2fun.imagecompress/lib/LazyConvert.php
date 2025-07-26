@@ -68,6 +68,7 @@ class LazyConvert
                     ? Convert::TYPE_AVIF
                     : Convert::TYPE_WEBP,
                 '!=IMAGE_IGNORE' => 'Y',
+                '!=IMAGE_HASH' => false,
 //                [
 //                    'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE',
 //                    '!=',
