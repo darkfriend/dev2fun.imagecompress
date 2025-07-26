@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.8
+ * @version 0.11.9
  */
 
 namespace Dev2fun\ImageCompress;
@@ -141,6 +141,20 @@ class AvifConvertPhp
                 break;
             case 'image/jpeg':
                 $img = \imageCreateFromJpeg($src);
+                $exif = exif_read_data($src);
+                if (!empty($exif['Orientation'])) {
+                    switch ($exif['Orientation']) {
+                        case 3: // Rotate 180 degrees
+                            $img = imagerotate($img, 180, 0);
+                            break;
+                        case 6: // Rotate 90 degrees CW
+                            $img = imagerotate($img, -90, 0);
+                            break;
+                        case 8: // Rotate 90 degrees CCW
+                            $img = imagerotate($img, 90, 0);
+                            break;
+                    }
+                }
                 break;
             case 'image/avif':
                 $img = \imagecreatefromavif($src);

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.6
+ * @version 0.11.9
  */
 
 namespace Dev2fun\ImageCompress;
@@ -208,6 +208,11 @@ class WebpConvertPhp
         return [];
     }
 
+    /**
+     * @param $srcWebp
+     * @return false|mixed|void
+     * @deprecated
+     */
     public function convertPath($srcWebp)
     {
         $uploadDir = Option::get('main', 'upload_dir', 'upload');
