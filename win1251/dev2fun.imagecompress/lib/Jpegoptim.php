@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.8
+ * @version 0.11.9
  */
 
 namespace Dev2fun\ImageCompress;
@@ -138,15 +138,30 @@ class Jpegoptim
         if (!empty($params['progressiveJpeg'])) {
             $strCommand .= '--all-progressive';
         }
-        $strCommand .= ' --strip-all -t';
+//        $strCommand .= ' --strip-all -t';
+        $strCommand .= ' --strip-com --strip-iptc --strip-xmp --strip-jfif --strip-jfxx --strip-Adobe --totals --preserve --preserve-perms';
         if ($quality) {
             $strCommand .= " -m{$quality}";
         }
+
+        $exif = exif_read_data($strFilePath);
+        if (!empty($exif['Orientation'])) {
+            switch ($exif['Orientation']) {
+                case 3: // Rotate 180 degrees
+                case 6: // Rotate 90 degrees CW
+                case 8: // Rotate 90 degrees CCW
+                    $strCommand .= ' --keep-exif';
+                    break;
+                default:
+                    $strCommand .= ' --strip-exif';
+            }
+        }
+
         exec($this->jpegOptimPath . "/jpegoptim $strCommand '$strFilePath' 2>&1", $res);
 
-        if (!empty($params['changeChmod'])) {
-            chmod($strFilePath, $params['changeChmod']);
-        }
+//        if (!empty($params['changeChmod'])) {
+//            chmod($strFilePath, $params['changeChmod']);
+//        }
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,

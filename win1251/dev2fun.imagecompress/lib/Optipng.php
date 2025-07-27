@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.8
+ * @version 0.11.9
  */
 
 namespace Dev2fun\ImageCompress;
@@ -136,20 +136,25 @@ class Optipng
         $event->send();
 
         exec($this->pngOptimPath . "/optipng -v", $out);
-        $execString = "-strip all -o{$quality} '$strFilePath' 2>&1";
+        $execString = "-preserve -strip all -o{$quality} '$strFilePath' 2>&1";
+
         if (!empty($out[0])) {
             if (preg_match('#optipng.(.*?)\:#i', $out[0], $vMatch)) {
                 $vMatch = preg_replace('#(\.)#', '', $vMatch[1]);
-                if ($vMatch && $vMatch < 70) {
-                    $execString = "-o{$quality} '$strFilePath' 2>&1";
+                if (preg_match('#(\d+)#', $vMatch, $vMatchResult)) {
+                    $vMatchResult = (int)($vMatchResult[1] ?? 0);
+                    if ($vMatchResult && $vMatchResult < 70) {
+                        $execString = "-preserve -o{$quality} '$strFilePath' 2>&1";
+                    }
                 }
             }
         }
+
         exec($this->pngOptimPath . "/optipng {$execString}", $res);
 
-        if (!empty($params['changeChmod'])) {
-            chmod($strFilePath, $params['changeChmod']);
-        }
+//        if (!empty($params['changeChmod'])) {
+//            chmod($strFilePath, $params['changeChmod']);
+//        }
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,

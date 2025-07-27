@@ -2,13 +2,15 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.8
+ * @version 0.11.9
  */
 
 namespace Dev2fun\ImageCompress;
 
+use Bitrix\Main\Application;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Config\Option;
+use Throwable;
 
 IncludeModuleLangFile(__FILE__);
 
@@ -349,68 +351,85 @@ class Compress
 
         $strFilePath = $_SERVER["DOCUMENT_ROOT"] . \CFile::GetPath($intFileID);
 
-        if (\file_exists($strFilePath)) {
-            $oldSize = $arFile["FILE_SIZE"]; // filesize($strFilePath);
-            if ($this->enableImageResize) {
-                $this->resize($intFileID, $strFilePath);
-            }
-            switch ($arFile["CONTENT_TYPE"]) {
-                case 'image/jpeg':
-                    $isCompress = $this->compressJPG($strFilePath);
-                    break;
-                case 'image/png':
-                    $isCompress = $this->compressPNG($strFilePath);
-                    break;
-                case 'application/pdf':
-                    $isCompress = $this->compressPdf($strFilePath);
-                    break;
-                case 'image/svg':
-                    $isCompress = $this->process(
-                        $strFilePath,
-                        Option::get($this->MODULE_ID, 'opti_algorithm_svg', '')
-                    );
-                    break;
-                case 'image/gif':
-                    $isCompress = $this->process(
-                        $strFilePath,
-                        Option::get($this->MODULE_ID, 'opti_algorithm_gif', '')
-                    );
-                    break;
-                default:
-                    $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONTENT_TYPE', [
-                        '#TYPE#' => $arFile["CONTENT_TYPE"],
-                    ]);
-                    return null;
-            }
-
-            if ($isCompress) {
-                \clearstatcache(true, $strFilePath);
-                $newSize = filesize($strFilePath);
-                if ($newSize != $oldSize) {
-                    //					$DB->Query("UPDATE b_file SET FILE_SIZE='" . $DB->ForSql($newSize, 255) . "' WHERE ID=" . intval($intFileID));
-                    $this->saveSizeBitrix($intFileID, $newSize);
+        try
+        {
+            if (\file_exists($strFilePath)) {
+                $oldSize = $arFile["FILE_SIZE"]; // filesize($strFilePath);
+                if ($this->enableImageResize) {
+                    $this->resize($intFileID, $strFilePath);
                 }
-                $arFields = [
-                    'FILE_ID' => $intFileID,
-                    'SIZE_BEFORE' => $oldSize,
-                    'SIZE_AFTER' => $newSize,
-                ];
-                $rs = ImageCompressTable::getById($intFileID);
-                if ($rs->getSelectedRowsCount() <= 0) {
-                    $res = ImageCompressTable::add($arFields);
+                switch ($arFile["CONTENT_TYPE"]) {
+                    case 'image/jpeg':
+                        $isCompress = $this->compressJPG($strFilePath);
+                        break;
+                    case 'image/png':
+                        $isCompress = $this->compressPNG($strFilePath);
+                        break;
+                    case 'application/pdf':
+                        $isCompress = $this->compressPdf($strFilePath);
+                        break;
+                    case 'image/svg':
+                        $isCompress = $this->process(
+                            $strFilePath,
+                            Option::get($this->MODULE_ID, 'opti_algorithm_svg', '')
+                        );
+                        break;
+                    case 'image/gif':
+                        $isCompress = $this->process(
+                            $strFilePath,
+                            Option::get($this->MODULE_ID, 'opti_algorithm_gif', '')
+                        );
+                        break;
+                    default:
+                        $this->LAST_ERROR = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONTENT_TYPE', [
+                            '#TYPE#' => $arFile["CONTENT_TYPE"],
+                        ]);
+                        return null;
+                }
+
+                Application::getInstance()->getConnection()->connect();
+
+                if ($isCompress) {
+                    \clearstatcache(true, $strFilePath);
+                    $newSize = filesize($strFilePath);
+
+                    if ($newSize != $oldSize) {
+//					$DB->Query("UPDATE b_file SET FILE_SIZE='" . $DB->ForSql($newSize, 255) . "' WHERE ID=" . intval($intFileID));
+                        $this->saveSizeBitrix($intFileID, $newSize);
+                    }
+                    $arFields = [
+                        'FILE_ID' => $intFileID,
+                        'SIZE_BEFORE' => $oldSize,
+                        'SIZE_AFTER' => $newSize,
+                    ];
+
+                    $rs = ImageCompressTable::getById($intFileID);
+                    if ($rs->getSelectedRowsCount() <= 0) {
+                        $res = ImageCompressTable::add($arFields);
+                    } else {
+                        $res = ImageCompressTable::update($intFileID, $arFields);
+                    }
+
                 } else {
-                    $res = ImageCompressTable::update($intFileID, $arFields);
+                    $this->LAST_ERROR = '';
                 }
             } else {
-                $this->LAST_ERROR = '';
+                $res = $this->addCompressTable($intFileID, [
+                    'FILE_ID' => $intFileID,
+                    'SIZE_BEFORE' => 0,
+                    'SIZE_AFTER' => 0,
+                ]);
             }
-        } else {
-            $res = $this->addCompressTable($intFileID, [
-                'FILE_ID' => $intFileID,
-                'SIZE_BEFORE' => 0,
-                'SIZE_AFTER' => 0,
-            ]);
+
+        } catch (Throwable $e) {
+            $this->LAST_ERROR = $e->getMessage();
+            $this->log($e->getMessage());
+            $connection = Application::getInstance()->getConnection();
+            if (!$connection->isConnected()) {
+                $connection->connect();
+            }
         }
+
         return $res;
     }
 
@@ -429,7 +448,9 @@ class Compress
         $width = Option::get($this->MODULE_ID, 'resize_image_width', '');
         $height = Option::get($this->MODULE_ID, 'resize_image_height', '');
         $algorithm = Option::get($this->MODULE_ID, 'resize_image_algorithm', '');
-        if (!$algorithm) $algorithm = BX_RESIZE_IMAGE_PROPORTIONAL;
+        if (!$algorithm) {
+            $algorithm = BX_RESIZE_IMAGE_PROPORTIONAL;
+        }
 
         $destinationFile = $_SERVER['DOCUMENT_ROOT'] . "/upload/{$this->MODULE_ID}/" . basename($strFilePath);
         $res = \CFile::ResizeImageFile(
@@ -504,7 +525,7 @@ class Compress
      */
     public static function CompressImageOnSectionEvent(&$arFields)
     {
-        if(!static::$enable) {
+        if (!static::$enable) {
             return;
         }
         $instance = self::getInstance();
@@ -528,7 +549,9 @@ class Compress
      */
     public static function CompressImageOnElementEvent(&$arFields)
     {
-        if(!static::$enable) return;
+        if (!static::$enable) {
+            return;
+        }
         $instance = self::getInstance();
         if (!$instance->enableElement) {
             return;
@@ -867,13 +890,13 @@ class Compress
     {
         global $DB;
         $strSql = $this->queryBuilder($arOrder, $arFilter);
-        //        if($limit) {
-        //            $strSql .= ' LIMIT '.$limit;
-        //        }
-        //
-        //        if($offset) {
-        //            $strSql .= ' OFFSET '.$offset;
-        //        }
+//        if($limit) {
+//            $strSql .= ' LIMIT '.$limit;
+//        }
+//
+//        if($offset) {
+//            $strSql .= ' OFFSET '.$offset;
+//        }
         return $DB->Query($strSql, false, "FILE: " . __FILE__ . "<br> LINE: " . __LINE__);
     }
 
@@ -1019,5 +1042,27 @@ SQL;
         return $this->LAST_ERROR;
     }
 
+    /**
+     * @param string $msg
+     * @param string $type SECURITY, ERROR, INFO, DEBUG или WARNING, для иного система установит UNKNOWN
+     * @return int
+     */
+    public function log(string $msg, string $type = 'ERROR'): int
+    {
+        return \CEventLog::Add([
+            "SEVERITY" => $type,
+            "AUDIT_TYPE_ID" => $type,
+            "MODULE_ID" => \Dev2funImageCompress::MODULE_ID,
+            "ITEM_ID" => '',
+            "DESCRIPTION" => $msg,
+        ]);
+    }
+
+//    public function saveNewSize(int $fileId, int $newSize, int $oldSize)
+//    {
+//        if ($newSize != $oldSize) {
+//            $this->saveSizeBitrix($intFileID, $newSize);
+//        }
+//    }
 
 }
