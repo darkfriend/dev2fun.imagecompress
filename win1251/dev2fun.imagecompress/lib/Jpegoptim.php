@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.9
+ * @version 0.11.10
  */
 
 namespace Dev2fun\ImageCompress;
@@ -139,7 +139,8 @@ class Jpegoptim
             $strCommand .= '--all-progressive';
         }
 //        $strCommand .= ' --strip-all -t';
-        $strCommand .= ' --strip-com --strip-iptc --strip-xmp --strip-jfif --strip-jfxx --strip-Adobe --totals --preserve --preserve-perms';
+//        $strCommand .= ' --strip-com --strip-iptc --strip-xmp --strip-jfif --strip-jfxx --strip-Adobe --totals --preserve --preserve-perms';
+        $strCommand .= ' --strip-com --strip-iptc --strip-xmp --totals --preserve --preserve-perms';
         if ($quality) {
             $strCommand .= " -m{$quality}";
         }
@@ -172,6 +173,10 @@ class Jpegoptim
         return true;
     }
 
+    /**
+     * @param array $advanceSettings
+     * @return array
+     */
     public function getOptionsSettings($advanceSettings=[])
     {
         return [];

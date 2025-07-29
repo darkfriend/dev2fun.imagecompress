@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.9
+ * @version 0.11.10
  */
 
 namespace Dev2fun\ImageCompress;
@@ -197,7 +197,7 @@ class Compress
      */
     public function compressJPG(?string $strFilePath)
     {
-        if(!static::$enable || !$this->enableJpeg || !$strFilePath) {
+        if (!static::$enable || !$this->enableJpeg || !$strFilePath) {
             return null;
         }
         $res = false;
@@ -229,7 +229,7 @@ class Compress
      */
     public function compressPNG(?string $strFilePath)
     {
-        if(!static::$enable || !$this->enablePng || !$strFilePath) {
+        if (!static::$enable || !$this->enablePng || !$strFilePath) {
             return null;
         }
         $res = false;
@@ -259,7 +259,7 @@ class Compress
      */
     public function compressPdf(?string $strFilePath)
     {
-        if(!static::$enable || !$this->enablePdf || !$strFilePath) {
+        if (!static::$enable || !$this->enablePdf || !$strFilePath) {
             return null;
         }
         $res = false;
@@ -387,7 +387,7 @@ class Compress
                         return null;
                 }
 
-                Application::getInstance()->getConnection()->connect();
+//                Application::getInstance()->getConnection()->connect();
 
                 if ($isCompress) {
                     \clearstatcache(true, $strFilePath);
@@ -424,10 +424,10 @@ class Compress
         } catch (Throwable $e) {
             $this->LAST_ERROR = $e->getMessage();
             $this->log($e->getMessage());
-            $connection = Application::getInstance()->getConnection();
-            if (!$connection->isConnected()) {
-                $connection->connect();
-            }
+//            $connection = Application::getInstance()->getConnection();
+//            if (!$connection->isConnected()) {
+//                $connection->connect();
+//            }
         }
 
         return $res;
@@ -436,14 +436,14 @@ class Compress
     /**
      * Resize image file
      * @param int $fileId
-     * @param string $strFilePath
+     * @param string|null $strFilePath
      * @return bool
      */
-    public function resize(int $fileId, string $strFilePath)
+    public function resize(int $fileId, ?string $strFilePath)
     {
-        if(!static::$enable) return false;
-        if (!$strFilePath) return false;
-        if (!$this->enableImageResize) return false;
+        if (!static::$enable || !$strFilePath || !$this->enableImageResize) {
+            return false;
+        }
 
         $width = Option::get($this->MODULE_ID, 'resize_image_width', '');
         $height = Option::get($this->MODULE_ID, 'resize_image_height', '');
