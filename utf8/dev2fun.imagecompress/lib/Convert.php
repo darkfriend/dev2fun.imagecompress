@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.8
+ * @version 0.11.11
  */
 
 namespace Dev2fun\ImageCompress;
@@ -1347,7 +1347,11 @@ class Convert
      */
     public static function getAbsolutePath(string $path): string
     {
-        return "{$_SERVER["DOCUMENT_ROOT"]}$path";
+        if (strpos($path, $_SERVER["DOCUMENT_ROOT"]) === false) {
+            return "{$_SERVER["DOCUMENT_ROOT"]}$path";
+        }
+
+        return $path;
     }
 
     /**
