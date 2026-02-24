@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.10
+ * @version 0.11.12
  */
 
 namespace Dev2fun\ImageCompress;
@@ -74,15 +74,31 @@ class Jpegoptim
             $path = $this->jpegOptimPath;
         }
         if (self::$isOptim === null || $path !== $this->jpegOptimPath) {
-            if (!\Dev2funImageCompress::checkAvailable("{$path}/jpegoptim")) {
+//            if (!\Dev2funImageCompress::checkAvailable("{$path}/jpegoptim")) {
+//                self::$isOptim = false;
+//                if ($exception) {
+//                    throw new \Exception("{$path}/jpegoptim no readable or executable");
+//                }
+//            } else {
+//                exec("{$path}/jpegoptim --version", $s);
+//                self::$isOptim = (bool)$s;
+//            }
+
+            if (!function_exists('exec')) {
                 self::$isOptim = false;
                 if ($exception) {
-                    throw new \Exception("{$path}/jpegoptim no readable or executable");
+                    throw new \Exception("Function \"exec\" is not available");
                 }
-            } else {
+            }
+
+            if (self::$isOptim === null) {
                 exec("{$path}/jpegoptim --version", $s);
                 self::$isOptim = (bool)$s;
+                if (!self::$isOptim && $exception) {
+                    throw new \Exception("{$path}/jpegoptim is not executable");
+                }
             }
+
         }
         return self::$isOptim;
     }
@@ -145,16 +161,18 @@ class Jpegoptim
             $strCommand .= " -m{$quality}";
         }
 
-        $exif = exif_read_data($strFilePath);
-        if (!empty($exif['Orientation'])) {
-            switch ($exif['Orientation']) {
-                case 3: // Rotate 180 degrees
-                case 6: // Rotate 90 degrees CW
-                case 8: // Rotate 90 degrees CCW
-                    $strCommand .= ' --keep-exif';
-                    break;
-                default:
-                    $strCommand .= ' --strip-exif';
+        if (function_exists('exif_read_data')) {
+            $exif = exif_read_data($strFilePath);
+            if (!empty($exif['Orientation'])) {
+                switch ($exif['Orientation']) {
+                    case 3: // Rotate 180 degrees
+                    case 6: // Rotate 90 degrees CW
+                    case 8: // Rotate 90 degrees CCW
+                        $strCommand .= ' --keep-exif';
+                        break;
+                    default:
+                        $strCommand .= ' --strip-exif';
+                }
             }
         }
 

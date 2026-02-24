@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.8
+ * @version 0.11.12
  */
 
 namespace Dev2fun\ImageCompress;
@@ -89,15 +89,31 @@ class Webp
             $path = $this->path;
         }
         if (self::$isOptim === null || $path !== $this->path) {
-            if (!\Dev2funImageCompress::checkAvailable("{$path}/cwebp")) {
+//            if (!\Dev2funImageCompress::checkAvailable("{$path}/cwebp")) {
+//                self::$isOptim = false;
+//                if ($exception) {
+//                    throw new \Exception("{$path}/cwebp no readable or executable");
+//                }
+//            } else {
+//                exec("{$path}/cwebp -version", $s);
+//                self::$isOptim = (bool)$s;
+//            }
+
+            if (!function_exists('exec')) {
                 self::$isOptim = false;
                 if ($exception) {
-                    throw new \Exception("{$path}/cwebp no readable or executable");
+                    throw new \Exception("Function \"exec\" is not available");
                 }
-            } else {
+            }
+
+            if (self::$isOptim === null) {
                 exec("{$path}/cwebp -version", $s);
                 self::$isOptim = (bool)$s;
+                if (!self::$isOptim && $exception) {
+                    throw new \Exception("{$path}/cwebp no executable");
+                }
             }
+
         }
         return self::$isOptim;
     }

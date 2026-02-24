@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.10
+ * @version 0.11.12
  */
 
 namespace Dev2fun\ImageCompress;
@@ -890,7 +890,7 @@ class Compress
     {
         global $DB;
         $strSql = $this->queryBuilder($arOrder, $arFilter);
-//        if($limit) {
+//        if ($limit) {
 //            $strSql .= ' LIMIT '.$limit;
 //        }
 //

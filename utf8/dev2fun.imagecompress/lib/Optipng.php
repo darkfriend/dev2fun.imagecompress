@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.9
+ * @version 0.11.12
  */
 
 namespace Dev2fun\ImageCompress;
@@ -74,14 +74,29 @@ class Optipng
             $path = $this->pngOptimPath;
         }
         if (self::$isOptim === null || $path !== $this->pngOptimPath) {
-            if (!\Dev2funImageCompress::checkAvailable("{$path}/optipng")) {
+//            if (!\Dev2funImageCompress::checkAvailable("{$path}/optipng")) {
+//                self::$isOptim = false;
+//                if ($exception) {
+//                    throw new \Exception("{$path}/optipng no readable or executable");
+//                }
+//            } else {
+//                exec("{$path}/optipng -v", $s);
+//                self::$isOptim = (bool)$s;
+//            }
+
+            if (!function_exists('exec')) {
                 self::$isOptim = false;
                 if ($exception) {
-                    throw new \Exception("{$path}/optipng no readable or executable");
+                    throw new \Exception("Function \"exec\" is not available");
                 }
-            } else {
+            }
+
+            if (self::$isOptim === null) {
                 exec("{$path}/optipng -v", $s);
                 self::$isOptim = (bool)$s;
+                if (!self::$isOptim && $exception) {
+                    throw new \Exception("{$path}/optipng is not executable");
+                }
             }
         }
         return self::$isOptim;

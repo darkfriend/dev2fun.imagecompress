@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.8
+ * @version 0.11.12
  */
 
 namespace Dev2fun\ImageCompress;
@@ -76,24 +76,51 @@ class Svg
             $pathNodejs = $this->pathNodejs;
         }
         if (self::$isOptim === null || $path !== $this->path || $pathNodejs !== $this->pathNodejs) {
-            if (!\Dev2funImageCompress::checkAvailable("{$pathNodejs}/node")) {
-                if ($exception) {
-                    throw new \Exception("{$pathNodejs}/node no readable or executable");
-                }
+//            if (!\Dev2funImageCompress::checkAvailable("{$pathNodejs}/node")) {
+//                if ($exception) {
+//                    throw new \Exception("{$pathNodejs}/node no readable or executable");
+//                }
+//                self::$isOptim = false;
+//                return self::$isOptim;
+//            }
+
+//            if (!\Dev2funImageCompress::checkAvailable("{$path}/{$this->binaryName}")) {
+//                if ($exception) {
+//                    throw new \Exception("{$path}/{$this->binaryName} no readable or executable");
+//                }
+//                self::$isOptim = false;
+//                return self::$isOptim;
+//            }
+
+//            exec("{$pathNodejs}/node {$path}/{$this->binaryName} -v", $s);
+//            self::$isOptim = (bool)$s;
+
+            if (!function_exists('exec')) {
                 self::$isOptim = false;
-                return self::$isOptim;
+                if ($exception) {
+                    throw new \Exception("Function \"exec\" is not available");
+                }
             }
 
-            if (!\Dev2funImageCompress::checkAvailable("{$path}/{$this->binaryName}")) {
-                if ($exception) {
-                    throw new \Exception("{$path}/{$this->binaryName} no readable or executable");
+            if (self::$isOptim === null) {
+                exec("{$pathNodejs}/node -v", $s);
+                $isOptim = (bool)$s;
+                if (!$isOptim) {
+                    self::$isOptim = false;
+                    if ($exception) {
+                        throw new \Exception("{$pathNodejs}/node no executable");
+                    }
                 }
-                self::$isOptim = false;
-                return self::$isOptim;
             }
 
-            exec("{$pathNodejs}/node {$path}/{$this->binaryName} -v", $s);
-            self::$isOptim = (bool)$s;
+            if (self::$isOptim === null) {
+                exec("{$pathNodejs}/node {$path}/{$this->binaryName} -v", $s);
+                self::$isOptim = (bool)$s;
+                if (!self::$isOptim && $exception) {
+                    throw new \Exception("{$pathNodejs}/node no executable");
+                }
+            }
+
         }
         return self::$isOptim;
     }

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.8
+ * @version 0.11.12
  */
 
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
@@ -199,12 +199,13 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 if(!$algorithmJpeg) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'jpeg']));
                 }
-                if (!\Dev2funImageCompress::checkAvailable("{$pthJpeg}/{$algorithmJpeg}")) {
-                    throw new Exception("{$pthJpeg}/{$algorithmJpeg} no readable or executable");
-                }
-                if (!file_exists("{$pthJpeg}/{$algorithmJpeg}")) {
-                    throw new Exception("path to jpegoptim not found");
-                }
+//                if (!\Dev2funImageCompress::checkAvailable("{$pthJpeg}/{$algorithmJpeg}")) {
+//                    throw new Exception("{$pthJpeg}/{$algorithmJpeg} no readable or executable");
+//                }
+//                if (!file_exists("{$pthJpeg}/{$algorithmJpeg}")) {
+//                    throw new Exception("path to jpegoptim not found");
+//                }
+                Check::isExecAvailable(true);
                 if (!Check::isOptim($algorithmJpeg, $pthJpeg)) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'jpegoptim']));
                 }
@@ -232,12 +233,13 @@ if ($request->isPost() && check_bitrix_sessid()) {
                 if(!$algorithmPng) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => 'png']));
                 }
-                if (!\Dev2funImageCompress::checkAvailable("{$pthPng}/{$algorithmPng}")) {
-                    throw new Exception("{$pthPng}/{$algorithmPng} no readable or executable");
-                }
-                if (!file_exists($pthPng)) {
-                    throw new Exception("path to optipng not found");
-                }
+//                if (!\Dev2funImageCompress::checkAvailable("{$pthPng}/{$algorithmPng}")) {
+//                    throw new Exception("{$pthPng}/{$algorithmPng} no readable or executable");
+//                }
+//                if (!file_exists($pthPng)) {
+//                    throw new Exception("path to optipng not found");
+//                }
+                Check::isExecAvailable(true);
                 if (!Check::isOptim($algorithmPng, $pthPng)) {
                     throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => 'jpegoptim']));
                 }
@@ -309,12 +311,13 @@ if ($request->isPost() && check_bitrix_sessid()) {
                             throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'nodejs']));
                         }
                         $pathNodejs = \rtrim($pathNodejs, '/');
-                        if (!\Dev2funImageCompress::checkAvailable($pathNodejs)) {
-                            throw new Exception("{$pathNodejs} no readable or executable");
-                        }
-                        if (!file_exists($pathNodejs)) {
-                            throw new Exception("path to node.js not found");
-                        }
+//                        if (!\Dev2funImageCompress::checkAvailable($pathNodejs)) {
+//                            throw new Exception("{$pathNodejs} no readable or executable");
+//                        }
+//                        if (!file_exists($pathNodejs)) {
+//                            throw new Exception("path to node.js not found");
+//                        }
+                        Check::isExecAvailable(true);
                         if (!\Dev2fun\ImageCompress\Svg::getInstance()->isOptim($pth, $pathNodejs)) {
                             throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_CHECK_NOFOUND', ['#MODULE#' => "{$saveType}|nodejs"]));
                         }
@@ -328,9 +331,9 @@ if ($request->isPost() && check_bitrix_sessid()) {
                         }
                     }
                 }
-                $updCheckbox['enable_'.$saveType] = $enable === 'Y';
-                $updString['opti_algorithm_'.$saveType] = $algorithm;
-                $updString['path_to_'.$saveType] = $pth;
+                $updCheckbox["enable_{$saveType}"] = $enable === 'Y';
+                $updString["opti_algorithm_{$saveType}"] = $algorithm;
+                $updString["path_to_{$saveType}"] = $pth;
 
                 // advanced settings
                 $advanceSettings = \Dev2fun\ImageCompress\Compress::getAlgInstance($saveType)
