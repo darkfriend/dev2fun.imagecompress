@@ -103,7 +103,7 @@ class Svg
             }
 
             if (self::$isOptim === null) {
-                exec("{$pathNodejs}/node -v", $s);
+                exec(escapeshellcmd($pathNodejs) . "/node -v", $s);
                 $isOptim = (bool)$s;
                 if (!$isOptim) {
                     self::$isOptim = false;
@@ -114,7 +114,7 @@ class Svg
             }
 
             if (self::$isOptim === null) {
-                exec("{$pathNodejs}/node {$path}/{$this->binaryName} -v", $s);
+                exec(escapeshellcmd($pathNodejs) . "/node " . escapeshellcmd("{$path}/{$this->binaryName}") . " -v", $s);
                 self::$isOptim = (bool)$s;
                 if (!self::$isOptim && $exception) {
                     throw new \Exception("{$pathNodejs}/node no executable");
@@ -159,7 +159,7 @@ class Svg
         $strCommand = '';
 
         exec(
-            "{$this->pathNodejs}/node {$this->path}/{$this->binaryName} $strCommand --input=$strFilePath --output=$strFilePath 2>&1",
+            escapeshellcmd($this->pathNodejs) . "/node " . escapeshellcmd("{$this->path}/{$this->binaryName}") . " $strCommand --input=" . escapeshellarg($strFilePath) . " --output=" . escapeshellarg($strFilePath) . " 2>&1",
             $res
         );
 

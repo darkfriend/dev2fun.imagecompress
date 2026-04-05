@@ -187,7 +187,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
             //            $enableJpeg =  $request->getPost('enable_jpeg');
             $algorithmJpeg = $_POST['common_options']['opti_algorithm_jpeg'] ?? '';
             //            $algorithmJpeg = $request->getPost('opti_algorithm_jpeg');
-            $pthJpeg = htmlspecialchars($_POST['common_options']['path_to_jpegoptim'] ?? '');
+            $pthJpeg = htmlspecialcharsEx($_POST['common_options']['path_to_jpegoptim'] ?? '');
             //            $pthJpeg = $request->getPost('path_to_jpegoptim');
             if ($pthJpeg) {
                 $pthJpeg = rtrim($pthJpeg, '/');
@@ -222,7 +222,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
 
             $enablePng = $_POST['common_options']['enable_png'] ?? 'N';
             $algorithmPng = $_POST['common_options']['opti_algorithm_png'] ?? '';
-            $pthPng = htmlspecialchars($_POST['common_options']['path_to_optipng'] ?? '');
+            $pthPng = htmlspecialcharsEx($_POST['common_options']['path_to_optipng'] ?? '');
             if ($pthPng) {
                 $pthPng = rtrim($pthPng, '/');
             }
@@ -255,7 +255,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
             //            $ps2pdf = $request->getPost('path_to_ps2pdf');
 
             $enablePdf = $_POST['common_options']['enable_pdf'] ?? 'N';
-            $ps2pdf = htmlspecialchars($_POST['common_options']['path_to_ps2pdf'] ?? '');
+            $ps2pdf = htmlspecialcharsEx($_POST['common_options']['path_to_ps2pdf'] ?? '');
             if ($ps2pdf) {
                 $ps2pdf = \rtrim($ps2pdf, '/');
             }
@@ -292,7 +292,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
 
                 $enable = $_POST['common_options']["enable_{$saveType}"] ?? 'N';
                 $algorithm = $_POST['common_options']["opti_algorithm_{$saveType}"] ?? '';
-                $pth = htmlspecialchars($_POST['common_options']["path_to_{$saveType}"] ?? '/usr/bin');
+                $pth = htmlspecialcharsEx($_POST['common_options']["path_to_{$saveType}"] ?? '/usr/bin');
                 //                $algorithm = $request->getPost('opti_algorithm_'.$saveType);
                 //                $pth = $request->getPost('path_to_'.$saveType, '/usr/bin');
                 if ($pth) {
@@ -306,7 +306,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
                         throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ALGORITHM_NOT_CHOICE', ['#MODULE#' => $saveType]));
                     }
                     if ($saveType === 'svg') {
-                        $pathNodejs = htmlspecialchars($_POST['common_options']["path_to_node"] ?? '/usr/bin');
+                        $pathNodejs = htmlspecialcharsEx($_POST['common_options']["path_to_node"] ?? '/usr/bin');
                         if (!$pathNodejs) {
                             throw new Exception(Loc::getMessage('D2F_IMAGECOMPRESS_ERROR_NO_PATH_TO', ['#MODULE#' => 'nodejs']));
                         }
@@ -491,7 +491,7 @@ if ($request->isPost() && check_bitrix_sessid()) {
 
                 $updString['convert_algorithm'] = $_POST['options'][$arSite['ID']]['convert_algorithm'] ?? 'phpWebp';
                 $updString['convert_quality'] = $_POST['options'][$arSite['ID']]['convert_quality'] ?? '80';
-                $updString['path_to_cwebp'] = htmlspecialchars($_POST['options'][$arSite['ID']]['path_to_cwebp'] ?? '/usr/bin');
+                $updString['path_to_cwebp'] = htmlspecialcharsEx($_POST['options'][$arSite['ID']]['path_to_cwebp'] ?? '/usr/bin');
 
                 if ($updString['path_to_cwebp']) {
                     $updString['path_to_cwebp'] = \rtrim($updString['path_to_cwebp'], '/');

@@ -107,7 +107,7 @@ class Webp
             }
 
             if (self::$isOptim === null) {
-                exec("{$path}/cwebp -version", $s);
+                exec(escapeshellcmd($path) . "/cwebp -version", $s);
                 self::$isOptim = (bool)$s;
                 if (!self::$isOptim && $exception) {
                     throw new \Exception("{$path}/cwebp no executable");
@@ -227,7 +227,10 @@ class Webp
         );
         $event->send();
 
-        \exec("{$this->path}/cwebp $strCommand '{$src}' -o '{$absSrcWebp}' 2>&1", $res);
+        \exec(
+            escapeshellcmd($this->path) . "/cwebp $strCommand " . escapeshellarg($src) . " -o " . escapeshellarg($absSrcWebp) . " 2>&1",
+            $res
+        );
         if (!empty($params['changeChmod'])) {
             @\chmod($absSrcWebp, $params['changeChmod']);
         }

@@ -80,7 +80,7 @@ class Gif
             }
 
             if (self::$isOptim === null) {
-                exec("{$path}/gifsicle --version", $s);
+                exec(escapeshellcmd($path) . "/gifsicle --version", $s);
                 self::$isOptim = (bool)$s;
                 if (!self::$isOptim && $exception) {
                     throw new \Exception("{$path}/gifsicle no executable");
@@ -131,7 +131,7 @@ class Gif
             $strCommand .= "-O{$params['compression']} ";
         }
 
-        exec($this->path . "/gifsicle $strCommand $strFilePath -o $strFilePath 2>&1", $res);
+        exec(escapeshellcmd($this->path) . "/gifsicle $strCommand " . escapeshellarg($strFilePath) . " -o " . escapeshellarg($strFilePath) . " 2>&1", $res);
 
         if (!empty($params['changeChmod'])) {
             chmod($strFilePath, $params['changeChmod']);
