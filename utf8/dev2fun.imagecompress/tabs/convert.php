@@ -290,6 +290,34 @@ $headerAccept = Option::get($curModuleName, "header_accept", 'N');
                 }
                 ?>
             />
+            <?=ShowJSHint("Если включено, то при удалении всего кэша (через стандартный механизм очистки кэша), удаляются и все webp/avif версии картинок, которые были ресайзнуты.")?>
+        </p>
+    </td>
+</tr>
+
+<tr class="convert__cache_clear_all">
+    <td width="40%">
+        <label for="cache_clear_find_images">
+            <?= Loc::getMessage("D2F_COMPRESS_CACHE_CLEAR_FIND_IMAGES") ?>:
+        </label>
+    </td>
+    <td width="60%">
+        <p>
+            <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_CACHE_CLEAR_BTN") ?>" onclick="cacheClearFindImages();"/>
+            <?=ShowJSHint("Очищается кэш отвечающий за поиск картинок на страницах сайта. Тем самым если у вас появились новые картинки, но их нет в обработке, то эта кнопка вам поможет.")?>
+        </p>
+    </td>
+</tr>
+<tr class="convert__cache_clear_all">
+    <td width="40%">
+        <label for="cache_clear_get_images">
+            <?= Loc::getMessage("D2F_COMPRESS_CACHE_CLEAR_GET_IMAGES") ?>:
+        </label>
+    </td>
+    <td width="60%">
+        <p>
+            <input type="button" value="<?= Loc::getMessage("D2F_COMPRESS_CACHE_CLEAR_BTN") ?>" onclick="cacheClearGetImages();"/>
+            <?=ShowJSHint("Очищается кэш отвечающий за замену картинок на страницах сайта. Тем самым если у вас есть сконвертированные webp/avif версии, но они не выводятся на сайте, то эта кнопка вам поможет.")?>
         </p>
     </td>
 </tr>

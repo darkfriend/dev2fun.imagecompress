@@ -121,6 +121,38 @@ if ($request->isPost() && check_bitrix_sessid()) {
             'success' => $res,
         ]);
         die();
+    } else if (isset($_POST['action']) && $_POST['action'] === 'cache-clear-find-images') {
+        $msg = '';
+        try {
+            \Dev2fun\ImageCompress\Cache::deleteCacheByDir('find-images');
+            $res = true;
+        } catch (Exception $e) {
+            $res = false;
+            $msg = mb_strtoupper($e->getMessage());
+            $msg = Loc::getMessage("D2F_COMPRESS_ERROR_CACHE_{$msg}");
+        }
+        $APPLICATION->RestartBuffer();
+        echo json_encode([
+            'success' => $res,
+            'msg' => $msg,
+        ]);
+        die();
+    } else if (isset($_POST['action']) && $_POST['action'] === 'cache-clear-get-images') {
+        $msg = '';
+        try {
+            \Dev2fun\ImageCompress\Cache::deleteCacheByDir('get-images');
+            $res = true;
+        } catch (Exception $e) {
+            $res = false;
+            $msg = mb_strtoupper($e->getMessage());
+            $msg = Loc::getMessage("D2F_COMPRESS_ERROR_CACHE_{$msg}");
+        }
+        $APPLICATION->RestartBuffer();
+        echo json_encode([
+            'success' => $res,
+            'msg' => $msg,
+        ]);
+        die();
     } else if (isset($_POST['action']) && $_POST['action'] === 'compress-agent') {
         $cacheDeletedAgentActive = ($_POST['active'] ?? 'N') === 'Y';
         if ($cacheDeletedAgentActive) {

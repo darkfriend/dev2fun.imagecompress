@@ -207,3 +207,10 @@ $MESS['D2F_COMPRESS_OPTIONS_CACHE_CLEAR_ALL_SUCCESS'] = "Кэш сконверт
 $MESS['D2F_COMPRESS_CACHE_CLEAR_ALL_LABEL'] = "Очистка resize_cache";
 $MESS['D2F_COMPRESS_CACHE_CLEAR_ALL_BTN'] = "Запустить очистку resize_cache";
 $MESS['D2F_COMPRESS_ENABLE_CLEAR_CACHE_LABEL'] = "Включить автоочистку resize_cache при полном сбросе кэша";
+
+$MESS['D2F_COMPRESS_CACHE_CLEAR_FIND_IMAGES'] = "Удалить cache поиска картинок";
+$MESS['D2F_COMPRESS_CACHE_CLEAR_GET_IMAGES'] = "Удалить cache подмены картинок";
+$MESS['D2F_COMPRESS_CACHE_CLEAR_GET_IMAGES_TITLE'] = "Удалить cache подмены webp/avif картинок";
+$MESS['D2F_COMPRESS_CACHE_CLEAR_BTN'] = "Очистить";
+
+$MESS['D2F_COMPRESS_ERROR_CACHE_ENGINE_IS_NOT_FILES'] = "Очистка работает только при файловом кэшировании";
