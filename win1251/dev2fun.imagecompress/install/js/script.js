@@ -283,3 +283,69 @@ document.addEventListener('DOMContentLoaded', function(){
     //     });
     // }
 });
+
+if (typeof cacheClearFindImages === "undefined") {
+    function cacheClearFindImages() {
+        let objRequest = {
+            AJAX_MODE : 'Y',
+            AJAX_IC : 'Y',
+            action : 'cache-clear-find-images',
+            sessid: BX.bitrix_sessid()
+        };
+        BX.showWait();
+        BX.ajax({
+            url: window.location.href,
+            data : objRequest,
+            method : 'POST',
+            timeout : 600,
+            dataType: 'json',
+            cache: false,
+            onsuccess: function(data) {
+                BX.closeWait();
+                if (!data.success) {
+                    alert('Successful!');
+                } else {
+                    alert(data.msg);
+                }
+            },
+            onfailure: function(err){
+                BX.closeWait();
+                console.log(err);
+                alert('Error!');
+            }
+        });
+    }
+}
+
+if (typeof cacheClearGetImages === "undefined") {
+    function cacheClearGetImages() {
+        let objRequest = {
+            AJAX_MODE : 'Y',
+            AJAX_IC : 'Y',
+            action : 'cache-clear-get-images',
+            sessid: BX.bitrix_sessid()
+        };
+        BX.showWait();
+        BX.ajax({
+            url: window.location.href,
+            data : objRequest,
+            method : 'POST',
+            timeout : 600,
+            dataType: 'json',
+            cache: false,
+            onsuccess: function(data) {
+                BX.closeWait();
+                if (!data.success) {
+                    alert('Successful!');
+                } else {
+                    alert(data.msg);
+                }
+            },
+            onfailure: function(err){
+                BX.closeWait();
+                console.log(err);
+                alert('Error!');
+            }
+        });
+    }
+}

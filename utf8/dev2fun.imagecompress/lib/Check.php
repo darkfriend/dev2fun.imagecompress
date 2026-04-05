@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.7.0
+ * @version 0.11.13
  */
 
 namespace Dev2fun\ImageCompress;
@@ -229,5 +229,20 @@ class Check
 //        }
 //        return $obj;
         //return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
+    }
+
+    /**
+     * @param bool $exception
+     * @return bool
+     * @throws \Exception
+     */
+    public static function isExecAvailable(bool $exception = false): bool
+    {
+        $result = function_exists('exec');
+        if (!$result && $exception) {
+            throw new \Exception("Function \"exec\" is not available");
+        }
+
+        return $result;
     }
 }
