@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.4
+ * @version 0.11.13
  * @since 0.9.0
  */
 
@@ -146,5 +146,24 @@ class Cache
     public static function getAgentActiveValue(): string
     {
         return self::getAgent()['ACTIVE'] ?? 'N';
+    }
+
+    /**
+     * Очищает папку с кэшем
+     * @param string $dir
+     * @return void
+     * @throws \Exception
+     */
+    public static function deleteCacheByDir(string $dir): void
+    {
+        if (self::getCacheEngine() !== 'cacheenginefiles') {
+            throw new \Exception('engine_is_not_files');
+        }
+
+        $moduleId = \Dev2funImageCompress::MODULE_ID;
+        $absPath = $_SERVER['DOCUMENT_ROOT'] . BX_ROOT . "/cache/{$moduleId}/$dir";
+        if (is_dir($absPath)) {
+            \Bitrix\Main\IO\Directory::deleteDirectory($absPath);
+        }
     }
 }

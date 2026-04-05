@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.12
+ * @version 0.11.13
  */
 
 namespace Dev2fun\ImageCompress;
@@ -96,7 +96,7 @@ class Ps2Pdf
             }
 
             if (self::$isOptim === null) {
-                \exec($path . '/gs -v', $s);
+                \exec(escapeshellcmd($path) . '/gs -v', $s);
                 self::$isOptim = (bool)$s;
                 if (!self::$isOptim && $exception) {
                     throw new \Exception("{$path}/gs is not executable");
@@ -143,7 +143,7 @@ class Ps2Pdf
         $strFilePathNew = $strFilePath.'.pdf';
         $strCommand = "-sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/{$params['pdfSetting']} -dNOPAUSE -dQUIET -dBATCH";
 
-        \exec($this->path . "/gs {$strCommand} -sOutputFile='{$strFilePathNew}' '{$strFilePath}' 2>&1", $res);
+        \exec(escapeshellcmd($this->path) . "/gs {$strCommand} -sOutputFile=" . escapeshellarg($strFilePathNew) . " " . escapeshellarg($strFilePath) . " 2>&1", $res);
 //        exec($this->path . "/ps2pdf $strCommand $strFilePath $strFilePathNew 2>&1", $res);
 
         if(\file_exists($strFilePathNew)) {

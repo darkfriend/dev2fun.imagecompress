@@ -302,7 +302,7 @@ if (typeof cacheClearFindImages === "undefined") {
             cache: false,
             onsuccess: function(data) {
                 BX.closeWait();
-                if (!data.success) {
+                if (data.success) {
                     alert('Successful!');
                 } else {
                     alert(data.msg);
@@ -335,7 +335,7 @@ if (typeof cacheClearGetImages === "undefined") {
             cache: false,
             onsuccess: function(data) {
                 BX.closeWait();
-                if (!data.success) {
+                if (data.success) {
                     alert('Successful!');
                 } else {
                     alert(data.msg);

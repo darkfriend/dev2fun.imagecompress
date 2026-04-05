@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.12
+ * @version 0.11.13
  */
 
 namespace Dev2fun\ImageCompress;
@@ -92,7 +92,7 @@ class Optipng
             }
 
             if (self::$isOptim === null) {
-                exec("{$path}/optipng -v", $s);
+                exec(escapeshellcmd($path) . "/optipng -v", $s);
                 self::$isOptim = (bool)$s;
                 if (!self::$isOptim && $exception) {
                     throw new \Exception("{$path}/optipng is not executable");
@@ -150,8 +150,8 @@ class Optipng
         );
         $event->send();
 
-        exec($this->pngOptimPath . "/optipng -v", $out);
-        $execString = "-preserve -strip all -o{$quality} '$strFilePath' 2>&1";
+        exec(escapeshellcmd($this->pngOptimPath) . "/optipng -v", $out);
+        $execString = "-preserve -strip all -o{$quality} " . escapeshellarg($strFilePath) . " 2>&1";
 
         if (!empty($out[0])) {
             if (preg_match('#optipng.(.*?)\:#i', $out[0], $vMatch)) {
@@ -159,13 +159,13 @@ class Optipng
                 if (preg_match('#(\d+)#', $vMatch, $vMatchResult)) {
                     $vMatchResult = (int)($vMatchResult[1] ?? 0);
                     if ($vMatchResult && $vMatchResult < 70) {
-                        $execString = "-preserve -o{$quality} '$strFilePath' 2>&1";
+                        $execString = "-preserve -o{$quality} " . escapeshellarg($strFilePath) . " 2>&1";
                     }
                 }
             }
         }
 
-        exec($this->pngOptimPath . "/optipng {$execString}", $res);
+        exec(escapeshellcmd($this->pngOptimPath) . "/optipng {$execString}", $res);
 
 //        if (!empty($params['changeChmod'])) {
 //            chmod($strFilePath, $params['changeChmod']);
