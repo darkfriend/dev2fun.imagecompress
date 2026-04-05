@@ -169,7 +169,7 @@ class Convert
         }
 
         return $obj;
-//        return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
+        //        return self::$optiClasses[$algorithm]::getInstance(); // PHP7+
     }
 
     /**
@@ -210,7 +210,7 @@ class Convert
         if (!in_array('#(\/bitrix\/(?!services\/main\/ajax\.php).*)#', $pages)) {
             array_unshift(
                 $pages,
-//                '#(\/bitrix\/.*)#',
+                //                '#(\/bitrix\/.*)#',
                 '#(\/bitrix\/(?!services\/main\/ajax\.php).*)#'
             );
         }
@@ -473,12 +473,12 @@ class Convert
             return false;
         }
 
-//        if ($file) {
-//            $fileScheme = \parse_url($file, \PHP_URL_SCHEME);
-//            if($fileScheme==='data') {
-//                return null;
-//            }
-//        }
+        //        if ($file) {
+        //            $fileScheme = \parse_url($file, \PHP_URL_SCHEME);
+        //            if($fileScheme==='data') {
+        //                return null;
+        //            }
+        //        }
 
         $event = new \Bitrix\Main\Event($this->MODULE_ID, "OnBeforePostConvertImage", [&$file]);
         $event->send();
@@ -492,9 +492,9 @@ class Convert
             return null;
         }
 
-//        if (!preg_match('#^[\w\-. ]+$#', $file)) {
-//            $file = urldecode($file);
-//        }
+        //        if (!preg_match('#^[\w\-. ]+$#', $file)) {
+        //            $file = urldecode($file);
+        //        }
         $file = urldecode($file);
 
         $absFile = "{$_SERVER["DOCUMENT_ROOT"]}{$file}";
@@ -679,8 +679,8 @@ class Convert
         if ($res) {
             \chmod($destinationFile, 0777);
             \copy($destinationFile, $strFilePath);
-//            Compress::getInstance()->saveWidthHeight($fileId, $strFilePath);
-//            unlink($destinationFile);
+            //            Compress::getInstance()->saveWidthHeight($fileId, $strFilePath);
+            //            unlink($destinationFile);
         }
         return $res;
     }
@@ -744,7 +744,7 @@ class Convert
             return $content;
         }
 
-//        $curUri = $APPLICATION->GetCurUri();
+        //        $curUri = $APPLICATION->GetCurUri();
         $curUri = $APPLICATION->GetCurPage();
         $userGroups = 'guest';
         $includeUserGroups = self::getInstance()->cacheIncludeUserGroups;
@@ -769,11 +769,11 @@ class Convert
                 $arFiles = [];
 
                 // новая обработка на будущее
-//                \preg_match_all('/([^"\']+\.(?:jpe?g|png))/mi', $content, $matchInlineImages);
-//                var_dump($matchInlineImages);
-//                if (!empty($matchInlineImages[1])) {
-//                    $arFiles = $matchInlineImages[1];
-//                }
+                //                \preg_match_all('/([^"\']+\.(?:jpe?g|png))/mi', $content, $matchInlineImages);
+                //                var_dump($matchInlineImages);
+                //                if (!empty($matchInlineImages[1])) {
+                //                    $arFiles = $matchInlineImages[1];
+                //                }
 
                 \preg_match_all('/([^"\'=\s]+\.(?:jpe?g|png))/mi', $content, $matchInlineImages);
                 if(!empty($matchInlineImages[1])) {
@@ -825,7 +825,7 @@ class Convert
             $cacheId = implode('|',$cacheId);
             LazyConvert::cache(
                 self::getInstance()->cacheTimeFindImages,
-                    $cacheId,
+                $cacheId,
                 '/find-images',
                 function () use ($arFiles) {
                     $currentFiles = LazyConvert::findFiles($arFiles);
@@ -843,12 +843,12 @@ class Convert
 
                         if (empty($currentFiles[$md5])) {
                             $rows[] = [
-//                                'SITE_ID' => Dev2funImageCompress::getSiteId(),
+                                //                                'SITE_ID' => Dev2funImageCompress::getSiteId(),
                                 'IMAGE_PATH' => $file,
                                 'IMAGE_HASH' => $md5,
-//                                'DATE_CREATE' => new SqlExpression("NOW()"),
+                                //                                'DATE_CREATE' => new SqlExpression("NOW()"),
                                 'IMAGE_IGNORE' => 'N',
-//                            'IMAGE_PROCESSED' => 'N',
+                                //                            'IMAGE_PROCESSED' => 'N',
                             ];
                         }
                     }
@@ -879,7 +879,7 @@ class Convert
                 '/get-images',
                 function () use ($arFiles) {
                     $filter = [
-//                        'IMAGE_PROCESSED' => 'Y',
+                        //                        'IMAGE_PROCESSED' => 'Y',
                         '=Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_PROCESSED' => 'Y',
                         '=Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_TYPE' => self::getInstance()->getImageTypeByAlgorithm(
                             self::getInstance()->algorithm
@@ -906,12 +906,12 @@ class Convert
                             $arFilesHash[$hash][] = $file;
                         }
 
-//                        $imagesHash[] = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
-//                        $rows[] = [
-//                            'SITE_ID' => Dev2funImageCompress::getSiteId(),
-//                            'IMAGE_PATH' => $file,
-//                            'IMAGE_HASH' => md5_file($_SERVER['DOCUMENT_ROOT'].$file),
-//                        ];
+                        //                        $imagesHash[] = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
+                        //                        $rows[] = [
+                        //                            'SITE_ID' => Dev2funImageCompress::getSiteId(),
+                        //                            'IMAGE_PATH' => $file,
+                        //                            'IMAGE_HASH' => md5_file($_SERVER['DOCUMENT_ROOT'].$file),
+                        //                        ];
                     }
 
                     if (!$imagesHash) {
@@ -921,28 +921,28 @@ class Convert
                         '=IMAGE_HASH' => array_unique($imagesHash),
                     ];
                     $images = ImageCompressImagesTable::getList([
-                            'select' => [
-                                '*',
-                                'CONVERTED_IMAGE_PATH' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.IMAGE_PATH',
-                                'CONVERTED_IMAGE_ID' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.ID',
-                                'CONVERTED_IMAGE_HASH' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.ORIGINAL_IMAGE_HASH',
-                                'IMAGE_TYPE' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.IMAGE_TYPE',
-//                                'IMAGE_PROCESSED' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_PROCESSED',
-//                                'REF_WEBP_' => 'WEBP_IMAGE',
-//                                'WEBP_' => 'WEBP_PATH',
-                            ],
-                            'filter' => $filter,
-                        ])
+                        'select' => [
+                            '*',
+                            'CONVERTED_IMAGE_PATH' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.IMAGE_PATH',
+                            'CONVERTED_IMAGE_ID' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.ID',
+                            'CONVERTED_IMAGE_HASH' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.ORIGINAL_IMAGE_HASH',
+                            'IMAGE_TYPE' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.CONVERTED_IMAGE.IMAGE_TYPE',
+                            //                                'IMAGE_PROCESSED' => 'Dev2fun\ImageCompress\ImageCompressImagesToConvertedTable:IMAGE.IMAGE_PROCESSED',
+                            //                                'REF_WEBP_' => 'WEBP_IMAGE',
+                            //                                'WEBP_' => 'WEBP_PATH',
+                        ],
+                        'filter' => $filter,
+                    ])
                         ->fetchAll();
 
                     $result = [];
                     foreach ($images as $image) {
                         if (
                             empty($arFilesHash[$image['IMAGE_HASH']])
-//                            || (
-//                                !empty($arFilesHash[$image['IMAGE_HASH']])
-//                                && !in_array($image['IMAGE_PATH'], $arFilesHash[$image['IMAGE_HASH']])
-//                            )
+                            //                            || (
+                            //                                !empty($arFilesHash[$image['IMAGE_HASH']])
+                            //                                && !in_array($image['IMAGE_PATH'], $arFilesHash[$image['IMAGE_HASH']])
+                            //                            )
                         ) {
                             continue;
                         }
@@ -1144,7 +1144,6 @@ class Convert
     public static function checkSupportWebpCurrentPath(): bool
     {
         global $APPLICATION;
-//        return !\preg_match('#\/bitrix\/admin\/#', $APPLICATION->GetCurPage());
         return !\preg_match('#(\/bitrix\/(?!services\/main\/ajax\.php).*)#', $APPLICATION->GetCurPage());
     }
 
@@ -1300,7 +1299,7 @@ class Convert
     }
 
     /**
-     * Delete webp picture
+     * Обработчик события на удаление исходной картинки. Удаляет все webp-версии.
      * @param array $arFile
      * @return bool
      * @throws \Exception
@@ -1317,6 +1316,10 @@ class Convert
             ],
         ])->fetch();
 
+        if (!$item) {
+            return true;
+        }
+
         $itemConverted = ImageCompressImagesConvertedTable::getList([
             'filter' => [
                 '=ORIGINAL_IMAGE_HASH' => $item['IMAGE_HASH'],
@@ -1325,15 +1328,12 @@ class Convert
 
         if ($itemConverted) {
             foreach ($itemConverted as $file) {
-                ImageCompressImagesConvertedTable::delete($file['ID']);
                 $convertAbsPath = self::getAbsolutePath($file['IMAGE_PATH']);
-                if (is_file($convertAbsPath)) {
-                    @unlink($convertAbsPath);
-                }
+                self::deleteConvertedImageById($file['ID'], $convertAbsPath);
             }
         }
 
-        if (!empty($item['IMAGE_PATH'])) {
+        if (!empty($item['ID'])) {
             ImageCompressImagesTable::delete($item['ID']);
         }
 
@@ -1362,9 +1362,9 @@ class Convert
      */
     public static function getConvertedPath(string $path = '', string $type = 'webp'): string
     {
-//        $moduleName = Dev2funImageCompress::MODULE_ID;
-//        $uploadDir = Option::get('main', 'upload_dir', 'upload');
-//        $srcWebp = "/{$uploadDir}/{$moduleName}";
+        //        $moduleName = Dev2funImageCompress::MODULE_ID;
+        //        $uploadDir = Option::get('main', 'upload_dir', 'upload');
+        //        $srcWebp = "/{$uploadDir}/{$moduleName}";
         $srcWebp = static::getPath();
         if ($type) {
             $srcWebp .= "/{$type}";
@@ -1501,7 +1501,8 @@ class Convert
     }
 
     /**
-     * Удаляет конвертированную картинку физически и в бд
+     * Удаляет конвертированную картинку физически и в бд.
+     * И удаляет папку, если она пуста
      * @param int|null $id
      * @param string|null $absPathConvertedImage
      * @return void
