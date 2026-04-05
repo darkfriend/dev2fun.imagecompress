@@ -661,7 +661,11 @@ $tabControl->begin();
 
 <form
     method="post"
-    action="<?= \sprintf('%s?mid=%s&lang=%s', $request->getRequestedPage(), \urlencode($mid), LANGUAGE_ID) ?>"
+    action="<?= htmlspecialchars(
+        \sprintf('%s?mid=%s&lang=%s', $request->getRequestedPage(), \urlencode($mid), LANGUAGE_ID),
+        ENT_QUOTES | ENT_SUBSTITUTE,
+        'UTF-8'
+    ) ?>"
 >
     <?php
     echo bitrix_sessid_post();
