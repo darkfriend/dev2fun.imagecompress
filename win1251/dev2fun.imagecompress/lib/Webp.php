@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.13
+ * @version 0.11.14
  */
 
 namespace Dev2fun\ImageCompress;
@@ -107,7 +107,7 @@ class Webp
             }
 
             if (self::$isOptim === null) {
-                exec(escapeshellcmd($path) . "/cwebp -version", $s);
+                exec(escapeshellarg($path) . "/cwebp -version", $s);
                 self::$isOptim = (bool)$s;
                 if (!self::$isOptim && $exception) {
                     throw new \Exception("{$path}/cwebp no executable");
@@ -228,7 +228,7 @@ class Webp
         $event->send();
 
         \exec(
-            escapeshellcmd($this->path) . "/cwebp $strCommand " . escapeshellarg($src) . " -o " . escapeshellarg($absSrcWebp) . " 2>&1",
+            escapeshellarg($this->path) . "/cwebp $strCommand " . escapeshellarg($src) . " -o " . escapeshellarg($absSrcWebp) . " 2>&1",
             $res
         );
         if (!empty($params['changeChmod'])) {

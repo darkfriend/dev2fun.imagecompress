@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.13
+ * @version 0.11.14
  */
 
 namespace Dev2fun\ImageCompress;
@@ -92,7 +92,7 @@ class Optipng
             }
 
             if (self::$isOptim === null) {
-                exec(escapeshellcmd($path) . "/optipng -v", $s);
+                exec(escapeshellarg($path) . "/optipng -v", $s);
                 self::$isOptim = (bool)$s;
                 if (!self::$isOptim && $exception) {
                     throw new \Exception("{$path}/optipng is not executable");
@@ -150,7 +150,7 @@ class Optipng
         );
         $event->send();
 
-        exec(escapeshellcmd($this->pngOptimPath) . "/optipng -v", $out);
+        exec(escapeshellarg($this->pngOptimPath) . "/optipng -v", $out);
         $execString = "-preserve -strip all -o{$quality} " . escapeshellarg($strFilePath) . " 2>&1";
 
         if (!empty($out[0])) {
@@ -165,7 +165,7 @@ class Optipng
             }
         }
 
-        exec(escapeshellcmd($this->pngOptimPath) . "/optipng {$execString}", $res);
+        exec(escapeshellarg($this->pngOptimPath) . "/optipng {$execString}", $res);
 
 //        if (!empty($params['changeChmod'])) {
 //            chmod($strFilePath, $params['changeChmod']);

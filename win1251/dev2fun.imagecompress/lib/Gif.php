@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.13
+ * @version 0.11.14
  */
 
 namespace Dev2fun\ImageCompress;
@@ -80,7 +80,7 @@ class Gif
             }
 
             if (self::$isOptim === null) {
-                exec(escapeshellcmd($path) . "/gifsicle --version", $s);
+                exec(escapeshellarg($path) . "/gifsicle --version", $s);
                 self::$isOptim = (bool)$s;
                 if (!self::$isOptim && $exception) {
                     throw new \Exception("{$path}/gifsicle no executable");
@@ -131,7 +131,7 @@ class Gif
             $strCommand .= "-O{$params['compression']} ";
         }
 
-        exec(escapeshellcmd($this->path) . "/gifsicle $strCommand " . escapeshellarg($strFilePath) . " -o " . escapeshellarg($strFilePath) . " 2>&1", $res);
+        exec(escapeshellarg($this->path) . "/gifsicle $strCommand " . escapeshellarg($strFilePath) . " -o " . escapeshellarg($strFilePath) . " 2>&1", $res);
 
         if (!empty($params['changeChmod'])) {
             chmod($strFilePath, $params['changeChmod']);

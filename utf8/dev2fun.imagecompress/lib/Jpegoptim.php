@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.13
+ * @version 0.11.14
  */
 
 namespace Dev2fun\ImageCompress;
@@ -92,7 +92,7 @@ class Jpegoptim
             }
 
             if (self::$isOptim === null) {
-                exec(escapeshellcmd($path) . "/jpegoptim --version", $s);
+                exec(escapeshellarg($path) . "/jpegoptim --version", $s);
                 self::$isOptim = (bool)$s;
                 if (!self::$isOptim && $exception) {
                     throw new \Exception("{$path}/jpegoptim is not executable");
@@ -177,7 +177,7 @@ class Jpegoptim
         }
 
         exec(
-            escapeshellcmd($this->jpegOptimPath) . "/jpegoptim $strCommand " . escapeshellarg($strFilePath) . " 2>&1",
+            escapeshellarg($this->jpegOptimPath) . "/jpegoptim $strCommand " . escapeshellarg($strFilePath) . " 2>&1",
             $res
         );
 

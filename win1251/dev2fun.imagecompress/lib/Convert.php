@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.13
+ * @version 0.11.14
  */
 
 namespace Dev2fun\ImageCompress;
@@ -748,7 +748,7 @@ class Convert
         $curUri = $APPLICATION->GetCurPage();
         $userGroups = 'guest';
         $includeUserGroups = self::getInstance()->cacheIncludeUserGroups;
-        if ($includeUserGroups && $USER->IsAuthorized()) {
+        if ($includeUserGroups && !empty($USER) && $USER->IsAuthorized()) {
             $userGroups = $USER->GetGroups();
         }
 

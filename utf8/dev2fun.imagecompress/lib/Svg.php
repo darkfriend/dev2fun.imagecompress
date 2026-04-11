@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.13
+ * @version 0.11.14
  */
 
 namespace Dev2fun\ImageCompress;
@@ -103,7 +103,7 @@ class Svg
             }
 
             if (self::$isOptim === null) {
-                exec(escapeshellcmd($pathNodejs) . "/node -v", $s);
+                exec(escapeshellarg($pathNodejs) . "/node -v", $s);
                 $isOptim = (bool)$s;
                 if (!$isOptim) {
                     self::$isOptim = false;
@@ -114,7 +114,7 @@ class Svg
             }
 
             if (self::$isOptim === null) {
-                exec(escapeshellcmd($pathNodejs) . "/node " . escapeshellcmd("{$path}/{$this->binaryName}") . " -v", $s);
+                exec(escapeshellarg($pathNodejs) . "/node " . escapeshellarg("{$path}/{$this->binaryName}") . " -v", $s);
                 self::$isOptim = (bool)$s;
                 if (!self::$isOptim && $exception) {
                     throw new \Exception("{$pathNodejs}/node no executable");
@@ -159,7 +159,7 @@ class Svg
         $strCommand = '';
 
         exec(
-            escapeshellcmd($this->pathNodejs) . "/node " . escapeshellcmd("{$this->path}/{$this->binaryName}") . " $strCommand --input=" . escapeshellarg($strFilePath) . " --output=" . escapeshellarg($strFilePath) . " 2>&1",
+            escapeshellarg($this->pathNodejs) . "/node " . escapeshellarg("{$this->path}/{$this->binaryName}") . " $strCommand --input=" . escapeshellarg($strFilePath) . " --output=" . escapeshellarg($strFilePath) . " 2>&1",
             $res
         );
 
