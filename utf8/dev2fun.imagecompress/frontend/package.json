@@ -1,0 +1,56 @@
+{
+    "name": "dev2fun-imagecompress-frontend",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "engines": {
+        "node": "24.14.1",
+        "npm": "11.11.0"
+    },
+    "scripts": {
+        "dev": "cross-env NODE_ENV=development PROJECT=school DIR=devserver TYPE=stage vite",
+        "build": "cross-env NODE_ENV=production PROJECT=school DIR=server TYPE=prod  vite build",
+        "preview": "vite preview",
+        "typecheck": "vue-tsc --noEmit",
+        "lint": "eslint .",
+        "format": "prettier . --write"
+    },
+    "dependencies": {
+        "vue": "^3.5.13",
+        "axios": "^1.7.9",
+        "cross-env": "^7.0.3",
+        "aos": "^2.3.4",
+        "lodash": "^4.17.21",
+        "vee-validate": "^4.15.1",
+        "@mdi/js": "^7.4.47",
+        "@suadelabs/vue3-multiselect": "^1.0.2",
+        "@tabler/icons-vue": "^3.21.0",
+        "empty-lite": "^2.0.0",
+        "vue-clipboard3": "^2.0.0",
+        "vue-draggable-next": "^2.2.1",
+        "vue-svg-inline-plugin": "^2.2.3",
+        "vue-tabler-icons": "^2.21.0"
+    },
+    "devDependencies": {
+        "vite": "^8.0.8",
+        "@vitejs/plugin-vue": "^6.0.5",
+        "vue-tsc": "^2.1.10",
+        "typescript": "^5.3.3",
+        "@vue/tsconfig": "^0.5.1",
+        "@types/node": "^22.0.0",
+        "@types/lodash": "^4.17.0",
+        "@types/aos": "^3.0.7",
+        "sass": "^1.77.0",
+        "autoprefixer": "^10.4.20",
+        "postcss": "^8.4.49",
+        "postcss-preset-env": "^10.1.1",
+        "tailwindcss": "^3.4.15",
+        "terser": "^5.36.0",
+        "@mdi/font": "^7.4.47",
+        "eslint": "^9.20.0",
+        "eslint-plugin-vue": "^9.31.0",
+        "@vue/eslint-config-typescript": "^14.0.0",
+        "@vue/eslint-config-prettier": "^10.0.0",
+        "prettier": "^3.3.0"
+    }
+}
