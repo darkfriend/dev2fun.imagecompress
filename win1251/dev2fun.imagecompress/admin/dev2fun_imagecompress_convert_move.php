@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.11.0
+ * @version 0.11.14
  */
 require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -59,15 +59,11 @@ function GetDirectorySize($path, $type = 'MB') {
     ];
 }
 
-function GetCountFiles($path)
-{
+function GetCountFiles($path) {
     $count = 0;
     $path = realpath($path);
     if ($path && file_exists($path)) {
         /** @var RecursiveDirectoryIterator $object */
-//        $s = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS));
-//        $c = count($s->get);
-//        var_dump($c);
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)) as $object){
             if ($object->isFile()) {
                 $count++;
@@ -75,23 +71,15 @@ function GetCountFiles($path)
         }
     }
 
-//    var_dump($count);
-
     return $count;
 }
 
-function GetFileNameByConvertFilename(string $dir, string $convertFilename)
-{
-//    var_dump($dir);
-//    var_dump($convertFilename);
+function GetFileNameByConvertFilename(string $dir, string $convertFilename) {
     $path = realpath($dir);
-//    var_dump('$path='.$path);
     if ($path && file_exists($path)) {
         /** @var RecursiveDirectoryIterator $object */
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)) as $object){
             $basename = $object->getBasename(".{$object->getExtension()}");
-//            var_dump("\$basename=$basename");
-//            var_dump($object->isFile());
             if ($object->isFile() && $basename === $convertFilename) {
                 return $object->getPathname();
             }
@@ -101,25 +89,6 @@ function GetFileNameByConvertFilename(string $dir, string $convertFilename)
     return null;
 }
 
-//function getNewPath()
-//{
-//    $moduleName = Dev2funImageCompress::MODULE_ID;
-//    $uploadDir = Option::get('main', 'upload_dir', 'upload');
-//    return "/{$uploadDir}/{$moduleName}";
-//}
-
-//$aTabs = [
-//    [
-//        "DIV" => "main",
-//        "TAB" => Loc::getMessage("SEC_MAIN_TAB"),
-//        "ICON" => "main_user_edit",
-//        "TITLE" => Loc::getMessage("SEC_MAIN_TAB_TITLE"),
-//    ],
-//];
-
-//$tabControl = new CAdminTabControl("tabControl", $aTabs, true, true);
-
-//$bVarsFromForm = false;
 $APPLICATION->SetTitle(Loc::getMessage("DEV2FUN_IMAGECOMPRESS_CONVERT_TITLE"));
 
 $paths = [
@@ -160,15 +129,9 @@ if (
                         'webp' => "{$_SERVER['DOCUMENT_ROOT']}/upload/resize_cache/webp",
                         'avif' => "{$_SERVER['DOCUMENT_ROOT']}/upload/resize_cache/avif",
                     ],
-//                    'currentDirSize' => $oldDirInfo['size'],
-//                    'currentCountFiles' => $oldDirInfo['countFiles'],
                 ];
 
             case "startConvert":
-//                if ($requestBody["action"] === "startConvert") {
-//                    var_dump($requestBody);
-//                    die();
-//                }
                 $cntRows = \Dev2fun\ImageCompress\ImageCompressImagesConvertedTable::query()
                     ->whereLike('IMAGE_PATH', '/upload/resize_cache%')
                     ->queryCountTotal();
@@ -186,22 +149,10 @@ if (
                     $sizes[$key] = GetDirectorySize($path);
                 }
                 $result['body'] = $sizes;
-//                $oldDirInfo = GetDirectorySize("{$_SERVER['DOCUMENT_ROOT']}/upload/resize_cache/webp");
-//                $result['body'] = [
-//                    'currentDirSize' => $oldDirInfo['size'],
-//                    'currentCountFiles' => $oldDirInfo['countFiles'],
-//                ];
                 $result['success'] = true;
                 break;
 
             case "convertMove":
-//                var_dump($requestBody);
-//                die();
-
-//                sleep(10);
-//                $result['body'] = [];
-//                $result['success'] = true;
-//                break;
 
                 $rows = \Dev2fun\ImageCompress\ImageCompressImagesConvertedTable::query()
                     ->setSelect([
@@ -211,9 +162,6 @@ if (
                     ->whereLike('IMAGE_PATH', '/upload/resize_cache%')
                     ->setLimit($requestBody["countPage"] ?? 500)
                     ->fetchAll();
-
-//                var_dump($rows);
-//                die();
 
                 if (!$rows) {
                     $result['msg'] = Loc::getMessage("D2F_IMAGECOMPRESS_CONVERT_MOVE_MSG_SUCCESSFUL");
@@ -242,21 +190,15 @@ if (
                         !is_dir($dirname)
                         && !mkdir($dirname, \BX_DIR_PERMISSIONS, true)
                     ) {
-//                        throw new \Exception("Не смог создать папку {$dirname}");
                         throw new \Exception(
                             Loc::getMessage("D2F_IMAGECOMPRESS_CONVERT_MOVE_ERROR_CREATE_DIR", ['#DIR#' => $dirname])
                         );
                     }
 
-//                    var_dump($absImagePath);
-//                    var_dump($absNewImagePath);
-//                    die();
-
                     if (is_file($absNewImagePath)) {
                         unlink($absImagePath);
                     } else {
                         if (!rename($absImagePath, $absNewImagePath)) {
-//                            $errors[] = "Не смог перенести файл {$absImagePath}";
                             $errors[] = Loc::getMessage("D2F_IMAGECOMPRESS_CONVERT_MOVE_ERROR_MOVE_FILE", ['#FILE#' => $absImagePath]);
                         }
                     }
@@ -454,17 +396,20 @@ if ($cntRows > 0 || $isPathExists) {
         'step2ProgressText' => Loc::getMessage("D2F_IMAGECOMPRESS_CONVERT_MOVE_STEP2_PROGRESS_TEXT"),
         'step2ProgressTextReminder' => Loc::getMessage("D2F_IMAGECOMPRESS_CONVERT_MOVE_STEP2_PROGRESS_TEXT_REMINDER"),
     ];
-    $messages = json_encode($messages, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $messages = json_encode(
+        $messages,
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
+    );
 
     echo <<<HTML
-        <script src="/bitrix/js/dev2fun.imagecompress/vue/js/main.bundle.js?v1&v={$fileUpdateTime}" defer></script>
+        <script type="module" src="/bitrix/js/dev2fun.imagecompress/vue/js/main.bundle.js?v={$fileUpdateTime}"></script>
         <script>
             window.d2fLocalMessages = {$messages};
         </script>
         <div id="dev2fun_imagecompress_convert_move">
             <mover-files></mover-files>
         </div>
-HTML;
+    HTML;
 } else {
     CAdminMessage::ShowMessage([
         "MESSAGE" => Loc::getMessage("D2F_IMAGECOMPRESS_CONVERT_MOVE_SUCCESSFUL_ALL"),
