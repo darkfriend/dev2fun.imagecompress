@@ -133,17 +133,68 @@
 
 ## Поддерживаемые события
 
-|  название события | передаваемые переменные  | описание |
-|---|---|---| 
-| OnBeforeResizeImage | $intFileID - идентификатор файла  | Событие запускается перед началом оптимизации (до поиска файла в базе) |
-| OnBeforeResizeImageJpegoptim | &$strFilePath - путь до файла,<br> &$quality - качество картинки,<br> &$params - дополнительные параметры  | Событие запускается перед началом оптимизации jpeg-картинок |
-| OnBeforeResizeImageOptipng | &$strFilePath - путь до файла,<br> &$quality - степень сжатия картинки,<br> &$params - дополнительные параметры  | Событие запускается перед началом оптимизации png-картинок |
-| OnAfterResizeImage | &$strFilePath - путь до файла | Событие запускается после оптимизации |
-| OnBeforeCheckWebpBrowserSupport | &$supportBrowsers - массив поддерживаемых браузеров | Событие запускается перед проверкой браузера |
-| OnAfterCheckWebpSupport | $result - результат проверки на поддержку webp,<br> обязательно сделайте `return $result;` | Событие запускается после всех проверок на поддержку webp |
-| OnBeforePostConvertImage | &$arFiles - список файлов подлежащих конвертации (только в режиме postConvert)<br>Кэшируется | Событие запускается в режиме postConvert перед началом конвертации |
-| OnBeforePostConvertReplaceImage | &$arFileReplace - список файлов подлежащих замене (только в режиме postConvert)<br>Не кэшируется | Событие запускается в режиме postConvert перед началом замены текущих картинок на webp |
-| OnBeforePostConvertImage | &$file - путь до файла перед началом его конвертации | Событие запускается в режиме postConvert перед началом конвертации файла в webp |
+<table>
+<tr>
+  <th>название события</th>
+  <th>передаваемые переменные</th>
+  <th>описание</th>
+</tr>
+
+<tr>
+    <td>**OnBeforeResizeImage**</td>
+    <td>`$intFileID` - идентификатор файла</td>
+    <td>Событие запускается перед началом оптимизации (до поиска файла в базе)</td>
+</tr>
+
+<tr>
+    <td>**OnBeforeResizeImageJpegoptim**</td>
+    <td>`&$strFilePath` - путь до файла,<br> `&$quality` - качество картинки,<br> `&$params` - дополнительные параметры</td>
+    <td>Событие запускается перед началом оптимизации jpeg-картинок</td>
+</tr>
+
+<tr>
+    <td>**OnBeforeResizeImageOptipng**</td>
+    <td>`&$strFilePath` - путь до файла,<br> `&$quality` - степень сжатия картинки,<br> `&$params` - дополнительные параметры</td>
+    <td>Событие запускается перед началом оптимизации png-картинок</td>
+</tr>
+
+<tr>
+    <td>**OnAfterResizeImage**</td>
+    <td>`&$strFilePath` - путь до файла</td>
+    <td>Событие запускается после оптимизации</td>
+</tr>
+
+<tr>
+    <td>**OnBeforeCheckWebpBrowserSupport**</td>
+    <td>`&$supportBrowsers` - массив поддерживаемых браузеров</td>
+    <td>Событие запускается перед проверкой браузера</td>
+</tr>
+
+<tr>
+    <td>**OnAfterCheckWebpSupport**</td>
+    <td>`$result` - результат проверки на поддержку webp,<br> обязательно сделайте `return $result;`</td>
+    <td>Событие запускается после всех проверок на поддержку webp</td>
+</tr>
+
+<tr>
+    <td>**OnBeforePostConvertImage**</td>
+    <td>`&$arFiles` - список файлов подлежащих конвертации (только в режиме postConvert)<br>Кэшируется</td>
+    <td>Событие запускается в режиме postConvert перед началом конвертации</td>
+</tr>
+
+<tr>
+    <td>**OnBeforePostConvertReplaceImage**</td>
+    <td>`&$arFileReplace` - список файлов подлежащих замене (только в режиме `postConvert`)<br>Не кэшируется</td>
+    <td>Событие запускается в режиме postConvert перед началом замены текущих картинок на webp</td>
+</tr>
+
+<tr>
+    <td>**OnBeforePostConvertImage**</td>
+    <td>`&$file` - путь до файла перед началом его конвертации</td>
+    <td>Событие запускается в режиме postConvert перед началом конвертации файла в webp</td>
+</tr>
+
+</table>
 
 ## Donate
 
