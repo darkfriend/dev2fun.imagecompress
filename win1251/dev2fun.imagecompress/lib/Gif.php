@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.14
+ * @version 0.11.15
  */
 
 namespace Dev2fun\ImageCompress;
@@ -128,10 +128,11 @@ class Gif
 
         $strCommand = '';
         if(!empty($params['compression'])) {
-            $strCommand .= "-O{$params['compression']} ";
+            $compression = (int)$params['compression'];
+            $strCommand .= "-O{$compression} ";
         }
 
-        exec(escapeshellarg($this->path) . "/gifsicle $strCommand " . escapeshellarg($strFilePath) . " -o " . escapeshellarg($strFilePath) . " 2>&1", $res);
+        exec(escapeshellarg("{$this->path}/gifsicle") . " {$strCommand} " . escapeshellarg($strFilePath) . " -o " . escapeshellarg($strFilePath) . " 2>&1", $res);
 
         if (!empty($params['changeChmod'])) {
             chmod($strFilePath, $params['changeChmod']);

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.8.0
+ * @version 0.11.15
  */
 require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -23,9 +23,9 @@ IncludeModuleLangFile(__FILE__);
 
 $canRead = $USER->CanDoOperation('imagecompress_list_read');
 $canWrite = $USER->CanDoOperation('imagecompress_list_write');
-if (!$canRead && !$canWrite)
+if (!$canRead && !$canWrite) {
     $APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
-
+}
 
 $EDITION_RIGHT = $APPLICATION->GetGroupRight($curModuleName);
 if ($EDITION_RIGHT === "D") {
@@ -48,6 +48,10 @@ $APPLICATION->SetTitle(GetMessage("SEC_IMG_COMPRESS_TITLE"));
 
 //require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");
 $recCompress = null;
+$isStateChanging = !empty($_REQUEST["compress"]) || ($_REQUEST["action"] ?? '') === "compress" || !empty($_REQUEST['compress_file_delete']);
+if ($isStateChanging && !check_bitrix_sessid()) {
+    $APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
+}
 if (!empty($_REQUEST["compress"]) && $compress = $_REQUEST["compress"]) {
     if (!is_array($compress)) {
         $compress = [$compress];

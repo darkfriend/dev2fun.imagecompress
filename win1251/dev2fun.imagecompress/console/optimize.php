@@ -2,9 +2,15 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.7.4
+ * @version 0.11.15
  * @copyright dev2fun
  */
+
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    die('CLI only');
+}
+
 set_time_limit(3600);
 $_SERVER['DOCUMENT_ROOT'] = __DIR__ . '/../../../../';
 
@@ -14,7 +20,7 @@ define("NO_KEEP_STATISTIC", true);
 //define("NOT_CHECK_PERMISSIONS", true);
 define("BX_BUFFER_USED", true);
 error_reporting(E_ALL | E_ERROR | E_PARSE);
-ini_set("display_errors", "On");
+ini_set("display_errors", "Off");
 
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php");
 

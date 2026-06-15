@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.14
+ * @version 0.11.15
  */
 
 namespace Dev2fun\ImageCompress;
@@ -150,6 +150,7 @@ class Jpegoptim
         );
         $event->send();
 
+        $quality = (int)$quality;
         $strCommand = '';
         if (!empty($params['progressiveJpeg'])) {
             $strCommand .= '--all-progressive';
@@ -177,7 +178,7 @@ class Jpegoptim
         }
 
         exec(
-            escapeshellarg($this->jpegOptimPath) . "/jpegoptim $strCommand " . escapeshellarg($strFilePath) . " 2>&1",
+            escapeshellarg("{$this->jpegOptimPath}/jpegoptim") . " {$strCommand} " . escapeshellarg($strFilePath) . " 2>&1",
             $res
         );
 

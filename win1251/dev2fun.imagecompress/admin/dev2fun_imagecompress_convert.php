@@ -1,7 +1,7 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.11.5
+ * @version 0.11.15
  */
 require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_before.php");
 
@@ -49,6 +49,13 @@ $APPLICATION->SetTitle(Loc::getMessage("DEV2FUN_IMAGECOMPRESS_CONVERT_TITLE"));
 
 //require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");
 $recCompress = null;
+if (
+    (!empty($_REQUEST["convert"]) || ($_REQUEST["action"] ?? '') === "convert" || ($_REQUEST["action_button"] ?? '') === "delete")
+    && !check_bitrix_sessid()
+) {
+    $APPLICATION->ThrowException(Loc::getMessage('ACCESS_DENIED'));
+    return;
+}
 if (!empty($_REQUEST["convert"]) || ($_REQUEST["action"] ?? '') === "convert") {
 
     if ($_REQUEST["convert"]) {
@@ -234,13 +241,15 @@ if ($rsFiles->getSelectedRowsCount()>0) {
                         } else {
                             $btnText = Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_BTN_ACTION');
                         }
+                        $imagePathSafe = htmlspecialcharsbx($arRec['IMAGE_PATH']);
+                        $idSafe = (int)$arRec['ID'];
                         return "
-                        <button name='convert' value='{$arRec['ID']}' data-image-id='{$arRec['ID']}'>{$btnText}</button>
+                        <button name='convert' value='{$idSafe}' data-image-id='{$idSafe}'>" . htmlspecialcharsbx($btnText) . "</button>
                         <br>
-                        <img style='max-width: 200px; height: auto;' src='{$arRec['IMAGE_PATH']}'>
+                        <img style='max-width: 200px; height: auto;' src='{$imagePathSafe}'>
                     ";
                     } else {
-                        return "<a href=\"{$arRec['IMAGE_PATH']}\" target='_blank'>{$name}</a>";
+                        return "<a href=\"" . htmlspecialcharsbx($arRec['IMAGE_PATH']) . "\" target='_blank'>" . htmlspecialcharsbx($name) . "</a>";
                     }
                 } else {
                     return "<span class='text-error'>" . Loc::getMessage(

@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.14
+ * @version 0.11.15
  */
 
 namespace Dev2fun\ImageCompress;
@@ -150,7 +150,8 @@ class Optipng
         );
         $event->send();
 
-        exec(escapeshellarg($this->pngOptimPath) . "/optipng -v", $out);
+        $quality = (int)$quality;
+        exec(escapeshellarg("{$this->pngOptimPath}/optipng") . " -v", $out);
         $execString = "-preserve -strip all -o{$quality} " . escapeshellarg($strFilePath) . " 2>&1";
 
         if (!empty($out[0])) {
@@ -165,7 +166,7 @@ class Optipng
             }
         }
 
-        exec(escapeshellarg($this->pngOptimPath) . "/optipng {$execString}", $res);
+        exec(escapeshellarg("{$this->pngOptimPath}/optipng") . " {$execString}", $res);
 
 //        if (!empty($params['changeChmod'])) {
 //            chmod($strFilePath, $params['changeChmod']);
@@ -173,7 +174,7 @@ class Optipng
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
-            "OnAfterResizeImage",
+            'OnAfterResizeImage',
             [&$strFilePath]
         );
         $event->send();

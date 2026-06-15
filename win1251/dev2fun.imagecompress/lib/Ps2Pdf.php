@@ -2,7 +2,7 @@
 /**
  * @author darkfriend <hi@darkfriend.ru>
  * @copyright dev2fun
- * @version 0.11.14
+ * @version 0.11.15
  */
 
 namespace Dev2fun\ImageCompress;
@@ -135,15 +135,19 @@ class Ps2Pdf
 
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
-            "OnBeforeResizeImagePs2Pdf",
+            'OnBeforeResizeImagePs2Pdf',
             [&$strFilePath, &$params]
         );
         $event->send();
 
         $strFilePathNew = $strFilePath.'.pdf';
-        $strCommand = "-sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/{$params['pdfSetting']} -dNOPAUSE -dQUIET -dBATCH";
+        $allowedPdfSettings = ['screen', 'ebook', 'printer', 'prepress', 'default'];
+        $pdfSetting = in_array($params['pdfSetting'], $allowedPdfSettings, true)
+            ? $params['pdfSetting']
+            : 'ebook';
+        $strCommand = "-sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/{$pdfSetting} -dNOPAUSE -dQUIET -dBATCH";
 
-        \exec(escapeshellarg($this->path) . "/gs {$strCommand} -sOutputFile=" . escapeshellarg($strFilePathNew) . " " . escapeshellarg($strFilePath) . " 2>&1", $res);
+        \exec(escapeshellarg("{$this->path}/gs") . " {$strCommand} -sOutputFile=" . escapeshellarg($strFilePathNew) . " " . escapeshellarg($strFilePath) . " 2>&1", $res);
 //        exec($this->path . "/ps2pdf $strCommand $strFilePath $strFilePathNew 2>&1", $res);
 
         if(\file_exists($strFilePathNew)) {
@@ -154,12 +158,14 @@ class Ps2Pdf
         if (!empty($params['changeChmod'])) {
             \chmod($strFilePath, $params['changeChmod']);
         }
+
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
-            "OnAfterResize",
+            'OnAfterResize',
             [&$strFilePath]
         );
         $event->send();
+
         return true;
     }
 }

@@ -2,11 +2,16 @@
 <?php
 /**
  * @author darkfriend <hi@darkfriend.ru>
- * @version 0.9.0
+ * @version 0.11.15
  * @since 0.9.0
  * @example /path_to_module/console/cache-delayed-delete.php -l=1000
  * @example /2 * * * * php -f /path_to_module/console/cache-delayed-delete.php -l=1000
  */
+
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    die('CLI only');
+}
 
 set_time_limit(3600);
 $_SERVER['DOCUMENT_ROOT'] = __DIR__ . '/../../../../';
@@ -19,7 +24,7 @@ define("NO_AGENT_STATISTIC", true);
 define("NO_AGENT_CHECK", true);
 define("BX_BUFFER_USED", true);
 error_reporting(E_ALL | E_ERROR | E_PARSE);
-ini_set("display_errors", "On");
+ini_set("display_errors", "Off");
 
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php");
 
