@@ -209,12 +209,14 @@ class Webp
 
         $strCommand = '';
         if(!empty($params['compression']) || $params['compression']===0) {
+            $params['compression'] = (int)$params['compression'];
             $strCommand .= "-m {$params['compression']} ";
         }
         if(!empty($params['multithreading'])) {
             $strCommand .= "-mt ";
         }
         if(!empty($params['quality']) && (int)$params['quality'] !== 100) {
+            $params['quality'] = (int)$params['quality'];
             $strCommand .= "-q {$params['quality']} ";
         } else {
             $strCommand .= '-lossless ';

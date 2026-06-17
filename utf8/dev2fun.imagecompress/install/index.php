@@ -287,9 +287,10 @@ class dev2fun_imagecompress extends CModule
 
     public function installFiles()
     {
-        CopyDirFiles(__DIR__ . "/admin", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/admin", true, true);
-        CopyDirFiles(__DIR__ . "/themes", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/themes", true, true);
-        CopyDirFiles(__DIR__ . "/js/vue", $_SERVER["DOCUMENT_ROOT"] . "/bitrix/js/{$this->MODULE_ID}/vue", true, true);
+        CopyDirFiles(__DIR__ . "/admin",  "{$_SERVER["DOCUMENT_ROOT"]}/bitrix/admin", true, true);
+        CopyDirFiles(__DIR__ . "/themes", "{$_SERVER["DOCUMENT_ROOT"]}/bitrix/themes", true, true);
+        CopyDirFiles(__DIR__ . "/js/vue", "{$_SERVER["DOCUMENT_ROOT"]}/bitrix/js/{$this->MODULE_ID}/vue", true, true);
+        CopyDirFiles(__DIR__ . "/css", "{$_SERVER["DOCUMENT_ROOT"]}/bitrix/css/{$this->MODULE_ID}", true, true);
 
         return true;
     }

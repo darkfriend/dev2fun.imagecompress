@@ -638,11 +638,11 @@ if ($request->isPost() && check_bitrix_sessid()) {
 $tabControl->begin();
 ?>
 
-<link rel="stylesheet" href="https://unpkg.com/blaze@4.0.0-6/scss/dist/components.cards.min.css">
-<link rel="stylesheet" href="https://unpkg.com/blaze@4.0.0-6/scss/dist/objects.grid.min.css">
-<link rel="stylesheet" href="https://unpkg.com/blaze@4.0.0-6/scss/dist/objects.grid.responsive.min.css">
-<link rel="stylesheet" href="https://unpkg.com/blaze@4.0.0-6/scss/dist/objects.containers.min.css">
-<link rel="stylesheet" href="https://unpkg.com/blaze@4.0.0-6/scss/dist/components.tables.min.css">
+<link rel="stylesheet" href="/bitrix/css/<?=\Dev2funImageCompress::MODULE_ID?>/blaze/components.cards.min.css">
+<link rel="stylesheet" href="/bitrix/css/<?=\Dev2funImageCompress::MODULE_ID?>/blaze/objects.grid.min.css">
+<link rel="stylesheet" href="/bitrix/css/<?=\Dev2funImageCompress::MODULE_ID?>/blaze/objects.grid.responsive.min.css">
+<link rel="stylesheet" href="/bitrix/css/<?=\Dev2funImageCompress::MODULE_ID?>/blaze/objects.containers.min.css">
+<link rel="stylesheet" href="/bitrix/css/<?=\Dev2funImageCompress::MODULE_ID?>/blaze/components.tables.min.css">
 
 <script type="text/javascript">
     <?=file_get_contents(__DIR__.'/install/js/script.js');?>

@@ -90,7 +90,7 @@ class Dev2funImageCompress
         if (!$host) {
             $host = $_SERVER['HTTP_HOST'];
         }
-        return $host;
+        return htmlspecialcharsbx($host);
     }
 
     /**
