@@ -84,7 +84,7 @@ class CompressAgent
         $agentId = CAgent::AddAgent(
             self::class . '::agentRun();',
             \Dev2funImageCompress::MODULE_ID,
-            'Y',
+            'N',
             600,
             '',
             'N',

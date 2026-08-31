@@ -28,7 +28,7 @@ class ConvertAgent
         $agentId = CAgent::AddAgent(
             LazyConvert::class . '::agentRun();',
             \Dev2funImageCompress::MODULE_ID,
-            'Y',
+            'N',
             120,
             '',
             'Y',

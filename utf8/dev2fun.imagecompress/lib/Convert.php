@@ -1171,7 +1171,12 @@ class Convert
      */
     public static function checkWebpSupport(): bool
     {
-        if(!static::checkSupportWebpCurrentPath()) {
+        // отключаю проверку браузера при работе в консоле
+        if (PHP_SAPI === 'cli') {
+            return true;
+        }
+
+        if (!static::checkSupportWebpCurrentPath()) {
             return false;
         }
 
