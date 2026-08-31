@@ -499,6 +499,10 @@ class Convert
 
         $absFile = "{$_SERVER["DOCUMENT_ROOT"]}{$file}";
 
+        if (!static::isPathInsideDocumentRoot($absFile)) {
+            return null;
+        }
+
         if(!\is_file($absFile)) {
             return null;
         }
@@ -1287,6 +1291,10 @@ class Convert
             $absFile = $file;
         }
 
+        if (!static::isPathInsideDocumentRoot($absFile)) {
+            return null;
+        }
+
         if(!\is_file($absFile)) {
             return null;
         }
@@ -1343,6 +1351,33 @@ class Convert
         }
 
         return true;
+    }
+
+    /**
+     * Проверяет, что абсолютный путь физически находится внутри DOCUMENT_ROOT
+     * (защита от directory traversal через "../" в путях, извлечённых из содержимого страницы или БД)
+     * @param string $absPath
+     * @return bool
+     */
+    public static function isPathInsideDocumentRoot(string $absPath): bool
+    {
+        $documentRoot = realpath($_SERVER["DOCUMENT_ROOT"]);
+        if (!$documentRoot) {
+            return false;
+        }
+
+        $realPath = realpath($absPath);
+        if ($realPath === false) {
+            // файла ещё не существует (например, целевой путь для записи) -
+            // проверяем по нормализованному, но не разрешённому симлинками пути
+            $realPath = $absPath;
+            if (strpos($realPath, '..') !== false) {
+                return false;
+            }
+        }
+
+        return strpos($realPath, $documentRoot . DIRECTORY_SEPARATOR) === 0
+            || $realPath === $documentRoot;
     }
 
     /**

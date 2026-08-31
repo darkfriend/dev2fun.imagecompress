@@ -1,8 +1,8 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @copyright dev2fun
- * @version 0.11.15
+ * @version 0.11.16
  */
 
 namespace Dev2fun\ImageCompress;
@@ -104,17 +104,6 @@ class Gif
             $this->lastError = 'no_active';
             return false;
         }
-        $strFilePath = strtr(
-            $strFilePath,
-            [
-                ' ' => '\ ',
-                '(' => '\(',
-                ')' => '\)',
-                ']' => '\]',
-                '[' => '\[',
-            ]
-        );
-
         if(empty($params['compression'])) {
             $params['compression'] = Option::get($this->MODULE_ID, 'gif_compress', 2);
         }
@@ -132,7 +121,12 @@ class Gif
             $strCommand .= "-O{$compression} ";
         }
 
-        exec(escapeshellarg("{$this->path}/gifsicle") . " {$strCommand} " . escapeshellarg($strFilePath) . " -o " . escapeshellarg($strFilePath) . " 2>&1", $res);
+        exec(escapeshellarg("{$this->path}/gifsicle") . " {$strCommand} " . escapeshellarg($strFilePath) . " -o " . escapeshellarg($strFilePath) . " 2>&1", $res, $resultCode);
+
+        if ($resultCode !== 0) {
+            $this->lastError = $res ? implode(PHP_EOL, $res) : 'gifsicle_exec_failed';
+            return false;
+        }
 
         if (!empty($params['changeChmod'])) {
             chmod($strFilePath, $params['changeChmod']);

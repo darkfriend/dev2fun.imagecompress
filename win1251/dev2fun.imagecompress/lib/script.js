@@ -1,11 +1,12 @@
 /**
- * @author darkfriend <hi@darkfriend.ru>
- * @version 0.11.5
+ * @author darkfriend <support@dev2fun.com>
+ * @version 0.11.16
  */
 function SendPropcess(step, type) {
     let objRequest = {
         AJAX_IC: 'Y',
         PAGEN_1: step,
+        sessid: (typeof BX !== 'undefined' && BX.bitrix_sessid) ? BX.bitrix_sessid() : (window.D2F_SESSID || ''),
     };
     let wrapId = 'compressAllStatus';
     switch (type) {
@@ -51,6 +52,7 @@ function SearchPictures() {
     let objRequest = {
         AJAX_IC: 'Y',
         action: 'searchPicture',
+        sessid: (typeof BX !== 'undefined' && BX.bitrix_sessid) ? BX.bitrix_sessid() : (window.D2F_SESSID || ''),
     };
     let wrapId = '';
     BX.showWait();

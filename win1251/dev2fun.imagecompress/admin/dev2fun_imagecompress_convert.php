@@ -1,6 +1,6 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @version 0.11.15
  */
 require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_before.php");
@@ -148,7 +148,7 @@ $list->getlAdmin()->AddAdminContextMenu(
                     '#IMAGE_TYPE#' => Convert::getInstance()->getImageTypeByAlgorithm(Convert::getInstance()->algorithm)
                 ]
             ),
-            'LINK' => "{$APPLICATION->GetCurPage()}?convert_all=Y&timehash={$convertSessionHash}",
+            'LINK' => "{$APPLICATION->GetCurPage()}?convert_all=Y&timehash={$convertSessionHash}&sessid=" . bitrix_sessid(),
         ],
         'search_pictures' => [
             'TEXT' => Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_SEARCH_PICTURES_BTN'),

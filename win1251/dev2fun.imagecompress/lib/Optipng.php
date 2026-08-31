@@ -1,8 +1,8 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @copyright dev2fun
- * @version 0.11.15
+ * @version 0.11.16
  */
 
 namespace Dev2fun\ImageCompress;
@@ -132,17 +132,6 @@ class Optipng
             $this->lastError = 'no_active';
             return false;
         }
-        $strFilePath = strtr(
-            $strFilePath,
-            [
-                ' ' => '\ ',
-                '(' => '\(',
-                ')' => '\)',
-                ']' => '\]',
-                '[' => '\[',
-            ]
-        );
-
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
             "OnBeforeResizeImageOptipng",
@@ -166,7 +155,12 @@ class Optipng
             }
         }
 
-        exec(escapeshellarg("{$this->pngOptimPath}/optipng") . " {$execString}", $res);
+        exec(escapeshellarg("{$this->pngOptimPath}/optipng") . " {$execString}", $res, $resultCode);
+
+        if ($resultCode !== 0) {
+            $this->lastError = $res ? implode(PHP_EOL, $res) : 'optipng_exec_failed';
+            return false;
+        }
 
 //        if (!empty($params['changeChmod'])) {
 //            chmod($strFilePath, $params['changeChmod']);

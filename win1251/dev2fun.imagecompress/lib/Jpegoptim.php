@@ -1,8 +1,8 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @copyright dev2fun
- * @version 0.11.15
+ * @version 0.11.16
  */
 
 namespace Dev2fun\ImageCompress;
@@ -132,17 +132,6 @@ class Jpegoptim
             $this->lastError = 'no_active';
             return false;
         }
-        $strFilePath = strtr(
-            $strFilePath,
-            [
-                ' ' => '\ ',
-                '(' => '\(',
-                ')' => '\)',
-                ']' => '\]',
-                '[' => '\[',
-            ]
-        );
-
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
             "OnBeforeResizeImageJpegoptim",
@@ -179,8 +168,14 @@ class Jpegoptim
 
         exec(
             escapeshellarg("{$this->jpegOptimPath}/jpegoptim") . " {$strCommand} " . escapeshellarg($strFilePath) . " 2>&1",
-            $res
+            $res,
+            $resultCode
         );
+
+        if ($resultCode !== 0) {
+            $this->lastError = $res ? implode(PHP_EOL, $res) : 'jpegoptim_exec_failed';
+            return false;
+        }
 
 //        if (!empty($params['changeChmod'])) {
 //            chmod($strFilePath, $params['changeChmod']);

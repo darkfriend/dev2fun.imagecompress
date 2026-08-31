@@ -1,8 +1,8 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @copyright dev2fun
- * @version 0.11.15
+ * @version 0.11.16
  */
 
 namespace Dev2fun\ImageCompress;
@@ -119,16 +119,6 @@ class Ps2Pdf
             $this->lastError = 'no_active';
             return false;
         }
-        $strFilePath = \strtr(
-            $strFilePath,
-            [
-                ' ' => '\ ',
-                '(' => '\(',
-                ')' => '\)',
-                ']' => '\]',
-                '[' => '\[',
-            ]
-        );
         if(!isset($params['pdfSetting'])) {
             $params['pdfSetting'] = $this->pdfSetting;
         }
@@ -147,13 +137,17 @@ class Ps2Pdf
             : 'ebook';
         $strCommand = "-sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/{$pdfSetting} -dNOPAUSE -dQUIET -dBATCH";
 
-        \exec(escapeshellarg("{$this->path}/gs") . " {$strCommand} -sOutputFile=" . escapeshellarg($strFilePathNew) . " " . escapeshellarg($strFilePath) . " 2>&1", $res);
+        \exec(escapeshellarg("{$this->path}/gs") . " {$strCommand} -sOutputFile=" . escapeshellarg($strFilePathNew) . " " . escapeshellarg($strFilePath) . " 2>&1", $res, $resultCode);
 //        exec($this->path . "/ps2pdf $strCommand $strFilePath $strFilePathNew 2>&1", $res);
 
-        if(\file_exists($strFilePathNew)) {
-            \unlink($strFilePath);
-            \rename($strFilePathNew, $strFilePath);
+        if ($resultCode !== 0 || !\file_exists($strFilePathNew)) {
+            $this->lastError = $res ? implode(PHP_EOL, $res) : 'ps2pdf_exec_failed';
+            @\unlink($strFilePathNew);
+            return false;
         }
+
+        \unlink($strFilePath);
+        \rename($strFilePathNew, $strFilePath);
 
         if (!empty($params['changeChmod'])) {
             \chmod($strFilePath, $params['changeChmod']);

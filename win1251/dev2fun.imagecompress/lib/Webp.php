@@ -1,8 +1,8 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @copyright dev2fun
- * @version 0.11.14
+ * @version 0.11.16
  */
 
 namespace Dev2fun\ImageCompress;
@@ -209,12 +209,14 @@ class Webp
 
         $strCommand = '';
         if(!empty($params['compression']) || $params['compression']===0) {
+            $params['compression'] = (int)$params['compression'];
             $strCommand .= "-m {$params['compression']} ";
         }
         if(!empty($params['multithreading'])) {
             $strCommand .= "-mt ";
         }
         if(!empty($params['quality']) && (int)$params['quality'] !== 100) {
+            $params['quality'] = (int)$params['quality'];
             $strCommand .= "-q {$params['quality']} ";
         } else {
             $strCommand .= '-lossless ';
@@ -229,8 +231,16 @@ class Webp
 
         \exec(
             escapeshellarg($this->path) . "/cwebp $strCommand " . escapeshellarg($src) . " -o " . escapeshellarg($absSrcWebp) . " 2>&1",
-            $res
+            $res,
+            $resultCode
         );
+
+        if ($resultCode !== 0 || !@\is_file($absSrcWebp) || @\filesize($absSrcWebp) === 0) {
+            $this->lastError = $res ? implode(PHP_EOL, $res) : 'cwebp_exec_failed';
+            @\unlink($absSrcWebp);
+            return false;
+        }
+
         if (!empty($params['changeChmod'])) {
             @\chmod($absSrcWebp, $params['changeChmod']);
         }

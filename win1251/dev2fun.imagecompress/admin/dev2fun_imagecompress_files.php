@@ -1,6 +1,6 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @version 0.11.15
  */
 require_once($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_admin_before.php");
@@ -151,9 +151,9 @@ $list->SetList(
             if (file_exists($_SERVER['DOCUMENT_ROOT'] . $arFile['SRC'])) {
                 $mimeType = mime_content_type($_SERVER['DOCUMENT_ROOT'] . $arFile['SRC']);
                 if($mimeType==='application/pdf') {
-                    return "<a href=\"{$arFile['SRC']}\" target='_blank'>{$arFile['ORIGINAL_NAME']}</a>";
+                    return "<a href=\"" . htmlspecialcharsbx($arFile['SRC']) . "\" target='_blank'>" . htmlspecialcharsbx($arFile['ORIGINAL_NAME']) . "</a>";
                 } else {
-                    return "<img style='max-width: 200px; height: auto;' src='" . $arFile['SRC'] . "'>";
+                    return "<img style='max-width: 200px; height: auto;' src='" . htmlspecialcharsbx($arFile['SRC']) . "'>";
                 }
             } else {
                 return "<span class='text-error'>" . GetMessage('DEV2FUN_IMAGECOMPRESS_FILE_NOT_FOUND') . "</span>";
