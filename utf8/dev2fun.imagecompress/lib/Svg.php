@@ -138,17 +138,6 @@ class Svg
             $this->lastError = 'no_active';
             return false;
         }
-        $strFilePath = strtr(
-            $strFilePath,
-            [
-                ' ' => '\ ',
-                '(' => '\(',
-                ')' => '\)',
-                ']' => '\]',
-                '[' => '\[',
-            ]
-        );
-
         $event = new \Bitrix\Main\Event(
             $this->MODULE_ID,
             "OnBeforeResizeImageSvg",
@@ -160,8 +149,14 @@ class Svg
 
         exec(
             escapeshellarg($this->pathNodejs) . "/node " . escapeshellarg("{$this->path}/{$this->binaryName}") . " $strCommand --input=" . escapeshellarg($strFilePath) . " --output=" . escapeshellarg($strFilePath) . " 2>&1",
-            $res
+            $res,
+            $resultCode
         );
+
+        if ($resultCode !== 0) {
+            $this->lastError = $res ? implode(PHP_EOL, $res) : 'svgo_exec_failed';
+            return false;
+        }
 
 //        if(file_exists($strFilePathNew)) {
 //            unlink($strFilePath);

@@ -231,8 +231,16 @@ class Webp
 
         \exec(
             escapeshellarg($this->path) . "/cwebp $strCommand " . escapeshellarg($src) . " -o " . escapeshellarg($absSrcWebp) . " 2>&1",
-            $res
+            $res,
+            $resultCode
         );
+
+        if ($resultCode !== 0 || !@\is_file($absSrcWebp) || @\filesize($absSrcWebp) === 0) {
+            $this->lastError = $res ? implode(PHP_EOL, $res) : 'cwebp_exec_failed';
+            @\unlink($absSrcWebp);
+            return false;
+        }
+
         if (!empty($params['changeChmod'])) {
             @\chmod($absSrcWebp, $params['changeChmod']);
         }

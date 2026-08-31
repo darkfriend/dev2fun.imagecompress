@@ -148,7 +148,7 @@ $list->getlAdmin()->AddAdminContextMenu(
                     '#IMAGE_TYPE#' => Convert::getInstance()->getImageTypeByAlgorithm(Convert::getInstance()->algorithm)
                 ]
             ),
-            'LINK' => "{$APPLICATION->GetCurPage()}?convert_all=Y&timehash={$convertSessionHash}",
+            'LINK' => "{$APPLICATION->GetCurPage()}?convert_all=Y&timehash={$convertSessionHash}&sessid=" . bitrix_sessid(),
         ],
         'search_pictures' => [
             'TEXT' => Loc::getMessage('DEV2FUN_IMAGECOMPRESS_CONVERT_SEARCH_PICTURES_BTN'),

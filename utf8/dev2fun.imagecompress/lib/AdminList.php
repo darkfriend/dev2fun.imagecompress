@@ -141,7 +141,7 @@ class AdminList
         }
         $arContext['compress_all'] = [
             'TEXT' => Loc::getMessage('D2F_COMPRESS_BTN_ALL'),
-            'LINK' => '/bitrix/admin/dev2fun_imagecompress_files.php?compress_all=Y',
+            'LINK' => '/bitrix/admin/dev2fun_imagecompress_files.php?compress_all=Y&sessid=' . bitrix_sessid(),
         ];
         $this->lAdmin->AddAdminContextMenu($arContext);
     }
@@ -553,6 +553,7 @@ class AdminList
         }
 
         echo '<script type="text/javascript">';
+            echo 'window.D2F_SESSID = ' . \CUtil::PhpToJSObject(bitrix_sessid()) . ';';
             include_once(__DIR__ . '/script.js');
         echo '</script>';
 
@@ -579,6 +580,26 @@ class AdminList
         global $APPLICATION, $recCompress;
         $navPageCount = 0;
         if (!empty($_REQUEST['compress_all'])) {
+            if (!check_bitrix_sessid()) {
+                if ($_REQUEST['AJAX_IC']) {
+                    $APPLICATION->RestartBuffer();
+                    echo \CUtil::PhpToJSObject([
+                        'html' => '',
+                        'error' => true,
+                        'step' => 0,
+                        'allStep' => 0,
+                        'pageCount' => 0,
+                        'count' => 0,
+                        'progressValue' => 100,
+                    ]);
+                    die();
+                }
+                \CAdminMessage::ShowMessage([
+                    "MESSAGE" => Loc::getMessage('ACCESS_DENIED'),
+                    "TYPE" => "ERROR",
+                ]);
+                return;
+            }
             \CJSCore::Init(['ajax']);
             echo '<div id="compressAllStatus">';
             if ($_REQUEST['AJAX_IC']) {
@@ -697,6 +718,25 @@ class AdminList
         $instance = Convert::getInstance();
         $algImageType = $instance->getImageTypeByAlgorithm($instance->algorithm);
         if (!empty($_REQUEST['convert_all']) && $_REQUEST['convert_all'] === 'Y') {
+            if (!check_bitrix_sessid()) {
+                if ($_REQUEST['AJAX_IC']) {
+                    $APPLICATION->RestartBuffer();
+                    echo \CUtil::PhpToJSObject([
+                        'html' => '',
+                        'error' => true,
+                        'step' => 0,
+                        'allStep' => 0,
+                        'count' => 0,
+                        'progressValue' => 100,
+                    ]);
+                    die();
+                }
+                \CAdminMessage::ShowMessage([
+                    "MESSAGE" => Loc::getMessage('ACCESS_DENIED'),
+                    "TYPE" => "ERROR",
+                ]);
+                return;
+            }
             \CJSCore::Init(['ajax']);
             echo '<div id="convertAllStatus">';
             if ($_REQUEST['AJAX_IC']) {
@@ -877,6 +917,16 @@ class AdminList
 //        $instance = Convert::getInstance();
 //        $algImageType = $instance->getImageTypeByAlgorithm($instance->algorithm);
         if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'searchPicture') {
+            if (!check_bitrix_sessid()) {
+                $APPLICATION->RestartBuffer();
+                echo json_encode([
+                    'success' => false,
+                    'msg' => Loc::getMessage('ACCESS_DENIED'),
+                    'body' => null,
+                ]);
+                die();
+            }
+
             $context = \Bitrix\Main\Context::getCurrent();
             $requestBody = $context->getRequest()->getJsonList()->toArray();
 
