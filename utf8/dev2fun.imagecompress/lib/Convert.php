@@ -841,7 +841,15 @@ class Convert
                         if ($isUrl) {
                             $md5 = md5_file($file);
                         } else {
-                            $absFile = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($file, '/');
+                            $normalizedFile = self::getNormalizePathFile($file);
+                            if ($normalizedFile === null) {
+                                continue;
+                            }
+                            $file = $normalizedFile;
+                            $absFile = self::getAbsolutePath($file);
+                            if (!self::isPathInsideDocumentRoot($absFile)) {
+                                continue;
+                            }
                             $md5 = md5_file($absFile);
                         }
 
@@ -899,9 +907,12 @@ class Convert
                         if ($isUrl) {
                             $hash = md5_file($fileNormalize);
                         } else {
-                            $absFile = $_SERVER['DOCUMENT_ROOT'] . '/' . ltrim($fileNormalize, '/');
-                            if (is_file($absFile)) {
-                                $hash = md5_file($_SERVER['DOCUMENT_ROOT'].$fileNormalize);
+                            $fileNormalize = self::getNormalizePathFile($fileNormalize);
+                            if ($fileNormalize !== null) {
+                                $absFile = self::getAbsolutePath($fileNormalize);
+                                if (self::isPathInsideDocumentRoot($absFile) && is_file($absFile)) {
+                                    $hash = md5_file($absFile);
+                                }
                             }
                         }
 

@@ -78,7 +78,11 @@ if (!empty($_REQUEST["compress"]) && $compress = $_REQUEST["compress"]) {
         }
     }
 } elseif (!empty($_REQUEST['compress_file_delete'])) {
-    CFile::Delete((int)$_REQUEST["compress_file_delete"]);
+    $compressFileDeleteId = (int)$_REQUEST["compress_file_delete"];
+    $rsOwnedFile = \Dev2fun\ImageCompress\ImageCompressTable::getById($compressFileDeleteId);
+    if ($rsOwnedFile->getSelectedRowsCount() > 0) {
+        CFile::Delete($compressFileDeleteId);
+    }
 }
 
 $list = new AdminList($curModuleName);
