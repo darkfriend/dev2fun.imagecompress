@@ -1,7 +1,7 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
- * @version 0.11.13
+ * @author darkfriend <support@dev2fun.com>
+ * @version 0.11.16
  */
 
 namespace Dev2fun\ImageCompress;
@@ -259,7 +259,15 @@ class LazyConvert
             if ($isUrl) {
                 $imagesHash[] = md5_file($file);
             } else {
-                $imagesHash[] = md5_file($_SERVER['DOCUMENT_ROOT'].$file);
+                $normalizedFile = Convert::getNormalizePathFile($file);
+                if ($normalizedFile === null) {
+                    continue;
+                }
+                $absFile = Convert::getAbsolutePath($normalizedFile);
+                if (!Convert::isPathInsideDocumentRoot($absFile) || !is_file($absFile)) {
+                    continue;
+                }
+                $imagesHash[] = md5_file($absFile);
             }
         }
         if (!$imagesHash) {
