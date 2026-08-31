@@ -1,8 +1,8 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @copyright dev2fun
- * @version 0.11.4
+ * @version 0.11.16
  * @since 0.11.4
  */
 
@@ -84,7 +84,7 @@ class CompressAgent
         $agentId = CAgent::AddAgent(
             self::class . '::agentRun();',
             \Dev2funImageCompress::MODULE_ID,
-            'Y',
+            'N',
             600,
             '',
             'N',

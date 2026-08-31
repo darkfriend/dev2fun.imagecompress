@@ -1,8 +1,8 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @copyright dev2fun
- * @version 0.11.13
+ * @version 0.11.16
  * @since 0.9.0
  */
 
@@ -51,7 +51,7 @@ class Cache
         $agentId = CAgent::AddAgent(
             self::class . '::agentRun();',
             \Dev2funImageCompress::MODULE_ID,
-            'Y',
+            'N',
             120,
             '',
             'N',

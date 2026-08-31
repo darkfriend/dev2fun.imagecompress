@@ -1,8 +1,8 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @copyright dev2fun
- * @version 0.11.6
+ * @version 0.11.16
  * @since 0.11.4
  */
 
@@ -28,7 +28,7 @@ class ConvertAgent
         $agentId = CAgent::AddAgent(
             LazyConvert::class . '::agentRun();',
             \Dev2funImageCompress::MODULE_ID,
-            'Y',
+            'N',
             120,
             '',
             'Y',

@@ -1,8 +1,8 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @copyright dev2fun
- * @version 0.11.14
+ * @version 0.11.16
  */
 
 namespace Dev2fun\ImageCompress;
@@ -1171,7 +1171,12 @@ class Convert
      */
     public static function checkWebpSupport(): bool
     {
-        if(!static::checkSupportWebpCurrentPath()) {
+        // отключаю проверку браузера при работе в консоле
+        if (PHP_SAPI === 'cli') {
+            return true;
+        }
+
+        if (!static::checkSupportWebpCurrentPath()) {
             return false;
         }
 
