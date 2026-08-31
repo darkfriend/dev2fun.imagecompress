@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @version 0.11.15
  * @since 0.9.0
  * @example /path_to_module/console/cache-delayed-delete.php -l=1000

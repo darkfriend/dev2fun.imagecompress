@@ -1,6 +1,6 @@
 <?php
 /**
- * User: darkfriend <hi@darkfriend.ru>
+ * User: darkfriend <support@dev2fun.com>
  * Date: 04.05.2017
  */
 $MESS['DEV2FUN_IMAGECOMPRESS_NOT_WRITE_IGAME'] = 'Не смог перезаписать файл';

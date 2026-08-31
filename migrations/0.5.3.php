@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: darkfriend <hi@darkfriend.ru>
+ * User: darkfriend <support@dev2fun.com>
  * Date: 13.10.2020
  * Time: 2:12
  */

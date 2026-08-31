@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @version 0.9.0
  */
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();

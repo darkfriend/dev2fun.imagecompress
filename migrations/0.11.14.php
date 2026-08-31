@@ -1,6 +1,6 @@
 <?php
 /**
- * User: darkfriend <hi@darkfriend.ru>
+ * User: darkfriend <support@dev2fun.com>
  * Date: 12.04.202
  * Time: 21:52
  */

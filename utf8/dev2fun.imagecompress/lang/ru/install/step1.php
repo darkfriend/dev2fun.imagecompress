@@ -2,7 +2,7 @@
 defined('B_PROLOG_INCLUDED') and (B_PROLOG_INCLUDED === true) or die();
 /**
  * Created by PhpStorm.
- * User: darkfriend <hi@darkfriend.ru>
+ * User: darkfriend <support@dev2fun.com>
  * Date: 04.05.2017
  */
 $MESS["D2F_MODULE_IMAGECOMPRESS_STEP1"] = "Проверка системы переустановкой модуля dev2fun.imagecompress";

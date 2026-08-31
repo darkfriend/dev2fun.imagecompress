@@ -1,6 +1,6 @@
 <?php
 /**
- * @author darkfriend <hi@darkfriend.ru>
+ * @author darkfriend <support@dev2fun.com>
  * @copyright dev2fun
  * @version 0.11.5
  * @since 0.11.0
